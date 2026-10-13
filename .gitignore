@@ -41,6 +41,7 @@ logs/
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
 *.swp
 *~
 
@@ -68,3 +69,6 @@ temp/
 
 # Project-specific
 # docs/drafts/       # jika ada folder drafts
+=======
+.env
+>>>>>>> 0c210bbf298ca6d182792f02277086119934d1c2
