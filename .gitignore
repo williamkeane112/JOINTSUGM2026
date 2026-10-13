@@ -41,34 +41,6 @@ logs/
 *.njsproj
 *.sln
 *.sw?
-<<<<<<< HEAD
-*.swp
-*~
-
-# OS files
-Thumbs.db
-.Spotlight-V100
-.Trashes
-
-# Testing
-coverage/
-.nyc_output/
-*.test.js.snap
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Kiro session data (optional — keep session history or not)
-# .kiro/sessions/
-
-# Lock files (pilih salah satu package manager)
-# package-lock.json  # uncomment jika pakai yarn
-# yarn.lock          # uncomment jika pakai npm/pnpm
-
-# Project-specific
-# docs/drafts/       # jika ada folder drafts
-=======
 .env
->>>>>>> 0c210bbf298ca6d182792f02277086119934d1c2
+
+.kiro

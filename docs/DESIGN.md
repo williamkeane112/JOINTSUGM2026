@@ -1409,5 +1409,148 @@ FEEL: Native mobile app quality, thumb-friendly, card-heavy layout, generous tou
 
 ---
 
+## 14. v0.dev Prompt — Dashboard Page (Production Code Generation)
+
+> **Beda dengan §11 (Google Stitch)**: Stitch menghasilkan mockup visual statis, cocok untuk eksplorasi look & feel. **v0.dev menghasilkan kode React + Tailwind nyata** yang akan dipakai/di-adaptasi langsung di `src/page/dashboard/Index.tsx`. Prompt untuk v0 harus berupa **spesifikasi fungsional yang presisi** (token warna literal, struktur komponen, tipe data, copy exact), bukan deskripsi gambar.
+
+### 14.1 Status Implementasi Saat Ini
+
+Dicek langsung dari kode (bukan asumsi):
+
+- `src/page/dashboard/Index.tsx` **masih placeholder** — hanya kartu "Ini Dashboard" + tombol Logout, memakai Tailwind `slate`/`red` default (belum pakai design tokens project).
+- `src/page/auth/Auth.tsx` **sudah production-quality** dan jadi referensi gaya visual: pakai `lucide-react` untuk ikon (`Sparkles`, `Mail`, `LockKeyhole`, `Eye/EyeOff`, `UserRound`, `ArrowRight`), Supabase client dari `src/lib/supabaseClient`, dan hex literal langsung di JSX (`#160820`, `#ff4f87`, dst) — **bukan** CSS var `var(--color-*)` di level komponen (CSS var hanya didefinisikan di `src/index.css` untuk class `.btn-*`/`.card`/`.badge-*`).
+- Routing aktual di `src/App.tsx` baru punya: `/` , `/auth`, `/dashboard`, `/topicSelect`. **Belum ada** route `/knowledge-map`, `/learning`, `/ai-tutor` — jadi prompt di bawah mendesain sidebar nav dengan 2 link aktif (Dashboard, Topik) + 2 placeholder (disabled, badge "Segera") agar kode yang di-generate v0 tidak patah saat ditempel.
+- Tidak ada komponen `Spark` mascot (SVG/Lottie) yang sudah dibuat — prompt di bawah menggunakan ikon `Sparkles` dari lucide-react sebagai representasi Spark sementara (konsisten dengan Auth.tsx), bukan custom illustration yang perlu di-generate v0 (v0 tidak reliable untuk custom character art).
+
+### 14.2 Design Tokens (literal, untuk ditempel ke prompt v0)
+
+v0 tidak bisa membaca `src/index.css`, jadi semua token harus **hex literal** di dalam prompt itu sendiri:
+
+```
+Brand:
+  ink:        #17111F
+  muted:      #766B7F
+  pink:       #FF4F87   (primary)
+  pink-deep:  #E62F72   (primary hover)
+  violet:     #6D36BD   (secondary / XP)
+  cream:      #FFF7F2   (page background)
+  surface:    #FFFFFF   (card background)
+  line:       #EADFE4   (border/divider)
+
+Mastery status (fungsional merah/kuning/hijau, hue dihangatkan):
+  mastered:        #1E9E6B   tint #E3F6EC   ink #136B49   border #BFE8D3
+  in-progress:     #E8A33D   tint #FDF1DE   ink #92591A   border #F3D9A6
+  not-mastered:    #E2544B   tint #FBE6E4   ink #9C2E27   border #F2C0BC
+  locked:          #AFA3AC   tint #F1EDEF   ink #766B7F   border #EADFE4
+
+Gamification:
+  xp:      #6D36BD (= violet)
+  streak:  #F2763C (coral-orange)
+
+Radius: cards/panels 14px, inputs/buttons 13px, pills 9999px
+Shadow card:       0 4px 16px rgba(23,17,31,0.08)
+Shadow card hover: 0 12px 28px rgba(23,17,31,0.14)
+Shadow primary:    0 10px 24px rgba(255,79,135,0.28)
+Font: headings "Plus Jakarta Sans" (letter-spacing -0.03em), body "Inter"
+Icons: lucide-react only (no emoji in actual code — emoji only in copy text)
+```
+
+### 14.3 Full Prompt — Paste Langsung ke v0
+
+```
+Build a React 18 + TypeScript dashboard page component named `DashboardPage` for "SkillPath AI", an adaptive math learning platform for Indonesian middle-school students. Output a single page component plus small sub-components in the same file or adjacent files, using Tailwind CSS utility classes with literal hex values (no shadcn default theme, no CSS variables — use arbitrary value syntax like bg-[#FF4F87]) and `lucide-react` for all icons (no emoji inside JSX icons; emoji only allowed inside text strings).
+
+DESIGN TOKENS (use these exact hex values):
+- Background (page): #FFF7F2
+- Card surface: #FFFFFF, radius 14px, shadow 0 4px 16px rgba(23,17,31,0.08), hover shadow 0 12px 28px rgba(23,17,31,0.14) with translateY(-2px)
+- Primary (pink): #FF4F87, hover #E62F72, button shadow 0 10px 24px rgba(255,79,135,0.28)
+- Secondary/XP (violet): #6D36BD
+- Streak (coral): #F2763C
+- Mastered (green): #1E9E6B, tint bg #E3F6EC, text #136B49, border #BFE8D3
+- In-progress (amber): #E8A33D, tint bg #FDF1DE, text #92591A, border #F3D9A6
+- Not-mastered (red): #E2544B, tint bg #FBE6E4, text #9C2E27, border #F2C0BC
+- Locked (gray-violet): #AFA3AC, tint bg #F1EDEF, text #766B7F, border #EADFE4
+- Border/divider: #EADFE4
+- Text ink: #17111F, muted text: #766B7F
+- Heading font: "Plus Jakarta Sans", body font: "Inter", both loaded via Google Fonts link in head (assume already loaded)
+
+LAYOUT: Desktop-first (1280px container), fully responsive down to 375px mobile. Two-region layout: fixed left sidebar (256px) + scrollable main content. On mobile, sidebar collapses and is replaced by a fixed bottom tab bar with 5 icons.
+
+=== SIDEBAR (desktop only, hidden below lg breakpoint) ===
+- Width 256px, white background, right border 1px #EADFE4, full height, flex column, padding 24px.
+- Top: logo row — a 36px rounded-xl gradient box (from #FF9AB8 to #FF4F87) containing a white `Sparkles` icon, next to bold text "SkillPath AI" (font-display).
+- Nav list below, each item: icon (lucide-react) + label, full width, rounded-[13px], padding 12px 16px, flex row gap 12px:
+  - "Dashboard" — icon `LayoutDashboard`, ACTIVE state: background #FFF0F5, text #E62F72, font-semibold, left border 3px solid #FF4F87
+  - "Topik Belajar" — icon `BookOpen`, links to /topicSelect, default state: text #17111F, hover background #FFF0F5
+  - "Peta Kemampuan" — icon `Map`, DISABLED/placeholder state: text #AFA3AC, cursor not-allowed, with a small pill badge "Segera" (bg #F1EDEF, text #766B7F, text-xs) aligned right
+  - "AI Tutor" — icon `Bot`, same disabled/placeholder style as above with "Segera" badge
+- Bottom of sidebar (mt-auto): divider line, then a row with a 40px circular avatar (initials placeholder "BS" on violet background #6D36BD text white), name "Budi Santoso" (font-semibold text-sm), and below it a small level pill "Level 7" (bg #F3ECFA text #6D36BD text-xs rounded-full px-2 py-0.5).
+
+=== MOBILE BOTTOM NAV (hidden on lg and above, fixed bottom, visible below lg) ===
+- White background, top border 1px #EADFE4, height 64px, 5 equal-width flex items, safe-area padding bottom.
+- Icons: `LayoutDashboard` (active, color #FF4F87, small dot indicator above icon), `Map` (muted #AFA3AC), `BookOpen` (muted, links /topicSelect), `Bot` (muted), `UserRound` (muted).
+
+=== MAIN CONTENT (padding 32px desktop, 16px mobile, max-width 1280px, mx-auto) ===
+
+1. GREETING HEADER (flex row, justify-between, items-start, wrap on mobile):
+   - Left: heading "Selamat pagi, Budi! 👋" (text-2xl md:text-3xl font-display font-bold text-[#17111F]), subtitle below "Kamu sudah belajar 3 hari berturut-turut 🔥" (text-sm text-[#766B7F] mt-1)
+   - Right: two pills side by side, gap 8px: streak pill (bg #FDE9DF text #F2763C, `Flame` icon + "3", rounded-full px-3 py-1.5 text-sm font-semibold) and XP pill (bg #F3ECFA text #6D36BD, `Zap` icon + "1.240 XP", same shape)
+
+2. STATS ROW — 4 equal cards in a `grid grid-cols-2 lg:grid-cols-4 gap-4` (mt-6):
+   Each card: white bg, rounded-[14px], shadow (card shadow token), padding 20px, flex column gap 8px.
+   - Card A "Overall Mastery": a circular SVG progress ring (size 64px, stroke 6px, track color #EADFE4, progress stroke #FF4F87, 68% filled) with "68%" centered in bold text-lg inside the ring; label below ring "Overall Mastery" text-xs text-[#766B7F]
+   - Card B "XP Total": icon `Zap` in a 32px circle bg #F3ECFA text #6D36BD top-left; big number "1.240" text-2xl font-display font-bold text-[#6D36BD]; label "Total XP" text-xs text-[#766B7F]; thin progress bar below (bg #EADFE4 track, #6D36BD fill at 60%) with caption "Level 7 → 8"
+   - Card C "Streak": icon `Flame` in 32px circle bg #FDE9DF text #F2763C; big number "3 Hari" text-2xl font-display font-bold text-[#F2763C]; 7 small dots row below representing last 7 days (filled dots #F2763C for active days, empty outline #EADFE4 for inactive)
+   - Card D "Topik Dikuasai": icon `Trophy` in 32px circle bg #E3F6EC text #1E9E6B; big number "2/5" text-2xl font-display font-bold text-[#1E9E6B]; label "Topik Dikuasai" text-xs text-[#766B7F]
+
+3. MAIN SPLIT — `grid grid-cols-1 lg:grid-cols-3 gap-6` (mt-6):
+   LEFT (lg:col-span-2) — Recommendation card:
+     - Section title "Rekomendasi Untukmu" (text-lg font-display font-bold mb-3)
+     - Card: white bg, rounded-[14px], shadow-card, padding 24px, LEFT BORDER 4px solid #E8A33D (amber, since this topic is in-progress)
+     - Inside: badge-progress pill "In Progress" top-left (bg #FDF1DE text #92591A border #F3D9A6, text-xs rounded-full px-3 py-1 border), topic name "Pecahan" (text-xl font-display font-bold mt-2), a small row with `Sparkles` icon (violet #6D36BD) + italic text "Nilaimu masih 45% — ayo kita tingkatkan! 💡" (text-sm text-[#766B7F])
+     - Mastery bar: track bg #EADFE4 h-2 rounded-full, fill #E8A33D width 45% with transition
+     - Row below bar: "45% dikuasai" (text-xs text-[#766B7F]) left, "~20 menit" with `Clock` icon right
+     - Bottom: full-width button "Mulai Sekarang" with `ArrowRight` icon, bg #FF4F87 text white font-semibold rounded-[13px] py-3, shadow (primary shadow token), hover darkens to #E62F72 and lifts -1px
+
+   RIGHT (lg:col-span-1) — stacked cards:
+     - "Aktivitas Terakhir" card (white, rounded-[14px], shadow-card, padding 20px): title text-sm font-semibold mb-3, then 3 list rows each with a small colored dot (status color), topic name text-sm, time-ago text-xs text-[#766B7F], and a small "+15 XP" badge (bg #F3ECFA text #6D36BD text-xs rounded-full px-2 py-0.5) right-aligned
+     - "Tip dari Spark" card below (bg #F3ECFA, rounded-[14px], padding 16px): `Sparkles` icon in violet circle 32px, text "Istirahat 5 menit setiap 25 menit belajar bisa bikin otakmu lebih fokus! 🧠" text-sm text-[#6D36BD]
+
+4. KNOWLEDGE MAP PREVIEW (mt-8):
+   - Header row: "Peta Kemampuanmu" title (text-lg font-display font-bold) left, "Lihat semua →" link (text-sm text-[#FF4F87] font-semibold, disabled/greyed with cursor-not-allowed since page not built yet) right
+   - Horizontal scroll row on mobile (`flex gap-4 overflow-x-auto`), grid on desktop (`lg:grid lg:grid-cols-5 lg:gap-4`), 5 compact topic cards (min-width 160px each), each: colored left border (4px, matching status), icon (`Calculator`, `Divide`, `Hash`, `Equal`, `BarChart3` respectively) in a 36px tinted circle, topic name text-sm font-semibold truncated, status badge below (mastered/progress/not-mastered/locked styles from tokens), mastery percentage text-xs. The 5th card ("Statistika") is LOCKED: grayscale icon, `Lock` icon overlay, badge-locked style, percentage replaced with "Terkunci" text.
+
+5. ACHIEVEMENTS ROW (mt-8, mb-8 to clear bottom nav on mobile):
+   - Header "Pencapaian Terbaru" (text-lg font-display font-bold mb-3)
+   - `flex gap-4 overflow-x-auto lg:grid lg:grid-cols-4` of 4 achievement cards (white bg, rounded-[14px], shadow-card, padding 16px, text-center, min-width 140px):
+     - 2 unlocked: colored circle icon (64px) top-center using `Trophy`/`Flame`/`Target`/`BookOpenCheck`, bold title below, small muted description
+     - 2 locked: grayscale circle with `Lock` icon, 50% opacity, title still visible but description replaced with "???"
+
+STATE HANDLING: Accept a typed prop `data: DashboardData` (define the TypeScript interface with fields: `studentName: string`, `streakDays: number`, `totalXp: number`, `level: number`, `overallMastery: number`, `topicsMastered: number`, `totalTopics: number`, `recommendedTopic: { name: string; mastery: number; estimatedMinutes: number; status: "weak"|"progress" }`, `recentActivity: { topic: string; timeAgo: string; xpGained: number }[]`, `knowledgeMapPreview: { name: string; status: "mastered"|"progress"|"weak"|"locked"; mastery: number }[]`, `achievements: { title: string; description: string; unlocked: boolean }[]`). Also handle an EMPTY/first-time state: if `overallMastery === 0` and no diagnostic completed, replace the recommendation card with a banner: "Mulai tes diagnostik untuk rekomendasi personal! →" (bg #FFF0F5 border #FF4F87, button "Mulai Tes Diagnostik").
+
+ACCESSIBILITY: All icon-only buttons need aria-label. Focus states must show a 3px solid #FF4F87 outline with 3px offset. Minimum touch target 44x44px on mobile nav items. Color is never the only status indicator — always pair with text label or icon.
+
+Do not invent a custom mascot illustration — use the `Sparkles` lucide icon wherever "Spark" the mascot is referenced in copy.
+```
+
+### 14.4 Prompt Granular (opsional, generate per komponen)
+
+Jika hasil generate full-page kurang presisi, pecah jadi beberapa prompt v0 terpisah lalu compose manual — biasanya kualitas per-komponen lebih tinggi:
+
+1. **`StatCard`** — "Build a reusable React + TS `StatCard` component: props `icon` (ReactNode), `iconBg` (string hex), `iconColor` (string hex), `label` (string), `value` (string), `valueColor` (string hex), optional `children` for extra content below (progress bar / dots / trend). White bg, rounded-14px, shadow `0 4px 16px rgba(23,17,31,0.08)`, padding 20px."
+2. **`RecommendationCard`** — props sesuai `recommendedTopic` di atas + `onStart: () => void`. Left border 4px color-coded by `status`.
+3. **`TopicMiniCard`** — props `name`, `icon`, `status` (`"mastered"|"progress"|"weak"|"locked"`), `mastery` (number). Styling per status pakai tabel token di §14.2.
+4. **`AchievementCard`** — props `title`, `description`, `unlocked` (boolean), `icon`.
+5. **`DashboardSidebar`** — props `activePath` (string), `userName`, `level`. Nav items hard-coded sesuai §14.3 (termasuk 2 item disabled dengan badge "Segera").
+
+### 14.5 Setelah Generate — Integrasi ke Kode
+
+- Hasil v0 akan pakai hex literal (`bg-[#FF4F87]`) — boleh dibiarkan, atau diselaraskan ke `var(--color-pink)` dkk di `src/index.css` agar satu sumber kebenaran (lihat §12 checklist "Semua warna menggunakan CSS variables").
+- Ganti import ikon menjadi `lucide-react` (sudah jadi dependency karena dipakai di `Auth.tsx`).
+- Mock `DashboardData` dulu dengan data statis, baru disambungkan ke `student_progress` + `student_answers` via service layer `src/lib/api/progress.ts` (lihat `skillpath-ai-supabase.md`) setelah BKT algorithm diimplementasikan.
+- Sidebar nav "Peta Kemampuan" dan "AI Tutor" tetap **disabled** di kode sampai route-nya benar-benar dibuat di `App.tsx` — jangan link ke path yang belum ada (akan ter-redirect ke `/dashboard` oleh catch-all route saat ini).
+
+---
+
 _Dokumen ini adalah living document — update setiap kali ada keputusan desain baru._
-_Last updated: 2026-10-12_
+_Last updated: 2026-10-13 — ditambahkan §14 v0.dev Prompt untuk Dashboard Page_

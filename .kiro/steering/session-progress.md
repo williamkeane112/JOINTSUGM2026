@@ -342,3 +342,31 @@ Auth page (`src/page/auth/Auth.tsx`) dibangun dari design reference eksternal de
 
 - Setup resmi skill `impeccable` (`impeccable context`) gagal karena tidak ada akses jaringan untuk download engine binary. Dilanjutkan dengan membaca context project secara manual + menerapkan `craft-floor.md` secara langsung (shadow offset+blur, radius 12-16px, badge text dicelup dari hue bukan abu-abu generik, dll), sesuai fallback instruction skill tersebut.
 - Tidak ada `PRODUCT.md` di project ini; karena task ini adalah penyempurnaan konsistensi pada dunia visual yang sudah ada (bukan surface baru), dilanjutkan tanpa `init`.
+
+## 🖥️ Dashboard Page — v0 Prompt Design (2026-10-13)
+
+### Konteks
+
+Setelah auth page selesai, lanjut ke dashboard page. User minta rancangan `docs/DESIGN.md` yang akan dipakai sebagai prompt untuk **v0.dev** (Vercel) — berbeda dari Google Stitch (§11, image-mockup generator), v0 menghasilkan kode React+Tailwind nyata, jadi perlu spesifikasi fungsional presisi (hex literal, struktur komponen, tipe data, copy exact), bukan deskripsi visual naratif.
+
+### Yang Dicek Sebelum Menulis
+
+- `src/page/dashboard/Index.tsx` — masih **placeholder** (kartu "Ini Dashboard" + tombol Logout, pakai Tailwind `slate`/`red` default, belum pakai design tokens project).
+- `src/page/auth/Auth.tsx` — referensi gaya aktual: `lucide-react` untuk ikon, Supabase client dari `src/lib/supabaseClient`, hex literal langsung di JSX (bukan `var(--color-*)` di level komponen — CSS var hanya untuk class `.btn-*`/`.card`/`.badge-*` di `src/index.css`).
+- `src/App.tsx` — route aktual baru: `/`, `/auth`, `/dashboard`, `/topicSelect`. **Belum ada** `/knowledge-map`, `/learning`, `/ai-tutor` — jadi desain sidebar harus punya state disabled/"Segera" untuk nav yang belum punya route, supaya kode hasil v0 tidak patah saat ditempel.
+- Tidak ada komponen Spark mascot custom (SVG/Lottie) yang sudah dibuat — prompt pakai ikon `Sparkles` dari lucide-react sebagai representasi Spark (v0 tidak reliable untuk custom character illustration).
+- `src/index.css` dibaca untuk menarik semua token hex/radius/shadow literal (v0 tidak bisa baca file CSS kita, jadi semua token harus ditulis literal di dalam prompt).
+
+### Yang Ditambahkan ke `docs/DESIGN.md`
+
+Section baru **§14 "v0.dev Prompt — Dashboard Page (Production Code Generation)"**, isi:
+
+- **§14.1** Status implementasi aktual (dicek dari kode, bukan asumsi) — placeholder dashboard, referensi gaya Auth.tsx, route yang tersedia, mascot belum ada komponennya.
+- **§14.2** Design tokens literal (hex, radius, shadow, font) — siap tempel ke prompt v0 karena v0 tidak baca `src/index.css`.
+- **§14.3** Prompt lengkap siap paste ke v0: struktur sidebar (desktop) + bottom nav (mobile), greeting header, 4 stat cards, recommendation card + aktivitas terakhir + tip Spark, knowledge map preview (5 topic mini-card termasuk 1 locked), achievements row (2 unlocked + 2 locked), definisi TypeScript interface `DashboardData` untuk props, empty-state (belum ada diagnostic test), dan catatan accessibility (focus ring, touch target, color tidak jadi satu-satunya indicator).
+- **§14.4** Prompt granular per komponen (`StatCard`, `RecommendationCard`, `TopicMiniCard`, `AchievementCard`, `DashboardSidebar`) sebagai alternatif jika generate full-page kurang presisi — strategi iterasi per-komponen biasanya lebih akurat di v0.
+- **§14.5** Catatan integrasi setelah generate: selaraskan hex literal hasil v0 ke CSS var project, ganti ikon ke `lucide-react` (sudah dependency), mock `DashboardData` dulu sebelum disambung ke `student_progress`/`student_answers` via `src/lib/api/progress.ts`, dan jangan aktifkan link sidebar ke route yang belum dibuat.
+
+### Status
+
+Dashboard page **belum di-generate/di-koding** — ini baru tahap desain/spec (`docs/DESIGN.md` §14). Langkah berikutnya: jalankan prompt §14.3 di v0.dev, tempel hasilnya ke `src/page/dashboard/Index.tsx`, lalu sambungkan ke data asli setelah BKT (`src/lib/algorithms/bkt.ts`) dan service layer progress diimplementasikan.
