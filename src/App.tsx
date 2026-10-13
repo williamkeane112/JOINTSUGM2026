@@ -1,8 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import ProtectedRoute from "./routers/ProtectedRoute";
 // public route
-import Login from "./page/auth/Login";
-import Register from "./page/auth/Register";
+import Auth from "./page/auth/Auth";
 import Index from "./page/Index";
 // protected route
 import Dashboard from "./page/dashboard/Index";
@@ -16,14 +14,16 @@ export default function App() {
         {/* public route */}
         <Route path="/" element={<Index />} />
         <Route element={<GuestProtectedRoute />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/auth" element={<Auth />} />
+          {/* Legacy routes redirect to /auth */}
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
+          <Route path="/register" element={<Navigate to="/auth" replace />} />
         </Route>
         {/* protected route */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/topicSelect" element={<TopicSelected />} />
-        </Route>
+        {/* <Route element={<ProtectedRoute />}> */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/topicSelect" element={<TopicSelected />} />
+        {/* </Route> */}
         {/* if link not found navigate to /dashboard */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

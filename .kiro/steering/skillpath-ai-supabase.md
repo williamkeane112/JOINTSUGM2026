@@ -407,7 +407,7 @@ USING (auth.uid() = user_id);
 - Use utility classes directly in JSX
 - Use custom classes from `src/index.css` (@layer components)
 - Available custom classes: `.btn-primary`, `.btn-secondary`, `.card`, `.card-hover`, `.input`, `.badge-*`
-- Color scheme: blue-500 (primary), green-500 (success), orange-500 (warning), red-500 (danger)
+- Color scheme (lihat `docs/DESIGN.md` §3): pink `#FF4F87` (primary), violet `#6D36BD` (secondary/XP), warm emerald `#1E9E6B` (mastered), warm amber `#E8A33D` (in progress), warm coral `#E2544B` (not mastered) — **bukan** `blue-500`/`green-500` Tailwind default
 - Avoid custom CSS files; extend `src/index.css` if needed
 
 ### Supabase Patterns

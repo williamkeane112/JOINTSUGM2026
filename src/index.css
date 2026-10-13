@@ -1,1 +1,216 @@
 @import "tailwindcss";
+
+:root {
+  /* ============================================
+     SkillPath AI Design Tokens
+     Single source of truth — mirrors docs/DESIGN.md §3-4
+     ============================================ */
+
+  /* Brand core */
+  --color-ink: #17111f; /* primary text on light surfaces */
+  --color-muted: #766b7f; /* secondary text on light surfaces */
+  --color-pink: #ff4f87; /* primary action, brand accent */
+  --color-pink-deep: #e62f72; /* hover/active state of primary, links */
+  --color-violet: #6d36bd; /* secondary accent — depth, focus, XP */
+  --color-night: #160820; /* dark hero/nav surfaces */
+  --color-cream: #fff7f2; /* light page/app surface */
+  --color-line: #eadfe4; /* borders, dividers on light surfaces */
+  --color-surface: #ffffff; /* elevated card surface on cream bg */
+
+  /* Mastery status — functional meaning preserved (red/amber/green),
+     hue warmed to belong to the pink/violet/cream world instead of
+     generic Tailwind red-500/amber-500/green-500. */
+  --color-mastered: #1e9e6b; /* 🟢 >70% */
+  --color-mastered-tint: #e3f6ec;
+  --color-mastered-ink: #136b49;
+  --color-mastered-line: #bfe8d3;
+
+  --color-progress: #e8a33d; /* 🟡 40-70% */
+  --color-progress-tint: #fdf1de;
+  --color-progress-ink: #92591a;
+  --color-progress-line: #f3d9a6;
+
+  --color-weak: #e2544b; /* 🔴 <40% */
+  --color-weak-tint: #fbe6e4;
+  --color-weak-ink: #9c2e27;
+  --color-weak-line: #f2c0bc;
+
+  --color-locked: #afa3ac; /* locked topic */
+  --color-locked-tint: #f1edef;
+  --color-locked-ink: #766b7f;
+  --color-locked-line: #eadfe4;
+
+  /* Gamification — reuses brand hues instead of introducing new ones */
+  --color-xp: var(--color-violet);
+  --color-streak: #f2763c; /* warm coral-orange, distinct from weak/mastered */
+  --color-gold: var(--color-progress);
+  --color-silver: #9c8fa0;
+
+  /* Typography */
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Spacing */
+  --space-card: 1.5rem;
+  --space-section: 2rem;
+
+  /* Radius — 12-16px for cards, pills for small controls (craft floor) */
+  --radius-input: 13px;
+  --radius-card: 14px;
+  --radius-pill: 9999px;
+
+  /* Shadows — always offset + blur, never a zero-offset colored halo */
+  --shadow-primary: 0 10px 24px rgba(255, 79, 135, 0.28);
+  --shadow-primary-hover: 0 14px 30px rgba(230, 47, 114, 0.3);
+  --shadow-violet: 0 10px 24px rgba(109, 54, 189, 0.25);
+  --shadow-mastered: 0 10px 20px rgba(30, 158, 107, 0.22);
+  --shadow-card: 0 4px 16px rgba(23, 17, 31, 0.08);
+  --shadow-card-hover: 0 12px 28px rgba(23, 17, 31, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+/* Tabular numerals for XP counters, timers, scores — never monospace-as-costume */
+.tabular,
+.font-display {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /* ---------- Buttons ---------- */
+  .btn-primary {
+    @apply bg-[var(--color-pink)] text-white px-6 py-3 rounded-[var(--radius-input)] font-semibold transition-all shadow-[var(--shadow-primary)] active:scale-[0.98];
+  }
+  .btn-primary:hover {
+    background: var(--color-pink-deep);
+    box-shadow: var(--shadow-primary-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-[var(--color-pink-deep)] border-2 border-[var(--color-pink)] px-6 py-3 rounded-[var(--radius-input)] font-semibold transition-all active:scale-[0.98];
+  }
+  .btn-secondary:hover {
+    background: var(--color-mastered-tint);
+    background: #fff0f5;
+  }
+
+  .btn-success {
+    @apply bg-[var(--color-mastered)] text-white px-6 py-3 rounded-[var(--radius-input)] font-semibold transition-all shadow-[var(--shadow-mastered)] active:scale-[0.98];
+  }
+  .btn-success:hover {
+    filter: brightness(1.08);
+  }
+
+  /* ---------- Cards ---------- */
+  /* Single elevation declaration: shadow only, no border, no stacked ghost-card. */
+  .card {
+    @apply bg-[var(--color-surface)] rounded-[var(--radius-card)] p-6;
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-hover {
+    @apply bg-[var(--color-surface)] rounded-[var(--radius-card)] p-6 transition-all duration-200;
+    box-shadow: var(--shadow-card);
+  }
+  .card-hover:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  /* ---------- Inputs ---------- */
+  .input {
+    @apply w-full rounded-[var(--radius-input)] border px-4 py-3 text-sm outline-none transition-all disabled:cursor-not-allowed;
+    border-color: var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .input::placeholder {
+    color: var(--color-muted);
+  }
+  .input:focus {
+    border-color: var(--color-pink);
+    box-shadow: 0 0 0 3px rgba(255, 79, 135, 0.15);
+  }
+  .input:disabled {
+    background: var(--color-locked-tint);
+  }
+
+  /* ---------- Badges ---------- */
+  /* Text tinted from each status hue, never generic gray. */
+  .badge-mastered {
+    @apply px-3 py-1 rounded-[var(--radius-pill)] text-sm font-medium border;
+    background: var(--color-mastered-tint);
+    color: var(--color-mastered-ink);
+    border-color: var(--color-mastered-line);
+  }
+
+  .badge-progress {
+    @apply px-3 py-1 rounded-[var(--radius-pill)] text-sm font-medium border;
+    background: var(--color-progress-tint);
+    color: var(--color-progress-ink);
+    border-color: var(--color-progress-line);
+  }
+
+  .badge-not-mastered {
+    @apply px-3 py-1 rounded-[var(--radius-pill)] text-sm font-medium border;
+    background: var(--color-weak-tint);
+    color: var(--color-weak-ink);
+    border-color: var(--color-weak-line);
+  }
+
+  .badge-locked {
+    @apply px-3 py-1 rounded-[var(--radius-pill)] text-sm font-medium border;
+    background: var(--color-locked-tint);
+    color: var(--color-locked-ink);
+    border-color: var(--color-locked-line);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Browser surfaces carry the brand too — selection, caret, focus ring */
+::selection {
+  background: var(--color-pink);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-pink);
+  outline-offset: 3px;
+}

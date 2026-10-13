@@ -110,7 +110,7 @@ P(L_new) = P(L|answer) + (1 - P(L|answer)) * P(T)
   - `.card`, `.card-hover`
   - `.input`
   - `.badge-mastered`, `.badge-progress`, `.badge-not-mastered`, `.badge-locked`
-- Color scheme: blue-500 (primary), green-500 (success), orange-500 (warning), red-500 (danger)
+- Color scheme (lihat `docs/DESIGN.md` §3): pink `#FF4F87` (primary), violet `#6D36BD` (secondary/XP), warm emerald `#1E9E6B` (mastered), warm amber `#E8A33D` (in progress), warm coral `#E2544B` (not mastered) — **bukan** `blue-500`/`green-500` Tailwind default
 
 ### Supabase Patterns
 - Always use Supabase JS Client, not raw SQL

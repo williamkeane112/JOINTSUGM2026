@@ -10,6 +10,7 @@
 ## 📋 Project Status: Planning & Setup Phase
 
 ### Current State
+
 - ✅ Project planning document created (`docs/PROJECT_PLAN.md`)
 - ✅ Steering files configured for Full Supabase architecture
 - ✅ Tailwind CSS v4 installed and configured
@@ -22,6 +23,7 @@
 ### 1. Project Planning & Documentation (Day 1 - Oct 11)
 
 #### Created Comprehensive Planning Document
+
 - **File**: `docs/PROJECT_PLAN.md` (2050 lines)
 - **Content**:
   - Executive summary & problem statement
@@ -35,6 +37,7 @@
   - Risk assessment & mitigation
 
 **Key Decisions Made**:
+
 - Subject: Matematika SMP only for MVP
 - Topics: Operasi Dasar, Pecahan, Persamaan Linear
 - Architecture: Full Supabase (no Node.js Express, no Python FastAPI)
@@ -46,6 +49,7 @@
 ### 2. Architecture Decisions (Day 1 - Oct 11)
 
 #### Initial Architecture (Before Revision)
+
 - Frontend: React + TypeScript + Vite
 - Backend: Node.js + Express
 - Database: MySQL
@@ -53,6 +57,7 @@
 - AI Service: OpenAI/Claude API
 
 #### **FINAL Architecture (After Discussion)**
+
 - ✅ **Frontend**: React 18+ + TypeScript + Vite
 - ✅ **Backend**: **Supabase** (Backend as a Service)
   - PostgreSQL database (not MySQL)
@@ -65,6 +70,7 @@
 - ✅ **AI Service**: OpenAI/Claude API (direct or via Edge Function)
 
 **Rationale for Supabase**:
+
 - Faster development (no backend boilerplate)
 - Built-in auth & JWT
 - Free tier sufficient for hackathon MVP
@@ -76,6 +82,7 @@
 ### 3. Tech Stack Configuration (Day 1 - Oct 11)
 
 #### Tailwind CSS v4 Setup
+
 - ✅ Installed: `tailwindcss` + `@tailwindcss/vite`
 - ✅ Configured: `vite.config.ts` with Tailwind plugin
 - ✅ Updated: `src/index.css` with Tailwind v4 syntax
@@ -97,10 +104,12 @@
 ### 4. Steering Files Created (Day 1-2 - Oct 11-12)
 
 #### File 1: `docs/PROJECT_PLAN.md`
+
 - Complete project documentation
 - Reference for all implementation details
 
 #### File 2: `.kiro/steering/skillpath-ai-supabase.md` (749 lines)
+
 - **Full Supabase architecture** guidelines
 - Tech stack with correct versions
 - Project structure (`/src/lib/` layout)
@@ -114,6 +123,7 @@
 - File naming conventions
 
 **Key Content**:
+
 - Complete BKT TypeScript class with formulas
 - Row Level Security (RLS) policies examples
 - Service layer abstraction pattern
@@ -125,6 +135,7 @@
 ## 🎯 Key Decisions & Constraints
 
 ### Must Follow
+
 1. **Database**: PostgreSQL (Supabase) with UUID primary keys
 2. **Auth**: Supabase Auth (JWT built-in), no custom implementation
 3. **BKT**: Client-side TypeScript (no Python backend)
@@ -137,6 +148,7 @@
 6. **MVP Scope**: 1 subject (Matematika), 3-5 topics only
 
 ### Must NOT Do (Skip for MVP)
+
 - ❌ Multiple subjects
 - ❌ Teacher dashboard
 - ❌ Complex gamification
@@ -149,6 +161,7 @@
 ## 📚 Important Technical Details
 
 ### Database Tables (PostgreSQL)
+
 1. `users` - Managed by Supabase Auth (auth.users)
 2. `topics` - Subject topics
 3. `prerequisites` - Topic dependencies
@@ -161,12 +174,14 @@
 **Key**: All tables use `UUID` primary keys, not `INT AUTO_INCREMENT`
 
 ### BKT Parameters
+
 - **P(L)**: Probability of mastery (0-1)
 - **P(T)**: Learning probability (~0.1)
 - **P(G)**: Guess probability (~0.25)
 - **P(S)**: Slip probability (~0.1)
 
 ### Mastery Thresholds
+
 - Not Mastered: < 0.40 (🔴 red)
 - In Progress: 0.40 - 0.70 (🟡 orange)
 - Mastered: > 0.70 (🟢 green)
@@ -177,35 +192,39 @@
 
 ### Initial Plan vs Final Plan
 
-| Aspect | Initial | Final (Current) |
-|--------|---------|-----------------|
-| Backend | Node.js + Express | ❌ Removed, use Supabase |
-| Database | MySQL | PostgreSQL (Supabase) |
-| Algorithm | Python FastAPI | TypeScript (client-side) |
-| ORM | Sequelize/Prisma | ❌ Not needed, use Supabase SDK |
-| HTTP Client | Axios | @supabase/supabase-js |
-| Primary Keys | INT AUTO_INCREMENT | UUID |
-| Auth | Custom JWT | Supabase Auth (built-in) |
+| Aspect       | Initial            | Final (Current)                 |
+| ------------ | ------------------ | ------------------------------- |
+| Backend      | Node.js + Express  | ❌ Removed, use Supabase        |
+| Database     | MySQL              | PostgreSQL (Supabase)           |
+| Algorithm    | Python FastAPI     | TypeScript (client-side)        |
+| ORM          | Sequelize/Prisma   | ❌ Not needed, use Supabase SDK |
+| HTTP Client  | Axios              | @supabase/supabase-js           |
+| Primary Keys | INT AUTO_INCREMENT | UUID                            |
+| Auth         | Custom JWT         | Supabase Auth (built-in)        |
 
 ---
 
 ## 📝 Session History
 
 ### Session 1 (Oct 11, 21:49 - 22:52)
+
 - **Topic**: Initial project planning
 - **Outcome**: Created comprehensive PROJECT_PLAN.md
 - **Key Moment**: Decided on BKT algorithm as core differentiator
 
 ### Session 2 (Oct 11, 22:01 - 22:10)
+
 - **Topic**: Tailwind CSS installation
 - **Outcome**: Installed Tailwind CSS v4 with Vite plugin
 - **Issue Resolved**: Initially tried old PostCSS method, corrected to v4 Vite plugin
 
 ### Session 3 (Oct 11, 22:10 - 22:23)
+
 - **Topic**: Steering files explanation
 - **Outcome**: Learned about `.kiro/steering/` feature (like CLAUDE.md)
 
 ### Session 4 (Oct 11, 22:13 - 22:52)
+
 - **Topic**: Architecture revision to Full Supabase
 - **Key Questions Answered**:
   - Backend: Full Supabase (no Node.js)
@@ -215,11 +234,13 @@
 - **Outcome**: Created `skillpath-ai-supabase.md` steering file (749 lines)
 
 ### Session 5 (Oct 12, 10:09 - 10:16)
+
 - **Topic**: Session management & context repository
 - **Outcome**: Learned about Kiro's auto-save sessions
 - **Clarified**: Difference between `/clear` vs `/chat new`
 
 ### Session 6 (Oct 12, 10:16 - Current)
+
 - **Topic**: Creating progress tracking file
 - **Outcome**: This file!
 
@@ -228,6 +249,7 @@
 ## 🚀 Ready for Next Steps
 
 ### Immediate Next Steps (Week 1 - Foundation)
+
 1. **Setup Supabase Project**
    - [ ] Create Supabase account
    - [ ] Initialize new project
@@ -287,8 +309,36 @@
 **Timeline**: 4 weeks MVP  
 **Current Week**: Week 1 (Foundation)  
 **Architecture**: Full Supabase + React + TypeScript  
-**Primary Goal**: Prove BKT-based personalization works  
+**Primary Goal**: Prove BKT-based personalization works
 
 **Steering File**: `.kiro/steering/skillpath-ai-supabase.md`  
 **Planning Doc**: `docs/PROJECT_PLAN.md`  
 **This File**: `.kiro/steering/session-progress.md`
+
+---
+
+## 🎨 Design System Unification (2026-10-13)
+
+### Konteks
+
+Auth page (`src/page/auth/Auth.tsx`) dibangun dari design reference eksternal dengan palet **pink/violet/night/cream** (`#FF4F87`, `#6D36BD`, `#160820`, `#FFF7F2`). Palet ini berbeda total dari design system lama di `docs/DESIGN.md` yang masih **blue-500 generik** (`#3B82F6`) ala SaaS dashboard, lengkap dengan maskot Spark ber-glow biru. `src/index.css` sempat punya dua set token sekaligus (campur blue lama + pink/violet baru), dan 99 referensi warna lama tersebar di 10 file dokumentasi.
+
+### Keputusan
+
+- **Pink `#FF4F87` + violet `#6D36BD` menggantikan biru sebagai brand/primary** di seluruh app — bukan hanya auth page. Alasan: auth page sudah establish identitas visual yang matang (hangat, personal, "belajar di malam hari yang fokus"), lebih distinctive dibanding blue-SaaS default yang jadi "tell" AI-generated.
+- **Status mastery (🔴🟡🟢) tetap pakai logika merah/kuning/hijau** — ini semantik fungsional, tidak diganti pink supaya user tidak bingung membedakan status dari aksi. Hue-nya dihangatkan: mastered `#1E9E6B`, in-progress `#E8A33D`, not-mastered `#E2544B` (bukan `green-500`/`amber-500`/`red-500` Tailwind default).
+- **Gamification (XP, streak) memakai ulang hue brand** — XP = violet (reuse, bukan purple-500 baru), streak = `#F2763C` koral-oranye.
+- **Font**: Plus Jakarta Sans (display/heading) + Inter (body) — sudah ditentukan di DESIGN.md lama tapi **tidak pernah benar-benar di-load** (tidak ada `<link>` Google Fonts di `index.html`). Ini diperbaiki sekaligus.
+- **Tracking floor**: headline di Auth.tsx pakai `-0.065em` yang melewati batas kenyamanan baca (-0.04em floor, -0.02 s/d -0.03em ideal). Dicatat sebagai standar baru untuk ke depan; Auth.tsx **tidak diubah** sekarang (di luar scope task ini).
+
+### Yang Diubah
+
+- `src/index.css` — ditulis ulang penuh: token brand (ink/pink/pink-deep/violet/night/cream/line/surface), status mastery dengan pasangan tint/ink/line per status, shadow selalu offset+blur (bukan halo warna offset-nol), radius 12-16px untuk card. Semua class `.btn-*`/`.card*`/`.input`/`.badge-*` pakai token baru.
+- `index.html` — load Plus Jakarta Sans + Inter via Google Fonts.
+- `docs/DESIGN.md` — §3 Color Palette, §4 Typography (tambah subsection Letter Spacing), §5 radius, §6 Component Library (buttons/cards/progress/badges/input/navigation/diagnostic test/chat bubble), maskot Spark, §11 Google Stitch prompts (7 prompt), §13 Tailwind custom classes code appendix — semua diselaraskan ke token baru.
+- `.kiro/steering/skillpath-ai-supabase.md` dan `AGENTS.md` — baris color scheme diperbarui.
+
+### Catatan Proses
+
+- Setup resmi skill `impeccable` (`impeccable context`) gagal karena tidak ada akses jaringan untuk download engine binary. Dilanjutkan dengan membaca context project secara manual + menerapkan `craft-floor.md` secara langsung (shadow offset+blur, radius 12-16px, badge text dicelup dari hue bukan abu-abu generik, dll), sesuai fallback instruction skill tersebut.
+- Tidak ada `PRODUCT.md` di project ini; karena task ini adalah penyempurnaan konsistensi pada dunia visual yang sudah ada (bukan surface baru), dilanjutkan tanpa `init`.
