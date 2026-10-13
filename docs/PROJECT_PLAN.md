@@ -5,6 +5,7 @@
 **SkillPath AI** adalah aplikasi pembelajaran adaptif yang menggunakan AI untuk memberikan pengalaman belajar yang dipersonalisasi berdasarkan kemampuan dan kelemahan setiap siswa. Berbeda dengan platform pembelajaran konvensional yang memberikan materi yang sama untuk semua siswa, SkillPath AI menggunakan algoritma Bayesian Knowledge Tracing (BKT) untuk memetakan kemampuan siswa secara real-time dan memberikan rekomendasi materi yang disesuaikan.
 
 ### Nilai Jual Utama (USP)
+
 Dua siswa dengan kemampuan berbeda akan mendapatkan jalur pembelajaran yang berbeda - sistem tidak hanya menjawab pertanyaan, tetapi secara aktif mengukur, menganalisis, dan menyesuaikan pembelajaran.
 
 ---
@@ -12,12 +13,14 @@ Dua siswa dengan kemampuan berbeda akan mendapatkan jalur pembelajaran yang berb
 ## Problem Statement
 
 ### Masalah yang Diselesaikan
+
 1. **Siswa tidak tahu kelemahan mereka**: Siswa sering tidak menyadari topik mana yang belum mereka kuasai dengan baik
 2. **Pembelajaran one-size-fits-all**: Materi yang sama diberikan ke semua siswa tanpa mempertimbangkan kemampuan individual
 3. **Guru kesulitan monitoring**: Guru sulit memantau kebutuhan belajar setiap siswa secara individual di kelas besar
 4. **Tidak ada personalisasi**: Platform belajar existing hanya memberikan materi statis tanpa adaptasi
 
 ### Target Pengguna
+
 - **Primary**: Siswa SMP/SMA yang ingin meningkatkan pemahaman pada mata pelajaran tertentu
 - **Secondary**: Guru yang ingin memantau progres siswa dan mengidentifikasi siswa yang membutuhkan bantuan
 
@@ -26,41 +29,50 @@ Dua siswa dengan kemampuan berbeda akan mendapatkan jalur pembelajaran yang berb
 ## MVP Scope & Features
 
 ### MVP Focus: Single Subject (Matematika)
+
 Untuk membuktikan konsep, MVP akan fokus pada **1 mata pelajaran** dengan **3-5 topik utama**.
 
 ### Core Features (MUST HAVE)
 
 #### 1. Diagnostic Test
+
 **Purpose**: Memetakan kemampuan awal siswa
 
 **Flow**:
+
 - Siswa mengerjakan 10-15 soal pilihan ganda
 - Sistem menganalisis jawaban untuk setiap topik
 - Output: Skor dan peta kemampuan awal
 
 **Data yang dicatat**:
+
 - Jawaban benar/salah per topik
 - Waktu pengerjaan (opsional untuk analisis lanjutan)
 - Pola kesalahan
 
 #### 2. Knowledge Map (Peta Kemampuan)
+
 **Purpose**: Visualisasi pemahaman siswa per topik
 
 **Kategori**:
+
 - 🔴 **Not Mastered** (0-40%): Belum dikuasai - prioritas tinggi
 - 🟡 **In Progress** (41-70%): Sedang dipelajari - perlu latihan
 - 🟢 **Mastered** (71-100%): Sudah dikuasai - maintenance
 
 **Display**:
+
 - Visual progress bar per topik
 - Recommended next topic
 - Prerequisites yang belum terpenuhi
 
 #### 3. Adaptive Learning Path
+
 **Purpose**: Rekomendasi materi berdasarkan kelemahan
 
 **Logic**:
-```
+
+```text
 IF topic_mastery < 40% AND prerequisites_met:
     RECOMMEND learning_material + basic_exercises
 ELSE IF topic_mastery < 70%:
@@ -70,26 +82,31 @@ ELSE IF topic_mastery >= 70%:
 ```
 
 **Features**:
+
 - Urutan pembelajaran berbeda per siswa
 - Auto-unlock topik berdasarkan prasyarat
 - Adaptive difficulty adjustment
 
 #### 4. AI Tutor (Contextual)
+
 **Purpose**: Menjelaskan konsep dan membahas kesalahan
 
 **Capabilities**:
+
 - Menjawab pertanyaan siswa dengan konteks materi
 - Menjelaskan mengapa jawaban salah
 - Memberikan hints untuk soal yang sulit
 - Penjelasan step-by-step
 
 **Context yang diberikan ke AI**:
+
 - Topik yang sedang dipelajari
 - Jawaban siswa (benar/salah)
 - Materi pembelajaran yang relevan
 - Level kemampuan siswa saat ini
 
 **Constraints**:
+
 - AI hanya dapat menjawab dalam scope materi yang tersedia
 - Tidak boleh memberikan jawaban langsung, hanya hints
 - Harus mengacu pada kurikulum yang telah ditentukan
@@ -97,6 +114,7 @@ ELSE IF topic_mastery >= 70%:
 #### 5. Progress Dashboard
 
 **Student View**:
+
 - Overall progress percentage
 - Topic mastery breakdown
 - Recent activities
@@ -104,12 +122,14 @@ ELSE IF topic_mastery >= 70%:
 - Next recommended topic
 
 **Teacher View** (optional untuk MVP):
+
 - Class overview
 - Students needing help (sorted by lowest mastery)
 - Topic difficulty analysis
 - Average progress per topic
 
 ### Features untuk Phase 2 (SKIP untuk MVP)
+
 - ❌ Gamifikasi kompleks (XP, leaderboard, rewards)
 - ❌ Multiple subjects
 - ❌ Video call dengan guru
@@ -177,6 +197,7 @@ ELSE IF topic_mastery >= 70%:
 ### Component Breakdown
 
 #### Frontend (React + TypeScript + Vite)
+
 ```
 src/
 ├── components/
@@ -227,6 +248,7 @@ src/
 ```
 
 #### Backend (Node.js + Express)
+
 ```
 backend/
 ├── src/
@@ -262,6 +284,7 @@ backend/
 ```
 
 #### Algorithm Engine (Python + FastAPI)
+
 ```
 algorithm-engine/
 ├── app/
@@ -351,6 +374,7 @@ algorithm-engine/
 ### Detailed Table Schemas
 
 #### Users Table
+
 ```sql
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -365,6 +389,7 @@ CREATE TABLE users (
 ```
 
 #### Topics Table
+
 ```sql
 CREATE TABLE topics (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -379,6 +404,7 @@ CREATE TABLE topics (
 ```
 
 #### Prerequisites Table
+
 ```sql
 CREATE TABLE prerequisites (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -392,6 +418,7 @@ CREATE TABLE prerequisites (
 ```
 
 #### Questions Table
+
 ```sql
 CREATE TABLE questions (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -409,6 +436,7 @@ CREATE TABLE questions (
 ```
 
 #### Student Progress Table (BKT State)
+
 ```sql
 CREATE TABLE student_progress (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -431,6 +459,7 @@ CREATE TABLE student_progress (
 ```
 
 #### Student Answers Table
+
 ```sql
 CREATE TABLE student_answers (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -449,6 +478,7 @@ CREATE TABLE student_answers (
 ```
 
 #### Learning Materials Table
+
 ```sql
 CREATE TABLE learning_materials (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -464,6 +494,7 @@ CREATE TABLE learning_materials (
 ```
 
 #### AI Tutor Conversations (Optional - untuk tracking)
+
 ```sql
 CREATE TABLE ai_conversations (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -487,9 +518,11 @@ CREATE TABLE ai_conversations (
 ### Bayesian Knowledge Tracing (BKT)
 
 #### Konsep Dasar
+
 BKT adalah Hidden Markov Model yang melacak probabilitas bahwa siswa telah menguasai suatu skill/topik berdasarkan observasi jawaban mereka.
 
 #### Parameters BKT
+
 - **P(L₀)**: Probabilitas awal bahwa siswa sudah menguasai topik (dari diagnostic test)
 - **P(T)**: Probabilitas siswa belajar/menguasai topik dari satu latihan
 - **P(G)**: Probabilitas siswa menebak jawaban dengan benar tanpa menguasai
@@ -498,18 +531,21 @@ BKT adalah Hidden Markov Model yang melacak probabilitas bahwa siswa telah mengu
 #### Update Formula
 
 **Setelah jawaban benar:**
+
 ```
-P(L|correct) = P(L) * (1 - P(S)) / 
+P(L|correct) = P(L) * (1 - P(S)) /
                [P(L) * (1 - P(S)) + (1 - P(L)) * P(G)]
 ```
 
 **Setelah jawaban salah:**
+
 ```
-P(L|wrong) = P(L) * P(S) / 
+P(L|wrong) = P(L) * P(S) /
              [P(L) * P(S) + (1 - P(L)) * (1 - P(G))]
 ```
 
 **Setelah update, hitung probabilitas belajar:**
+
 ```
 P(L_new) = P(L|answer) + (1 - P(L|answer)) * P(T)
 ```
@@ -523,7 +559,7 @@ class BKTModel:
     def __init__(self, p_init=0.0, p_transit=0.1, p_guess=0.25, p_slip=0.1):
         """
         Initialize BKT parameters
-        
+
         Args:
             p_init: Initial probability of mastery P(L0)
             p_transit: Probability of learning P(T)
@@ -534,41 +570,41 @@ class BKTModel:
         self.p_transit = p_transit
         self.p_guess = p_guess
         self.p_slip = p_slip
-    
+
     def update(self, is_correct: bool) -> float:
         """
         Update P(L) based on student answer
-        
+
         Args:
             is_correct: Whether student answered correctly
-            
+
         Returns:
             Updated probability of mastery
         """
         if is_correct:
             # P(L | correct answer)
             numerator = self.p_learned * (1 - self.p_slip)
-            denominator = (self.p_learned * (1 - self.p_slip) + 
+            denominator = (self.p_learned * (1 - self.p_slip) +
                           (1 - self.p_learned) * self.p_guess)
         else:
             # P(L | wrong answer)
             numerator = self.p_learned * self.p_slip
-            denominator = (self.p_learned * self.p_slip + 
+            denominator = (self.p_learned * self.p_slip +
                           (1 - self.p_learned) * (1 - self.p_guess))
-        
+
         # Update P(L) with evidence
         p_learned_given_answer = numerator / denominator if denominator > 0 else 0
-        
+
         # Apply learning transition
-        self.p_learned = (p_learned_given_answer + 
+        self.p_learned = (p_learned_given_answer +
                          (1 - p_learned_given_answer) * self.p_transit)
-        
+
         return self.p_learned
-    
+
     def get_mastery_percentage(self) -> float:
         """Convert P(L) to percentage"""
         return self.p_learned * 100
-    
+
     def is_mastered(self, threshold=0.95) -> bool:
         """Check if topic is considered mastered"""
         return self.p_learned >= threshold
@@ -577,6 +613,7 @@ class BKTModel:
 ### Recommendation Engine
 
 #### Logic Flow
+
 ```python
 # algorithm-engine/app/models/recommendation_engine.py
 
@@ -586,11 +623,11 @@ class RecommendationEngine:
         'in_progress': 0.70,
         'mastered': 0.95
     }
-    
+
     def get_next_topic(self, user_id: int, available_topics: list) -> dict:
         """
         Determine next recommended topic for student
-        
+
         Returns:
             {
                 'topic_id': int,
@@ -601,7 +638,7 @@ class RecommendationEngine:
         """
         # Get student progress for all topics
         progress = self._get_student_progress(user_id)
-        
+
         # Filter topics by prerequisites
         eligible_topics = []
         for topic in available_topics:
@@ -610,20 +647,20 @@ class RecommendationEngine:
                     'topic': topic,
                     'mastery': progress.get(topic['id'], {}).get('p_learned', 0)
                 })
-        
+
         if not eligible_topics:
             return None
-        
+
         # Sort by priority:
         # 1. Topics not mastered (lowest mastery first)
         # 2. Topics in progress
         # 3. Topics mastered (for review)
-        
-        not_mastered = [t for t in eligible_topics 
+
+        not_mastered = [t for t in eligible_topics
                        if t['mastery'] < self.MASTERY_THRESHOLD['not_mastered']]
-        in_progress = [t for t in eligible_topics 
+        in_progress = [t for t in eligible_topics
                       if self.MASTERY_THRESHOLD['not_mastered'] <= t['mastery'] < self.MASTERY_THRESHOLD['in_progress']]
-        
+
         # Prioritize lowest mastery in not_mastered
         if not_mastered:
             not_mastered.sort(key=lambda x: x['mastery'])
@@ -638,7 +675,7 @@ class RecommendationEngine:
             eligible_topics.sort(key=lambda x: x['mastery'])
             recommended = eligible_topics[0]
             reason = "Review topik atau coba tantangan lanjutan"
-        
+
         return {
             'topic_id': recommended['topic']['id'],
             'topic_name': recommended['topic']['name'],
@@ -646,34 +683,34 @@ class RecommendationEngine:
             'mastery_level': recommended['mastery'] * 100,
             'prerequisites_met': True
         }
-    
+
     def _check_prerequisites(self, user_id: int, topic_id: int, progress: dict) -> bool:
         """
         Check if student meets prerequisites for a topic
         """
         prerequisites = self._get_prerequisites(topic_id)
-        
+
         if not prerequisites:
             return True
-        
+
         for prereq in prerequisites:
             prereq_id = prereq['requires_topic_id']
             min_mastery = prereq['min_mastery_required']
-            
+
             student_mastery = progress.get(prereq_id, {}).get('p_learned', 0)
-            
+
             if student_mastery < min_mastery:
                 return False
-        
+
         return True
-    
+
     def get_adaptive_questions(self, user_id: int, topic_id: int, count: int = 5) -> list:
         """
         Get adaptive questions based on student performance
         """
         progress = self._get_topic_progress(user_id, topic_id)
         mastery = progress.get('p_learned', 0)
-        
+
         # Determine difficulty based on mastery
         if mastery < 0.3:
             difficulty = 'easy'
@@ -681,10 +718,10 @@ class RecommendationEngine:
             difficulty = 'medium'
         else:
             difficulty = 'hard'
-        
+
         # Get questions with appropriate difficulty
         questions = self._get_questions_by_difficulty(topic_id, difficulty, count)
-        
+
         return questions
 ```
 
@@ -693,13 +730,16 @@ class RecommendationEngine:
 ## API Design
 
 ### Base URL
+
 ```
 Development: http://localhost:3000/api/v1
 Production: https://skillpath-ai.com/api/v1
 ```
 
 ### Authentication
+
 All endpoints (except auth endpoints) require JWT token in header:
+
 ```
 Authorization: Bearer <jwt_token>
 ```
@@ -709,6 +749,7 @@ Authorization: Bearer <jwt_token>
 #### Authentication
 
 **POST /auth/register**
+
 ```json
 Request:
 {
@@ -734,6 +775,7 @@ Response: 201 Created
 ```
 
 **POST /auth/login**
+
 ```json
 Request:
 {
@@ -760,6 +802,7 @@ Response: 200 OK
 
 **GET /diagnostic/test**
 Get diagnostic test questions
+
 ```json
 Response: 200 OK
 {
@@ -785,6 +828,7 @@ Response: 200 OK
 
 **POST /diagnostic/submit**
 Submit diagnostic test answers
+
 ```json
 Request:
 {
@@ -836,6 +880,7 @@ Response: 200 OK
 
 **GET /learning/progress**
 Get student's overall progress
+
 ```json
 Response: 200 OK
 {
@@ -872,6 +917,7 @@ Response: 200 OK
 
 **GET /learning/recommendation**
 Get recommended next topic
+
 ```json
 Response: 200 OK
 {
@@ -889,6 +935,7 @@ Response: 200 OK
 
 **GET /learning/topic/:topicId**
 Get learning materials for a topic
+
 ```json
 Response: 200 OK
 {
@@ -929,6 +976,7 @@ Response: 200 OK
 
 **GET /exercises/topic/:topicId**
 Get adaptive exercises for a topic
+
 ```json
 Response: 200 OK
 {
@@ -952,6 +1000,7 @@ Response: 200 OK
 
 **POST /exercises/submit**
 Submit exercise answers and get BKT update
+
 ```json
 Request:
 {
@@ -997,6 +1046,7 @@ Response: 200 OK
 
 **POST /ai-tutor/ask**
 Ask AI tutor a question
+
 ```json
 Request:
 {
@@ -1029,6 +1079,7 @@ Response: 200 OK
 
 **POST /ai-tutor/explain**
 Get explanation for a concept
+
 ```json
 Request:
 {
@@ -1053,6 +1104,7 @@ Response: 200 OK
 #### Dashboard (Teacher View - Optional for MVP)
 
 **GET /teacher/class-overview**
+
 ```json
 Response: 200 OK
 {
@@ -1085,6 +1137,7 @@ Response: 200 OK
 ## Technology Stack
 
 ### Frontend
+
 - **Framework**: React 18+ with TypeScript
 - **Build Tool**: Vite
 - **UI Library**: Tailwind CSS + shadcn/ui
@@ -1095,6 +1148,7 @@ Response: 200 OK
 - **Forms**: React Hook Form + Zod validation
 
 ### Backend (Node.js)
+
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
 - **Database ORM**: Sequelize or Prisma
@@ -1105,6 +1159,7 @@ Response: 200 OK
 - **Environment**: dotenv
 
 ### Algorithm Engine (Python)
+
 - **Framework**: FastAPI
 - **HTTP Client**: httpx (for API calls)
 - **Math/Stats**: NumPy, SciPy
@@ -1112,16 +1167,19 @@ Response: 200 OK
 - **ASGI Server**: Uvicorn
 
 ### Database
+
 - **Primary DB**: MySQL 8.0+
 - **Connection Pool**: mysql2 (Node.js)
 
 ### AI Service
+
 - **Provider Options**:
   - OpenAI API (GPT-4 or GPT-3.5-turbo)
   - Anthropic Claude API
   - Local LLM (optional for cost reduction)
 
 ### DevOps & Tools
+
 - **Version Control**: Git
 - **Package Manager**: npm (frontend/backend), pip (Python)
 - **API Testing**: Postman or Thunder Client
@@ -1129,6 +1187,7 @@ Response: 200 OK
 - **Database Client**: MySQL Workbench or DBeaver
 
 ### Deployment (Production - Optional)
+
 - **Frontend Hosting**: Vercel or Netlify
 - **Backend Hosting**: Railway, Render, or AWS EC2
 - **Database**: PlanetScale, Railway, or AWS RDS
@@ -1141,29 +1200,34 @@ Response: 200 OK
 ### Student User Stories
 
 #### Epic 1: Onboarding & Assessment
+
 - **US-1.1**: As a student, I want to register with my email so I can create an account
 - **US-1.2**: As a student, I want to take a diagnostic test so the system can understand my current level
 - **US-1.3**: As a student, I want to see my diagnostic test results with a breakdown per topic so I know my strengths and weaknesses
 
 #### Epic 2: Personalized Learning
+
 - **US-2.1**: As a student, I want to see a knowledge map showing my mastery level for each topic
 - **US-2.2**: As a student, I want to receive recommendations on which topic to study next based on my weaknesses
 - **US-2.3**: As a student, I want topics with unmet prerequisites to be locked so I learn in the correct order
 - **US-2.4**: As a student, I want to access learning materials for recommended topics so I can study the concepts
 
 #### Epic 3: Adaptive Practice
+
 - **US-3.1**: As a student, I want to get practice questions that match my current skill level
 - **US-3.2**: As a student, I want the difficulty to adjust based on my answers so I'm appropriately challenged
 - **US-3.3**: As a student, I want to see immediate feedback on my answers with explanations
 - **US-3.4**: As a student, I want to see my mastery level update after each practice session
 
 #### Epic 4: AI Tutor Support
+
 - **US-4.1**: As a student, I want to ask the AI tutor questions about concepts I don't understand
 - **US-4.2**: As a student, I want the AI to explain why my answer was wrong when I make a mistake
 - **US-4.3**: As a student, I want to receive hints instead of direct answers so I can learn to solve problems myself
 - **US-4.4**: As a student, I want the AI tutor to use the learning materials as context so explanations are consistent
 
 #### Epic 5: Progress Tracking
+
 - **US-5.1**: As a student, I want to see my overall progress percentage on my dashboard
 - **US-5.2**: As a student, I want to view my learning history and see which topics I've practiced
 - **US-5.3**: As a student, I want to see a visual representation of my improvement over time
@@ -1171,6 +1235,7 @@ Response: 200 OK
 ### Teacher User Stories (Phase 2)
 
 #### Epic 6: Class Monitoring
+
 - **US-6.1**: As a teacher, I want to see an overview of all my students' progress
 - **US-6.2**: As a teacher, I want to identify students who are struggling with specific topics
 - **US-6.3**: As a teacher, I want to see which topics are most challenging for the class
@@ -1181,6 +1246,7 @@ Response: 200 OK
 ## UI/UX Design & User Flow
 
 ### Design Principles
+
 1. **Clarity First**: Learning interface harus clean dan tidak overwhelming
 2. **Immediate Feedback**: Setiap action harus memberikan feedback langsung
 3. **Progress Visibility**: Siswa harus selalu tahu posisi mereka dalam learning journey
@@ -1188,6 +1254,7 @@ Response: 200 OK
 5. **Mobile-Friendly**: Responsive design (MVP fokus web, tapi siap untuk mobile)
 
 ### Color Scheme
+
 ```
 Primary Colors:
 - Main: #3B82F6 (Blue) - Trust, learning, professionalism
@@ -1212,6 +1279,7 @@ Status Colors:
 ### Key Pages & User Flow
 
 #### 1. Landing Page
+
 ```
 ┌─────────────────────────────────────────┐
 │  [Logo] SkillPath AI           [Login] │
@@ -1232,6 +1300,7 @@ Status Colors:
 ```
 
 #### 2. Registration/Login Flow
+
 ```
 Register → Email Verification (optional) → Diagnostic Test Intro
                                                  ↓
@@ -1243,6 +1312,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 3. Diagnostic Test Page
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  ← Tes Diagnostik Matematika                    │
@@ -1265,6 +1335,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 4. Diagnostic Test Results
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Hasil Tes Diagnostik                           │
@@ -1300,6 +1371,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 5. Student Dashboard
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ☰ SkillPath AI            [John Doe ▼]  [🔔]          │
@@ -1338,6 +1410,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 6. Learning Material Page
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ← Kembali                                  [AI Tutor] │
@@ -1377,6 +1450,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 7. Adaptive Exercise Page
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ← Latihan: Pecahan                    [AI Tutor 💬]   │
@@ -1409,6 +1483,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 8. Answer Feedback
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ✓ Jawaban Benar!                                      │
@@ -1437,6 +1512,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 9. AI Tutor Chat Interface
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  AI Tutor - Pecahan                           [✕ Close] │
@@ -1472,6 +1548,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 #### 10. Progress/Analytics Page
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ☰ SkillPath AI - Progress                             │
@@ -1516,6 +1593,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 ### Navigation Flow Diagram
+
 ```
          [Landing Page]
                 ↓
@@ -1551,6 +1629,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 #### Week 1: Foundation & Setup (Days 1-7)
 
 **Backend Setup (Days 1-3)**
+
 - [ ] Initialize project structure (Node.js + Express)
 - [ ] Setup MySQL database and create initial tables
 - [ ] Implement user authentication (register, login with JWT)
@@ -1562,6 +1641,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - Learning materials per topic
 
 **Frontend Setup (Days 1-3)**
+
 - [ ] Setup React + TypeScript + Vite project
 - [ ] Configure Tailwind CSS and install UI components
 - [ ] Setup routing (React Router)
@@ -1570,12 +1650,14 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - [ ] Implement protected routes
 
 **Python Algorithm Engine Setup (Days 4-5)**
+
 - [ ] Initialize FastAPI project
 - [ ] Implement BKT model class
 - [ ] Create basic API endpoints for BKT calculations
 - [ ] Test BKT algorithm with sample data
 
 **Integration (Days 6-7)**
+
 - [ ] Connect frontend to backend API
 - [ ] Connect backend to Python algorithm engine
 - [ ] Test authentication flow end-to-end
@@ -1588,6 +1670,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 #### Week 2: Core Algorithm & Diagnostic Test (Days 8-14)
 
 **Algorithm Development (Days 8-10)**
+
 - [ ] Implement full BKT update logic
 - [ ] Create recommendation engine
 - [ ] Implement prerequisite checker
@@ -1597,6 +1680,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - GET /api/algorithm/prerequisites/:topicId
 
 **Diagnostic Test (Days 8-11)**
+
 - [ ] Backend: Test management API
   - GET /api/diagnostic/test
   - POST /api/diagnostic/submit
@@ -1614,12 +1698,14 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - Show recommendation
 
 **Knowledge Map Component (Days 12-13)**
+
 - [ ] Create TopicCard component with mastery visualization
 - [ ] Implement color-coded status (red/yellow/green)
 - [ ] Show locked topics with prerequisites
 - [ ] Display recommended next topic
 
 **Testing & Bug Fixes (Day 14)**
+
 - [ ] Test diagnostic flow end-to-end
 - [ ] Verify BKT calculations are correct
 - [ ] Test with multiple student scenarios
@@ -1632,6 +1718,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 #### Week 3: Adaptive Learning & AI Tutor (Days 15-21)
 
 **Learning Materials (Days 15-16)**
+
 - [ ] Backend: Learning content API
   - GET /api/learning/topic/:topicId
   - GET /api/learning/progress
@@ -1642,6 +1729,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - Navigation between materials
 
 **Adaptive Exercise System (Days 17-19)**
+
 - [ ] Backend: Exercise API
   - GET /api/exercises/topic/:topicId (adaptive questions)
   - POST /api/exercises/submit
@@ -1656,12 +1744,14 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - Celebrate success
 
 **BKT Update Flow (Days 18-19)**
+
 - [ ] After each answer, call algorithm engine to update P(L)
 - [ ] Update student_progress table
 - [ ] Recalculate mastery percentage
 - [ ] Update recommendation if needed
 
 **AI Tutor Integration (Days 20-21)**
+
 - [ ] Setup AI API integration (OpenAI or Claude)
 - [ ] Backend: AI Tutor service
   - Build context from topic + student state + question
@@ -1681,6 +1771,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 #### Week 4: Dashboard, Polish & Testing (Days 22-28)
 
 **Student Dashboard (Days 22-23)**
+
 - [ ] Overall progress summary
 - [ ] Recommended next topic card
 - [ ] Quick stats (topics studied, questions answered)
@@ -1688,12 +1779,14 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - [ ] Recent activities
 
 **Progress Tracking Page (Day 24)**
+
 - [ ] Progress chart (mastery over time)
 - [ ] Detailed breakdown per topic
 - [ ] Learning history
 - [ ] Achievements/milestones (optional simple badges)
 
 **Polish & UX Improvements (Days 25-26)**
+
 - [ ] Improve loading states
 - [ ] Add animations and transitions
 - [ ] Improve error handling and user feedback
@@ -1701,6 +1794,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - [ ] Accessibility improvements (ARIA labels, keyboard navigation)
 
 **Testing & Bug Fixes (Day 27)**
+
 - [ ] End-to-end user flow testing
 - [ ] Test edge cases:
   - All topics mastered
@@ -1710,6 +1804,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - [ ] Fix bugs
 
 **Demo Preparation (Day 28)**
+
 - [ ] Prepare demo script
 - [ ] Create sample student accounts with different progress levels
 - [ ] Prepare presentation materials
@@ -1722,21 +1817,22 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 
 ### Priority Matrix
 
-| Feature                  | Priority | Complexity | Impact |
-|-------------------------|----------|------------|--------|
-| BKT Algorithm           | P0       | High       | High   |
-| Diagnostic Test         | P0       | Medium     | High   |
-| Knowledge Map           | P0       | Medium     | High   |
-| Adaptive Exercises      | P0       | High       | High   |
-| Learning Materials      | P0       | Low        | High   |
-| AI Tutor                | P1       | Medium     | High   |
-| Progress Dashboard      | P1       | Medium     | Medium |
-| Recommendation Engine   | P0       | Medium     | High   |
-| Prerequisite System     | P1       | Medium     | Medium |
-| Teacher Dashboard       | P2       | Medium     | Low    |
-| Gamification            | P3       | Medium     | Low    |
+| Feature               | Priority | Complexity | Impact |
+| --------------------- | -------- | ---------- | ------ |
+| BKT Algorithm         | P0       | High       | High   |
+| Diagnostic Test       | P0       | Medium     | High   |
+| Knowledge Map         | P0       | Medium     | High   |
+| Adaptive Exercises    | P0       | High       | High   |
+| Learning Materials    | P0       | Low        | High   |
+| AI Tutor              | P1       | Medium     | High   |
+| Progress Dashboard    | P1       | Medium     | Medium |
+| Recommendation Engine | P0       | Medium     | High   |
+| Prerequisite System   | P1       | Medium     | Medium |
+| Teacher Dashboard     | P2       | Medium     | Low    |
+| Gamification          | P3       | Medium     | Low    |
 
 **Legend:**
+
 - P0: Must have for MVP
 - P1: Should have for good demo
 - P2: Nice to have
@@ -1749,29 +1845,34 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ### Unit Testing
 
 **Backend (Node.js)**
+
 - Use Jest or Mocha
 - Test controllers, services, and models
 - Mock database calls
 - Test authentication middleware
 
 **Python Algorithm Engine**
+
 - Use pytest
 - Test BKT model calculations
 - Test recommendation logic
 - Test edge cases (P(L) = 0, P(L) = 1, etc.)
 
 **Frontend**
+
 - Use Vitest (comes with Vite)
 - Test utility functions
 - Test custom hooks
 - Test critical components (optional for hackathon)
 
 ### Integration Testing
+
 - Test API endpoints with real database (test DB)
 - Test algorithm engine responses
 - Test AI API integration (with mocked responses)
 
 ### End-to-End Testing
+
 - Manual testing of complete user flows:
   1. Register → Diagnostic Test → Dashboard
   2. Learning Material → Exercise → Feedback → Progress Update
@@ -1783,6 +1884,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
   - Student with mixed performance
 
 ### Performance Testing
+
 - Load test with multiple concurrent users (optional)
 - Database query optimization
 - API response time monitoring
@@ -1794,6 +1896,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ### Demo Day Metrics
 
 **What to Measure:**
+
 1. **Algorithm Accuracy**
    - Does recommendation match weakest topic?
    - Does mastery increase after correct answers?
@@ -1815,24 +1918,25 @@ Register → Email Verification (optional) → Diagnostic Test Intro
    - Immediate feedback
 
 **Demo Script Example:**
+
 ```
 1. Student A starts diagnostic test
    → Shows weak in Pecahan (45%)
    → Recommendation: Start with Pecahan
-   
+
 2. Student A studies Pecahan materials
    → Attempts exercises
    → Gets medium difficulty questions
-   
+
 3. Student A answers correctly
    → Mastery increases to 52%
    → Gets slightly harder questions
-   
+
 4. Student A makes mistake
    → AI Tutor explains the concept
    → Provides hints
    → Mastery update reflects understanding
-   
+
 5. After multiple sessions
    → Pecahan reaches 75% (mastered)
    → Persamaan Linear unlocks
@@ -1840,6 +1944,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ```
 
 ### Post-MVP Metrics (if deployed)
+
 - User retention rate
 - Average time to master a topic
 - Correlation between initial diagnostic and improvement
@@ -1853,18 +1958,22 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ### Technical Risks
 
 #### Risk 1: BKT Algorithm Complexity
+
 **Probability**: Medium  
 **Impact**: High  
 **Mitigation**:
+
 - Start with simplified BKT implementation
 - Use fixed parameters initially (tune later with data)
 - Have fallback to simpler scoring system
 - Test thoroughly with sample data before integration
 
 #### Risk 2: AI API Costs
+
 **Probability**: Medium  
 **Impact**: Medium  
 **Mitigation**:
+
 - Set rate limits per user
 - Cache common explanations
 - Use cheaper model (GPT-3.5) for MVP
@@ -1872,18 +1981,22 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - Consider local LLM alternatives
 
 #### Risk 3: Content Creation Bottleneck
+
 **Probability**: High  
 **Impact**: Medium  
 **Mitigation**:
+
 - Focus on 3-5 topics only for MVP
 - Use AI to help generate questions and materials
 - Reuse existing educational content (with proper attribution)
 - Prioritize quality over quantity
 
 #### Risk 4: Integration Complexity (3 services)
+
 **Probability**: Medium  
 **Impact**: High  
 **Mitigation**:
+
 - Use Docker for local development
 - Clear API contracts between services
 - Implement proper error handling
@@ -1892,18 +2005,22 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ### Project Management Risks
 
 #### Risk 5: Time Constraint (4 weeks)
+
 **Probability**: High  
 **Impact**: High  
 **Mitigation**:
+
 - Strict scope management (no feature creep)
 - Focus on core P0 features
 - Skip nice-to-haves if behind schedule
 - Have a "minimum demo" version ready by Week 3
 
 #### Risk 6: Team Availability
+
 **Probability**: Medium  
 **Impact**: Medium  
 **Mitigation**:
+
 - Clear task assignments from Day 1
 - Daily standups (async if needed)
 - Parallel work streams (frontend/backend/algorithm)
@@ -1914,6 +2031,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ## Future Enhancements (Post-MVP)
 
 ### Phase 2 Features
+
 - Multiple subjects (Fisika, Kimia, Bahasa Inggris)
 - Teacher dashboard with class analytics
 - Parent portal for monitoring
@@ -1921,6 +2039,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - Offline mode
 
 ### Phase 3 Features
+
 - Spaced repetition algorithm
 - Peer learning features
 - Live tutoring sessions
@@ -1928,6 +2047,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - Advanced gamification (XP, levels, badges)
 
 ### Phase 4 Features
+
 - Custom curriculum builder for teachers
 - School/institution accounts
 - Advanced analytics and insights
@@ -1944,6 +2064,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 **Total Topics**: 3 (for MVP)
 
 #### Topic 1: Operasi Dasar
+
 - **Description**: Penjumlahan, pengurangan, perkalian, pembagian bilangan bulat
 - **Difficulty**: Beginner
 - **Prerequisites**: None
@@ -1951,6 +2072,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - **Materials**: 5 concept pages, 3 example sets
 
 #### Topic 2: Pecahan
+
 - **Description**: Pengertian pecahan, operasi pecahan, pecahan desimal
 - **Difficulty**: Beginner to Intermediate
 - **Prerequisites**: Operasi Dasar (min 70% mastery)
@@ -1958,6 +2080,7 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 - **Materials**: 6 concept pages, 4 example sets
 
 #### Topic 3: Persamaan Linear
+
 - **Description**: Persamaan linear satu variabel dan aplikasinya
 - **Difficulty**: Intermediate
 - **Prerequisites**: Operasi Dasar (70%), Pecahan (70%)
@@ -1967,13 +2090,13 @@ Register → Email Verification (optional) → Diagnostic Test Intro
 ### B. Sample BKT Parameters (Initial Estimates)
 
 | Parameter | Easy Topic | Medium Topic | Hard Topic |
-|-----------|-----------|--------------|------------|
-| P(L₀)     | 0.10      | 0.05         | 0.02       |
-| P(T)      | 0.15      | 0.10         | 0.08       |
-| P(G)      | 0.25      | 0.25         | 0.20       |
-| P(S)      | 0.10      | 0.15         | 0.20       |
+| --------- | ---------- | ------------ | ---------- |
+| P(L₀)     | 0.10       | 0.05         | 0.02       |
+| P(T)      | 0.15       | 0.10         | 0.08       |
+| P(G)      | 0.25       | 0.25         | 0.20       |
+| P(S)      | 0.10       | 0.15         | 0.20       |
 
-*Note: These will be refined with real student data*
+_Note: These will be refined with real student data_
 
 ### C. Environment Variables Template
 
@@ -2033,6 +2156,7 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 **SkillPath AI** adalah aplikasi pembelajaran adaptif yang berfokus pada personalisasi pembelajaran menggunakan algoritma Bayesian Knowledge Tracing dan AI Tutor. MVP akan dibangun dalam 4 minggu dengan fokus pada 1 mata pelajaran (Matematika) dan 3-5 topik utama.
 
 **Keunggulan utama**:
+
 1. ✅ Pembelajaran benar-benar adaptif (bukan sekadar chatbot)
 2. ✅ Pengukuran kemampuan yang akurat dengan BKT
 3. ✅ Rekomendasi personalized berdasarkan kelemahan siswa
@@ -2040,6 +2164,7 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 5. ✅ Real-time progress tracking
 
 **Nilai jual untuk demo**:
+
 > "Dua siswa dengan kemampuan berbeda akan mendapatkan pembelajaran yang berbeda - sistem tidak hanya menjawab pertanyaan, tetapi secara aktif mengukur, menganalisis, dan menyesuaikan pembelajaran untuk setiap individu."
 
 ---
@@ -2047,4 +2172,3 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 **Document Version**: 1.0  
 **Last Updated**: 2026-10-11  
 **Status**: Ready for Implementation
-
