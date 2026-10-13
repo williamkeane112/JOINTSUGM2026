@@ -292,3 +292,33 @@
 **Steering File**: `.kiro/steering/skillpath-ai-supabase.md`  
 **Planning Doc**: `docs/PROJECT_PLAN.md`  
 **This File**: `.kiro/steering/session-progress.md`
+
+
+
+---
+
+## 🎨 Design System Unification (2026-10-13)
+
+### Konteks
+
+Auth page (`src/page/auth/Auth.tsx`) dibangun dari design reference eksternal dengan palet **pink/violet/night/cream** (`#FF4F87`, `#6D36BD`, `#160820`, `#FFF7F2`). Palet ini berbeda total dari design system lama di `docs/DESIGN.md` yang masih **blue-500 generik** (`#3B82F6`) ala SaaS dashboard, lengkap dengan maskot Spark ber-glow biru. `src/index.css` sempat punya dua set token sekaligus (campur blue lama + pink/violet baru), dan 99 referensi warna lama tersebar di 10 file dokumentasi.
+
+### Keputusan
+
+- **Pink `#FF4F87` + violet `#6D36BD` menggantikan biru sebagai brand/primary** di seluruh app — bukan hanya auth page. Alasan: auth page sudah establish identitas visual yang matang (hangat, personal, "belajar di malam hari yang fokus"), lebih distinctive dibanding blue-SaaS default yang jadi "tell" AI-generated.
+- **Status mastery (🔴🟡🟢) tetap pakai logika merah/kuning/hijau** — ini semantik fungsional, tidak diganti pink supaya user tidak bingung membedakan status dari aksi. Hue-nya dihangatkan: mastered `#1E9E6B`, in-progress `#E8A33D`, not-mastered `#E2544B` (bukan `green-500`/`amber-500`/`red-500` Tailwind default).
+- **Gamification (XP, streak) memakai ulang hue brand** — XP = violet (reuse, bukan purple-500 baru), streak = `#F2763C` koral-oranye.
+- **Font**: Plus Jakarta Sans (display/heading) + Inter (body) — sudah ditentukan di DESIGN.md lama tapi **tidak pernah benar-benar di-load** (tidak ada `<link>` Google Fonts di `index.html`). Ini diperbaiki sekaligus.
+- **Tracking floor**: headline di Auth.tsx pakai `-0.065em` yang melewati batas kenyamanan baca (-0.04em floor, -0.02 s/d -0.03em ideal). Dicatat sebagai standar baru untuk ke depan; Auth.tsx **tidak diubah** sekarang (di luar scope task ini).
+
+### Yang Diubah
+
+- `src/index.css` — ditulis ulang penuh: token brand (ink/pink/pink-deep/violet/night/cream/line/surface), status mastery dengan pasangan tint/ink/line per status, shadow selalu offset+blur (bukan halo warna offset-nol), radius 12-16px untuk card. Semua class `.btn-*`/`.card*`/`.input`/`.badge-*` pakai token baru.
+- `index.html` — load Plus Jakarta Sans + Inter via Google Fonts.
+- `docs/DESIGN.md` — §3 Color Palette, §4 Typography (tambah subsection Letter Spacing), §5 radius, §6 Component Library (buttons/cards/progress/badges/input/navigation/diagnostic test/chat bubble), maskot Spark, §11 Google Stitch prompts (7 prompt), §13 Tailwind custom classes code appendix — semua diselaraskan ke token baru.
+- `.kiro/steering/skillpath-ai-supabase.md` dan `AGENTS.md` — baris color scheme diperbarui.
+
+### Catatan Proses
+
+- Setup resmi skill `impeccable` (`impeccable context`) gagal karena tidak ada akses jaringan untuk download engine binary. Dilanjutkan dengan membaca context project secara manual + menerapkan `craft-floor.md` secara langsung (shadow offset+blur, radius 12-16px, badge text dicelup dari hue bukan abu-abu generik, dll), sesuai fallback instruction skill tersebut.
+- Tidak ada `PRODUCT.md` di project ini; karena task ini adalah penyempurnaan konsistensi pada dunia visual yang sudah ada (bukan surface baru), dilanjutkan tanpa `init`.

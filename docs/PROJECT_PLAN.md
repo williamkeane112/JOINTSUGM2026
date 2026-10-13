@@ -1255,25 +1255,28 @@ Response: 200 OK
 
 ### Color Scheme
 
+> **Ref**: `docs/DESIGN.md` §3 — token resmi, bukan nilai di bawah ini.
+
 ```
 Primary Colors:
-- Main: #3B82F6 (Blue) - Trust, learning, professionalism
-- Success: #10B981 (Green) - Mastered, correct answers
-- Warning: #F59E0B (Orange) - In progress
-- Danger: #EF4444 (Red) - Not mastered, incorrect answers
+- Main: #FF4F87 (Pink) - Hangat, personal, distinctive (bukan blue-SaaS generik)
+- Secondary: #6D36BD (Violet) - Depth, XP/gamification
+- Success: #1E9E6B (Emerald hangat) - Mastered, correct answers
+- Warning: #E8A33D (Amber hangat) - In progress
+- Danger: #E2544B (Koral hangat) - Not mastered, incorrect answers
 
 Neutral Colors:
-- Background: #F9FAFB
+- Background: #FFF7F2 (Cream)
 - Card: #FFFFFF
-- Text Primary: #111827
-- Text Secondary: #6B7280
-- Border: #E5E7EB
+- Text Primary: #17111F (Ink)
+- Text Secondary: #766B7F (Muted)
+- Border: #EADFE4 (Line)
 
 Status Colors:
-- Mastered: #10B981 (Green)
-- In Progress: #F59E0B (Orange)
-- Not Mastered: #EF4444 (Red)
-- Locked: #9CA3AF (Gray)
+- Mastered: #1E9E6B (Emerald hangat)
+- In Progress: #E8A33D (Amber hangat)
+- Not Mastered: #E2544B (Koral hangat)
+- Locked: #AFA3AC (Netral violet-gray)
 ```
 
 ### Key Pages & User Flow

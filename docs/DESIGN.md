@@ -47,7 +47,7 @@ Spark adalah AI companion siswa — sosok kecil berbentuk bintang bercahaya deng
 #### Referensi Visual Character
 
 - Bentuk: Bintang 5 sudut yang membulat (rounded star), ukuran ~40x40px di UI
-- Warna default: Kuning emas `#F59E0B` dengan glow biru `#3B82F6`
+- Warna default: Kuning emas `#E8A33D` dengan glow pink `#FF4F87`
 - Mata: Dua lingkaran hitam kecil yang expressif
 - Mulut: Kurva sederhana yang berubah (senyum, kaget, semangat)
 
@@ -75,58 +75,61 @@ Spark juga "leveling up" bersama siswa — tampilannya berevolusi:
 
 ## 3. Color Palette
 
-### Primary Colors
+> **Dunia visual**: hangat, personal, malam-fokus — pink/violet di atas night & cream, bukan biru-SaaS generik. Diturunkan dari auth page (`src/page/auth/Auth.tsx` + token di `src/index.css`), bukan sebaliknya.
+
+### Brand Core
 
 ```
---color-primary-50:  #EFF6FF   /* Background ringan */
---color-primary-100: #DBEAFE   /* Hover states */
---color-primary-400: #60A5FA   /* Lighter actions */
---color-primary-500: #3B82F6   /* Primary action (buttons, links) */
---color-primary-600: #2563EB   /* Hover primary */
---color-primary-700: #1D4ED8   /* Active/pressed */
+--color-ink:    #17111F   /* Teks utama di atas surface terang */
+--color-pink:   #FF4F87   /* Primary action — tombol, link, aksen */
+--color-pink-deep: #E62F72 /* Hover/active dari primary */
+--color-violet: #6D36BD   /* Aksen sekunder — depth, focus, XP */
+--color-night:  #160820   /* Surface gelap — hero, nav malam */
+--color-cream:  #FFF7F2   /* Surface terang — page/app background */
 ```
 
-### Semantic Colors
+### Support Neutrals
 
 ```
-/* Mastery Status */
---color-mastered:    #22C55E   /* Green-500 — Mastered (>70%) */
---color-progress:    #F59E0B   /* Amber-500 — In Progress (40-70%) */
---color-weak:        #EF4444   /* Red-500 — Not Mastered (<40%) */
---color-locked:      #9CA3AF   /* Gray-400 — Locked topic */
-
-/* Gamification */
---color-xp:          #8B5CF6   /* Purple-500 — XP points */
---color-streak:      #F97316   /* Orange-500 — Streak fire */
---color-gold:        #F59E0B   /* Amber-500 — Achievement gold */
---color-silver:      #6B7280   /* Gray-500 — Achievement silver */
+--color-muted:   #766B7F  /* Teks sekunder */
+--color-line:    #EADFE4  /* Border, divider */
+--color-surface: #FFFFFF  /* Card di atas cream — satu elevasi, bukan ghost card */
 ```
 
-### Neutral Colors
+### Mastery Status
+
+Makna fungsionalnya **tetap merah/kuning/hijau** (jangan diganti pink — nanti user bingung membedakan status dari aksi). Hue-nya dihangatkan agar menyatu dengan dunia pink/violet/cream, bukan `red-500`/`amber-500`/`green-500` Tailwind default.
 
 ```
---color-bg:          #FAFAFA   /* Page background */
---color-surface:     #FFFFFF   /* Cards, panels */
---color-border:      #E5E7EB   /* Borders */
---color-text-primary: #111827  /* Headings */
---color-text-secondary: #6B7280 /* Body text */
---color-text-muted:  #9CA3AF   /* Placeholder, caption */
+--color-mastered: #1E9E6B  /* 🟢 Mastered (>70%) — emerald hangat */
+--color-progress: #E8A33D  /* 🟡 In Progress (40-70%) — amber hangat */
+--color-weak:     #E2544B  /* 🔴 Not Mastered (<40%) — koral hangat */
+--color-locked:   #AFA3AC  /* Locked topic — netral dari keluarga muted/line */
 ```
 
-### Gradient System
+Setiap status punya pasangan tint/ink/line untuk badge (lihat §6.4) — teks badge selalu dicelup dari hue status itu sendiri, **tidak pernah abu-abu generik**.
+
+### Gamification
+
+Memakai ulang hue brand yang sudah ada, bukan menambah warna baru yang tidak bermakna.
 
 ```
-/* Hero / Onboarding */
---gradient-hero: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 50%, #FFF7ED 100%)
+--color-xp:     var(--color-violet)  /* XP — reuse violet, bukan purple-500 baru */
+--color-streak: #F2763C              /* Streak — koral-oranye, beda dari weak & mastered */
+--color-gold:   var(--color-progress) /* Achievement gold — reuse amber */
+--color-silver: #9C8FA0               /* Achievement silver — dari keluarga violet-muted */
+```
 
-/* Card accent (topic mastered) */
---gradient-mastered: linear-gradient(135deg, #22C55E20, #16A34A10)
+### Shadows
 
-/* XP Bar */
---gradient-xp: linear-gradient(90deg, #8B5CF6, #3B82F6)
+Shadow selalu punya offset + blur (bukan halo warna offset-nol — itu dekorasi, bukan depth).
 
-/* Spark glow */
---gradient-spark: radial-gradient(circle, #FEF08A, #F59E0B)
+```
+--shadow-primary:  0 10px 24px rgba(255, 79, 135, 0.28)
+--shadow-violet:   0 10px 24px rgba(109, 54, 189, 0.25)
+--shadow-mastered: 0 10px 20px rgba(30, 158, 107, 0.22)
+--shadow-card:     0 4px 16px rgba(23, 17, 31, 0.08)
+--shadow-card-hover: 0 12px 28px rgba(23, 17, 31, 0.14)
 ```
 
 ---
@@ -170,6 +173,18 @@ font-family-mono: "JetBrains Mono", "Fira Code", monospace;
 --font-extrabold: 800  /* Hero text, XP counter */
 ```
 
+### Letter Spacing (tracking)
+
+Tracking rapat memberi karakter pada headline display, tapi ada batas sebelum teks jadi sulit dibaca.
+
+```
+--tracking-floor:   -0.04em  /* Batas rapat maksimum — jangan lebih rapat dari ini */
+--tracking-display: -0.03em  /* Default untuk h1-h4 (font-display), biasanya terbaca lebih baik dari floor */
+--tracking-body:    normal   /* Body text — jangan di-tracking */
+```
+
+Numerik (XP counter, skor, timer) pakai `font-variant-numeric: tabular-nums` agar sejajar saat berubah — bukan font monospace sebagai kostum "teknis".
+
 ---
 
 ## 5. Spacing & Layout
@@ -194,26 +209,25 @@ font-family-mono: "JetBrains Mono", "Fira Code", monospace;
 ### Border Radius
 
 ```
---radius-sm:   6px    /* Input fields */
---radius-md:   10px   /* Buttons, small cards */
---radius-lg:   16px   /* Cards */
+--radius-sm:   6px    /* Input fields kecil */
+--radius-md:   13px   /* Input fields, buttons — selaras var(--radius-input) */
+--radius-lg:   14px   /* Cards — selaras var(--radius-card), craft floor 12-16px */
 --radius-xl:   24px   /* Modal, big panels */
 --radius-2xl:  32px   /* Hero sections */
---radius-full: 9999px /* Pills, badges, avatars */
+--radius-full: 9999px /* Pills, badges, avatars — var(--radius-pill) */
 ```
 
 ### Shadows
 
-```
---shadow-sm:  0 1px 3px rgba(0,0,0,0.08)
---shadow-md:  0 4px 12px rgba(0,0,0,0.10)
---shadow-lg:  0 8px 24px rgba(0,0,0,0.12)
---shadow-xl:  0 16px 48px rgba(0,0,0,0.14)
+Shadow neutral (netral, berbasis ink bukan hitam murni) untuk depth umum; shadow berwarna untuk gamification/status didefinisikan sekali di §3 — rujuk dari sana, jangan duplikasi nilai.
 
-/* Colored shadows untuk gamification */
---shadow-xp:     0 4px 16px rgba(139,92,246,0.30)
---shadow-mastered: 0 4px 16px rgba(34,197,94,0.25)
---shadow-primary:  0 4px 16px rgba(59,130,246,0.30)
+```
+--shadow-sm:  0 1px 3px rgba(23,17,31,0.06)
+--shadow-md:  0 4px 16px rgba(23,17,31,0.08)   /* = var(--shadow-card) di §3 */
+--shadow-lg:  0 12px 28px rgba(23,17,31,0.14)  /* = var(--shadow-card-hover) di §3 */
+--shadow-xl:  0 20px 48px rgba(23,17,31,0.18)
+
+/* Shadow berwarna: lihat §3 Shadows (--shadow-primary, --shadow-violet, --shadow-mastered) */
 ```
 
 ### Layout Grid
@@ -245,27 +259,27 @@ margin: 16px
 #### Variants
 
 ```
-PRIMARY   → bg-primary-500, white text, shadow-primary on hover
-SECONDARY → bg-white, border-primary-500, primary-500 text
-SUCCESS   → bg-mastered, white text
-DANGER    → bg-red-500, white text
-GHOST     → transparent, primary text, hover bg-primary-50
-XP        → bg-gradient-xp, white text, shadow-xp (untuk reward actions)
+PRIMARY   → bg-[var(--color-pink)], white text, shadow-primary; hover bg-[var(--color-pink-deep)]
+SECONDARY → bg-transparent, border-[var(--color-pink)], text-[var(--color-pink-deep)]
+SUCCESS   → bg-[var(--color-mastered)], white text, shadow-mastered
+DANGER    → bg-[var(--color-weak)], white text
+GHOST     → transparent, text-[var(--color-pink-deep)], hover bg-[#fff0f5]
+XP        → bg-[var(--color-violet)], white text, shadow-violet (untuk reward actions)
 ```
 
 #### Sizes
 
 ```
-SM  → px-3 py-1.5 text-sm rounded-md
-MD  → px-4 py-2   text-base rounded-md  (default)
-LG  → px-6 py-3   text-lg rounded-lg
-XL  → px-8 py-4   text-xl rounded-xl   (CTA hero)
+SM  → px-3 py-1.5 text-sm rounded-[10px]
+MD  → px-4 py-2   text-base rounded-[var(--radius-input)]  (default)
+LG  → px-6 py-3   text-lg rounded-[var(--radius-input)]
+XL  → px-8 py-4   text-xl rounded-[16px]   (CTA hero)
 ```
 
 #### States
 
 - `default` → base style
-- `hover` → lift effect (translateY -1px) + stronger shadow
+- `hover` → lift effect (translateY -1px) + stronger shadow (lihat §3 Shadows)
 - `active` → press down (translateY 0)
 - `loading` → spinner icon kiri + disabled
 - `disabled` → opacity 50%, no cursor
@@ -275,21 +289,20 @@ XL  → px-8 py-4   text-xl rounded-xl   (CTA hero)
 #### Base Card
 
 ```
-bg-white
-rounded-2xl (16px)
-border border-gray-100
-shadow-md
+bg-[var(--color-surface)]
+rounded-[var(--radius-card)] (14px)
+shadow: var(--shadow-card)       /* satu deklarasi elevasi — shadow saja, bukan border + shadow */
 p-6
 transition: shadow 200ms, transform 200ms
-hover: shadow-lg, translateY(-2px)
+hover: shadow var(--shadow-card-hover), translateY(-2px)
 ```
 
 #### Topic Card (Knowledge Map)
 
 ```
 Base card +
-Left border: 4px solid [status-color]
-Header: topic icon (emoji/svg) + name + difficulty badge
+Left border: 4px solid [status-color dari §3 Mastery Status]
+Header: topic icon (SVG, bukan emoji) + name + difficulty badge
 Body: Progress bar + percentage + last practiced
 Footer: "Lanjutkan" button atau "Terkunci" state
 ```
@@ -298,19 +311,19 @@ Footer: "Lanjutkan" button atau "Terkunci" state
 
 ```
 Centered layout
-Circle icon top (64px, gradient bg)
-Title bold
-Description muted
-Unlocked: full color | Locked: grayscale + overlay
+Circle icon top (64px, bg violet/pink sesuai konteks)
+Title bold (font-display)
+Description muted (var(--color-muted))
+Unlocked: full color | Locked: desaturated + overlay var(--color-locked-tint)
 ```
 
 #### Stat Card (Dashboard)
 
 ```
-Icon kiri (32px, colored bg circle)
-Label atas (text-sm muted)
-Value besar (text-2xl bold, colored)
-Trend indicator bawah (↑ +5% this week)
+Icon kiri (32px, colored bg circle sesuai status/metric)
+Label atas (text-sm var(--color-muted))
+Value besar (text-2xl font-display bold, warna sesuai metric)
+Trend indicator bawah (↑ +5% minggu ini)
 ```
 
 ### 6.3 Progress Components
@@ -318,8 +331,8 @@ Trend indicator bawah (↑ +5% this week)
 #### XP Progress Bar
 
 ```
-Container: bg-primary-100, rounded-full, h-3
-Fill: bg-gradient-xp, rounded-full, transition width 600ms ease
+Container: bg-[var(--color-line)], rounded-full, h-3
+Fill: bg-[var(--color-violet)], rounded-full, transition width 600ms ease
 Label kiri: "Level X"
 Label kanan: "Y / Z XP"
 Animasi: pulse saat XP ditambah
@@ -328,8 +341,8 @@ Animasi: pulse saat XP ditambah
 #### Topic Mastery Bar
 
 ```
-Container: bg-gray-100, rounded-full, h-2
-Fill: warna sesuai status (green/amber/red)
+Container: bg-[var(--color-line)], rounded-full, h-2
+Fill: warna sesuai status (mastered/progress/weak dari §3)
 Percentage label di kanan
 ```
 
@@ -337,45 +350,47 @@ Percentage label di kanan
 
 ```
 SVG circle, stroke-dasharray animation
-Center: percentage besar (text-4xl bold)
+Center: percentage besar (text-4xl font-display bold)
 Sub: "Overall Mastery"
-Warna: stroke sesuai mastery level
+Warna: stroke sesuai mastery level (§3)
 ```
 
 ### 6.4 Badges & Pills
 
-```
-MASTERED   → bg-green-100 text-green-700 border-green-200
-IN_PROGRESS → bg-amber-100 text-amber-700 border-amber-200
-NOT_MASTERED → bg-red-100 text-red-700 border-red-200
-LOCKED     → bg-gray-100 text-gray-500 border-gray-200
-NEW        → bg-blue-100 text-blue-700 border-blue-200
-XP         → bg-purple-100 text-purple-700 border-purple-200
+Teks badge selalu dicelup dari hue status itu sendiri (lihat §3) — tidak pernah abu-abu generik.
 
-Size: px-3 py-1 text-xs font-semibold rounded-full
+```
+MASTERED     → bg-[var(--color-mastered-tint)] text-[var(--color-mastered-ink)] border-[var(--color-mastered-line)]
+IN_PROGRESS  → bg-[var(--color-progress-tint)] text-[var(--color-progress-ink)] border-[var(--color-progress-line)]
+NOT_MASTERED → bg-[var(--color-weak-tint)] text-[var(--color-weak-ink)] border-[var(--color-weak-line)]
+LOCKED       → bg-[var(--color-locked-tint)] text-[var(--color-locked-ink)] border-[var(--color-locked-line)]
+NEW          → bg-[#f3ecfa] text-[var(--color-violet)] border-[#ddc8f0]
+XP           → bg-[#f3ecfa] text-[var(--color-violet)] border-[#ddc8f0]
+
+Size: px-3 py-1 text-xs font-semibold rounded-[var(--radius-pill)]
 ```
 
 ### 6.5 Input Fields
 
 ```
 Base:
-  border border-gray-300
-  rounded-lg (10px)
+  border border-[var(--color-line)]
+  rounded-[var(--radius-input)] (13px)
   px-4 py-3
   text-base
-  bg-white
-  placeholder: text-gray-400
+  bg-[var(--color-surface)]
+  placeholder: text-[var(--color-muted)]
 
 Focus:
-  border-primary-500
-  ring-2 ring-primary-200
+  border-[var(--color-pink)]
+  ring-2 ring-[rgba(255,79,135,0.15)]
   outline-none
 
 Error:
-  border-red-500
-  ring-2 ring-red-100
+  border-[var(--color-weak)]
+  ring-2 ring-[var(--color-weak-tint)]
 
-Icon left/right: absolute, text-gray-400
+Icon left/right: absolute, text-[var(--color-muted)]
 ```
 
 ### 6.6 Navigation
@@ -384,13 +399,13 @@ Icon left/right: absolute, text-gray-400
 
 ```
 Width: 256px (collapsed: 72px)
-bg-white
-border-right: 1px solid border-color
-shadow-sm
+bg-[var(--color-surface)]
+border-right: 1px solid var(--color-line)
+shadow: var(--shadow-card)
 
 Top: Logo + Spark character (animasi idle)
-Nav items: icon + label, rounded-lg, hover bg-primary-50
-Active: bg-primary-50 text-primary-600 font-semibold border-l-2 border-primary-500
+Nav items: icon + label, rounded-[var(--radius-input)], hover bg-[#fff0f5]
+Active: bg-[#fff0f5] text-[var(--color-pink-deep)] font-semibold border-l-2 border-[var(--color-pink)]
 Bottom: User avatar + name + settings icon
 ```
 
@@ -398,28 +413,28 @@ Bottom: User avatar + name + settings icon
 
 ```
 Fixed bottom
-bg-white
-border-top
+bg-[var(--color-surface)]
+border-top: 1px solid var(--color-line)
 5 items: Home, Map, Learn, Tutor, Profile
-Active: primary color icon + dot indicator
+Active: warna var(--color-pink) pada icon + dot indicator
 ```
 
 #### Top Bar
 
 ```
 h-16
-bg-white
-border-bottom
+bg-[var(--color-surface)]
+border-bottom: 1px solid var(--color-line)
 Left: Hamburger (mobile) / Logo (desktop)
-Center: Page title
-Right: XP counter pill + Streak counter + Notification bell + Avatar
+Center: Page title (font-display)
+Right: XP counter pill (violet) + Streak counter (coral-orange) + Notification bell + Avatar
 ```
 
 ### 6.7 Question Card (Diagnostic & Exercise)
 
 ```
 Container: max-w-2xl, centered
-Card: rounded-2xl, p-8, shadow-md
+Card: rounded-[var(--radius-card)], p-8, shadow: var(--shadow-card)
 
 Header:
   - Question number pill (Q 1/15)
@@ -431,11 +446,11 @@ Body:
   - Visual/equation block (optional)
 
 Options: 4 option buttons
-  - Base: border rounded-xl p-4 text-left w-full
-  - Hover: border-primary-300 bg-primary-50
-  - Selected: border-primary-500 bg-primary-50 font-semibold
-  - Correct (after submit): border-green-500 bg-green-50 ✓ icon
-  - Wrong (after submit): border-red-500 bg-red-50 ✗ icon
+  - Base: border border-[var(--color-line)] rounded-[var(--radius-input)] p-4 text-left w-full
+  - Hover: border-[var(--color-pink)] bg-[#fff0f5]
+  - Selected: border-[var(--color-pink)] bg-[#fff0f5] font-semibold
+  - Correct (after submit): border-[var(--color-mastered)] bg-[var(--color-mastered-tint)] ✓ icon
+  - Wrong (after submit): border-[var(--color-weak)] bg-[var(--color-weak-tint)] ✗ icon
 
 Footer:
   - Progress: "3 dari 15 soal"
@@ -445,12 +460,12 @@ Footer:
 ### 6.8 AI Tutor Chat Bubble
 
 ```
-User bubble: bg-primary-500 text-white, rounded-2xl rounded-br-sm, max-w-xs, right-aligned
-Spark bubble: bg-white border shadow-sm, rounded-2xl rounded-bl-sm, max-w-sm, left-aligned
+User bubble: bg-[var(--color-pink)] text-white, rounded-2xl rounded-br-sm, max-w-xs, right-aligned
+Spark bubble: bg-[var(--color-surface)] shadow: var(--shadow-card), rounded-2xl rounded-bl-sm, max-w-sm, left-aligned
   + Spark avatar (24px) di pojok kiri bubble
 
-Typing indicator: 3 dots animasi pulse
-Timestamp: text-xs text-muted di bawah bubble
+Typing indicator: 3 dots animasi pulse (warna var(--color-violet))
+Timestamp: text-xs text-[var(--color-muted)] di bawah bubble
 ```
 
 ---
@@ -936,7 +951,7 @@ xl:  > 1280px  (desktop)
 ## 10. Accessibility
 
 - Color contrast ratio minimum 4.5:1 (WCAG AA)
-- Focus indicators visible (ring-2 ring-primary-500)
+- Focus indicators visible (ring-2 ring-[var(--color-pink)])
 - ARIA labels pada semua interactive elements
 - Keyboard navigable (Tab order logical)
 - Screen reader: semantic HTML (heading hierarchy, landmarks)
@@ -959,26 +974,26 @@ xl:  > 1280px  (desktop)
 ```
 Design a modern educational learning platform dashboard called "SkillPath AI" with the following specifications:
 
-STYLE: Clean, playful-professional, white background, inspired by Duolingo's gamification but more academic. Use blue (#3B82F6) as primary color, green (#22C55E) for success/mastered states, amber (#F59E0B) for in-progress, and purple (#8B5CF6) for XP/gamification elements.
+STYLE: Clean, playful-professional, warm cream background (#FFF7F2), inspired by Duolingo's gamification but more academic. Use pink (#FF4F87) as primary color, green (#1E9E6B) for success/mastered states, amber (#E8A33D) for in-progress, and violet (#6D36BD) for XP/gamification elements.
 
 LAYOUT: Desktop (1280px wide). Left sidebar (256px) + main content area.
 
 SIDEBAR:
 - Logo "SkillPath AI" with a small glowing star mascot called "Spark" at the top
-- Navigation items with icons: Dashboard (active, blue highlight), Knowledge Map, Learn, AI Tutor
+- Navigation items with icons: Dashboard (active, pink highlight), Knowledge Map, Learn, AI Tutor
 - Bottom: user avatar + name "Budi Santoso" + level badge "Level 7"
 
 MAIN CONTENT (top to bottom):
-1. GREETING HEADER: "Selamat pagi, Budi! 👋" in large bold text. Subtitle: "Kamu sudah belajar 3 hari berturut-turut 🔥". Right side: orange streak counter "🔥 3" pill + purple XP counter "⚡ 1,240 XP" pill.
+1. GREETING HEADER: "Selamat pagi, Budi! 👋" in large bold text. Subtitle: "Kamu sudah belajar 3 hari berturut-turut 🔥". Right side: coral-orange streak counter "🔥 3" pill + violet XP counter "⚡ 1,240 XP" pill.
 
 2. STATS ROW (4 equal cards):
-   - Card 1: Circular progress chart showing "68%" with label "Overall Mastery", blue ring
-   - Card 2: "1,240 XP" large bold purple text, small level progress bar below, "Level 7 → 8"
-   - Card 3: "🔥 3 Hari" orange text, small calendar dots showing last 7 days activity
+   - Card 1: Circular progress chart showing "68%" with label "Overall Mastery", pink ring
+   - Card 2: "1,240 XP" large bold violet text, small level progress bar below, "Level 7 → 8"
+   - Card 3: "🔥 3 Hari" coral-orange text, small calendar dots showing last 7 days activity
    - Card 4: "2 dari 5" green text, "Topik Dikuasai" label
 
 3. MAIN SPLIT (2/3 + 1/3):
-   LEFT (2/3): "Rekomendasi Untukmu" section title. Large recommendation card: topic "Pecahan" with amber left border, mascot Spark saying "Nilaimu 45% — ayo kita tingkatkan! 💡", mastery bar at 45% (amber), "~20 menit" time estimate, big blue "Mulai Sekarang" button.
+   LEFT (2/3): "Rekomendasi Untukmu" section title. Large recommendation card: topic "Pecahan" with amber left border, mascot Spark saying "Nilaimu 45% — ayo kita tingkatkan! 💡", mastery bar at 45% (amber), "~20 menit" time estimate, big pink "Mulai Sekarang" button.
 
    RIGHT (1/3): "Aktivitas Terakhir" with 3 recent activity items (each with topic icon, name, time ago, XP gained badge). Below: small "Spark Tip" card with star mascot and motivational text.
 
@@ -998,7 +1013,7 @@ GAMIFICATION FEEL: The interface should feel rewarding and motivating. Progress 
 ```
 Design a Knowledge Map page for "SkillPath AI", an adaptive math learning platform for middle school students.
 
-STYLE: White background, clean, with a subtle grid pattern. Primary blue (#3B82F6), mastery colors: green for mastered, amber for in-progress, red for not-mastered, gray for locked.
+STYLE: Warm cream background (#FFF7F2), clean, with a subtle grid pattern. Primary pink (#FF4F87), mastery colors: green for mastered, amber for in-progress, red for not-mastered, muted violet-gray for locked.
 
 LAYOUT: Desktop 1280px. Same left sidebar as dashboard. Main area has:
 
@@ -1027,28 +1042,28 @@ Show Spark mascot in bottom-right corner as floating button "Tanya Spark" with c
 ```
 Design a Diagnostic Test page for "SkillPath AI" educational platform. This is a focused, distraction-free test-taking interface.
 
-STYLE: Clean white background, minimal UI. The test is the focus. Primary blue (#3B82F6).
+STYLE: Clean warm cream background, minimal UI. The test is the focus. Primary pink (#FF4F87).
 
 LAYOUT: Full page, no sidebar. Centered content, max-width 680px.
 
-TOP BAR (full width, white, border-bottom):
+TOP BAR (full width, cream, border-bottom):
 - Left: "SkillPath AI" logo small
-- Center: Progress bar (40% filled, blue) with "Soal 6 dari 15" label above
+- Center: Progress bar (40% filled, pink) with "Soal 6 dari 15" label above
 - Right: "Keluar" ghost button (with warning intent)
 
-QUESTION CARD (centered, white, rounded-2xl, shadow-lg, padding 40px):
-- TOP: small "Operasi Dasar" topic pill (blue) left, "01:23" timer right (gray)
+QUESTION CARD (centered, white, rounded-[14px], shadow soft, padding 40px):
+- TOP: small "Operasi Dasar" topic pill (pink) left, "01:23" timer right (muted)
 - QUESTION NUMBER: "Soal 6" in muted small text
 - QUESTION TEXT (text-xl, dark, line-height relaxed): "Berapakah hasil dari 3/4 + 1/2?"
-- 4 OPTION BUTTONS stacked, full-width, each a bordered rounded-xl card (padding 16px):
+- 4 OPTION BUTTONS stacked, full-width, each a bordered rounded-[13px] card (padding 16px):
   Option A: "1/4"
-  Option B: "5/4" — THIS ONE IS SELECTED (blue border, blue-50 background, checkmark circle)
+  Option B: "5/4" — THIS ONE IS SELECTED (pink border, soft pink-tint background #fff0f5, checkmark circle)
   Option C: "3/8"
   Option D: "2/6"
 
 BOTTOM OF CARD:
 - Left: small Spark mascot saying "Ambil waktumu, tidak ada yang buru-buru! 😊"
-- Right: "Jawab" button (blue, large, enabled since option selected)
+- Right: "Jawab" button (pink, large, enabled since option selected)
 
 OUTSIDE CARD BOTTOM: small text "Tes ini membantu kami memahami kemampuan awalmu"
 
@@ -1080,8 +1095,8 @@ FEEDBACK SECTION (below card, animated in from bottom):
 Green tinted card:
 - Large Spark mascot (excited, stars around it) + "Benar! 🎉" in large green bold text
 - Explanation: "2/3 = 4/6, sehingga 4/6 + 1/6 = 5/6. Menyamakan penyebut adalah kuncinya!"
-- Bottom left: "+15 XP" purple badge with up arrow (as if floating up)
-- Bottom right: "Soal Berikutnya →" blue button
+- Bottom left: "+15 XP" violet badge with up arrow (as if floating up)
+- Bottom right: "Soal Berikutnya →" pink button
 
 BACKGROUND: Subtle confetti particles (small colored dots) scattered in background to celebrate.
 
@@ -1119,7 +1134,7 @@ RIGHT PANEL (chat area):
   CHAT HEADER: Spark avatar (32px animated star) + "Spark AI Tutor" bold + "Online" green dot
 
   CHAT MESSAGES (scroll area):
-  [Student bubble - right aligned, blue bg]: "Kenapa hasilnya bukan 1/2 ya? Aku pikir 2/3 + 1/6 = 2/9?"
+  [Student bubble - right aligned, pink bg]: "Kenapa hasilnya bukan 1/2 ya? Aku pikir 2/3 + 1/6 = 2/9?"
 
   [Spark bubble - left aligned, white card with shadow]:
   Spark avatar 24px left of bubble.
@@ -1138,7 +1153,7 @@ RIGHT PANEL (chat area):
 
   CHAT INPUT BAR (bottom, white, border-top):
   - Text input: "Tanya Spark tentang Pecahan..." placeholder
-  - Send button (blue, arrow icon)
+  - Send button (pink, arrow icon)
 
   OVERALL: Warm, encouraging, feels like chatting with a smart friend who explains patiently.
 ```
@@ -1150,14 +1165,14 @@ RIGHT PANEL (chat area):
 ```
 Design a welcoming onboarding screen for "SkillPath AI", a math learning platform for Indonesian middle school students.
 
-STYLE: Bright, energetic, playful. Gradient background: soft blue-to-green-to-peach gradient (like a sunrise). Large friendly illustrations. Very approachable for 12-15 year olds.
+STYLE: Bright, energetic, playful. Gradient background: pink-to-violet-to-cream gradient (deep and warm, like dusk). Large friendly illustrations. Very approachable for 12-15 year olds.
 
 LAYOUT: Fullscreen. Centered content. Step 1 of 3.
 
-TOP: Step indicator — 3 dots, first one filled blue, others gray outline. "Langkah 1 dari 3" small text.
+TOP: Step indicator — 3 dots, first one filled pink, others cream outline. "Langkah 1 dari 3" small text.
 
 CENTER CONTENT:
-- SPARK MASCOT: Large (120px), animated star character with a big smile, waving hand. Yellow/gold with blue glow aura. This is the hero of the screen.
+- SPARK MASCOT: Large (120px), animated star character with a big smile, waving hand. Gold with pink glow aura. This is the hero of the screen.
 - SPEECH BUBBLE from Spark: "Hei! Aku Spark, teman belajar matematikamu! ⭐"
 - MAIN HEADING (text-4xl, dark, bold): "Selamat datang di SkillPath AI!"
 - SUBTITLE: "Platform belajar yang menyesuaikan diri dengan kemampuanmu"
@@ -1167,7 +1182,7 @@ FORM AREA (white card, rounded-2xl, shadow, max-w-md):
 - Input field: large, "Nama panggilanmu..." placeholder
 - Below input: Spark says "Aku akan memanggil kamu dengan ini! 😊"
 
-BUTTON: "Halo Spark! 👋" — large, full-width, gradient blue button
+BUTTON: "Halo Spark! 👋" — large, full-width, gradient pink button
 
 BOTTOM: "Sudah punya akun? Masuk" link
 
@@ -1181,11 +1196,11 @@ FEEL: Should feel like the start of an adventure, not a boring sign-up form. Pla
 ```
 Design the MOBILE version (375px iPhone) of the SkillPath AI dashboard.
 
-STYLE: Same color system as desktop — white background, blue primary, green/amber/purple accents.
+STYLE: Same color system as desktop — cream background, pink primary, green/amber/violet accents.
 
 LAYOUT: Single column, bottom navigation bar.
 
-TOP BAR (fixed, white):
+TOP BAR (fixed, cream):
 - Left: Hamburger menu icon
 - Center: "SkillPath AI" logo
 - Right: "🔥 3" fire pill + "⚡ 1,240" XP pill (compact)
@@ -1194,13 +1209,13 @@ CONTENT (scrollable):
 1. GREETING: "Pagi, Budi! 👋" (text-2xl) + "3 hari berturut-turut 🔥" subtitle
 
 2. STATS GRID (2x2):
-   - Overall Mastery: mini circular "68%" blue
-   - XP: "1,240" purple + "Level 7"
+   - Overall Mastery: mini circular "68%" pink
+   - XP: "1,240" violet + "Level 7"
    - Streak: "🔥 3 Hari"
    - Topics: "2/5 ⭐"
 
 3. RECOMMENDATION CARD (full width, prominent):
-   Amber left border. "Lanjutkan: Pecahan". Spark avatar small. 45% mastery bar. "Mulai →" button blue full-width.
+   Amber left border. "Lanjutkan: Pecahan". Spark avatar small. 45% mastery bar. "Mulai →" button pink full-width.
 
 4. TOPIC LIST (horizontal scroll, peek-next):
    5 topic pill cards scrollable: icon + name + % + color dot
@@ -1208,14 +1223,14 @@ CONTENT (scrollable):
 5. RECENT ACTIVITY (3 items vertical list):
    Each: colored dot + topic + time + XP badge
 
-BOTTOM NAVIGATION (fixed, white, border-top, 5 tabs):
-- 🏠 Beranda (active, blue)
+BOTTOM NAVIGATION (fixed, cream, border-top, 5 tabs):
+- 🏠 Beranda (active, pink)
 - 🗺️ Peta
 - 📚 Belajar
 - 🤖 Tutor
 - 👤 Profil
 
-Active tab: icon colored blue + label blue + small dot indicator above icon.
+Active tab: icon colored pink + label pink + small dot indicator above icon.
 
 FEEL: Native mobile app quality, thumb-friendly, card-heavy layout, generous touch targets.
 ```
@@ -1261,24 +1276,32 @@ FEEL: Native mobile app quality, thumb-friendly, card-heavy layout, generous tou
 @layer components {
   /* Gamification */
   .xp-pill {
-    @apply bg-purple-100 text-purple-700 font-semibold px-3 py-1 rounded-full text-sm flex items-center gap-1;
+    @apply font-semibold px-3 py-1 rounded-full text-sm flex items-center gap-1;
+    background: #f3ecfa;
+    color: var(--color-violet);
   }
   .streak-pill {
-    @apply bg-orange-100 text-orange-700 font-semibold px-3 py-1 rounded-full text-sm flex items-center gap-1;
+    @apply font-semibold px-3 py-1 rounded-full text-sm flex items-center gap-1;
+    background: #fde9df;
+    color: var(--color-streak);
   }
 
   /* Topic status cards */
   .topic-card-mastered {
-    @apply card border-l-4 border-l-green-500;
+    @apply card;
+    border-left: 4px solid var(--color-mastered);
   }
   .topic-card-progress {
-    @apply card border-l-4 border-l-amber-500;
+    @apply card;
+    border-left: 4px solid var(--color-progress);
   }
   .topic-card-weak {
-    @apply card border-l-4 border-l-red-500;
+    @apply card;
+    border-left: 4px solid var(--color-weak);
   }
   .topic-card-locked {
-    @apply card border-l-4 border-l-gray-300 opacity-60;
+    @apply card opacity-60;
+    border-left: 4px solid var(--color-locked);
   }
 
   /* Stat card */
@@ -1288,42 +1311,58 @@ FEEL: Native mobile app quality, thumb-friendly, card-heavy layout, generous tou
 
   /* Section heading */
   .section-title {
-    @apply text-xl font-bold text-gray-900 mb-4;
+    @apply text-xl font-bold mb-4;
+    color: var(--color-ink);
+    font-family: var(--font-display);
   }
 
   /* Feedback states */
   .feedback-correct {
-    @apply bg-green-50 border border-green-200 rounded-xl p-4 text-green-800;
+    @apply rounded-[13px] p-4 border;
+    background: var(--color-mastered-tint);
+    border-color: var(--color-mastered-line);
+    color: var(--color-mastered-ink);
   }
   .feedback-wrong {
-    @apply bg-red-50 border border-red-200 rounded-xl p-4 text-red-800;
+    @apply rounded-[13px] p-4 border;
+    background: var(--color-weak-tint);
+    border-color: var(--color-weak-line);
+    color: var(--color-weak-ink);
   }
 
   /* Chat bubbles */
   .bubble-user {
-    @apply bg-blue-500 text-white rounded-2xl rounded-br-sm px-4 py-3 max-w-xs ml-auto;
+    @apply text-white rounded-2xl rounded-br-sm px-4 py-3 max-w-xs ml-auto;
+    background: var(--color-pink);
   }
   .bubble-spark {
-    @apply bg-white border border-gray-200 shadow-sm rounded-2xl rounded-bl-sm px-4 py-3 max-w-sm;
+    @apply rounded-2xl rounded-bl-sm px-4 py-3 max-w-sm;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
   }
 
   /* Mastery progress bar */
   .mastery-bar-track {
-    @apply w-full bg-gray-100 rounded-full h-2;
+    @apply w-full rounded-full h-2;
+    background: var(--color-line);
   }
   .mastery-bar-fill-mastered {
-    @apply bg-green-500 h-2 rounded-full transition-all duration-500;
+    @apply h-2 rounded-full transition-all duration-500;
+    background: var(--color-mastered);
   }
   .mastery-bar-fill-progress {
-    @apply bg-amber-500 h-2 rounded-full transition-all duration-500;
+    @apply h-2 rounded-full transition-all duration-500;
+    background: var(--color-progress);
   }
   .mastery-bar-fill-weak {
-    @apply bg-red-500 h-2 rounded-full transition-all duration-500;
+    @apply h-2 rounded-full transition-all duration-500;
+    background: var(--color-weak);
   }
 
   /* Floating XP animation */
   .xp-float {
-    @apply text-purple-600 font-bold text-lg pointer-events-none;
+    @apply font-bold text-lg pointer-events-none;
+    color: var(--color-violet);
     animation: floatUp 1s ease-out forwards;
   }
 
