@@ -9,7 +9,7 @@ import {
   summarize,
   topicHref,
 } from "./dashboardLogic";
-import type { DashboardData, DashTopic } from "./types";
+import type { DashboardData, DashTopic } from "../../lib/dashboard/types";
 
 const topic = (overrides: Partial<DashTopic> & Pick<DashTopic, "id">): DashTopic => ({
   name: overrides.id,

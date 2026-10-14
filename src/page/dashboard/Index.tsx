@@ -1,77 +1,189 @@
-import { ArrowRight } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
-import DashboardTopBar from "./DashboardTopBar";
-import EmptyState from "./EmptyState";
-import HeroCard from "./HeroCard";
-import MasteryCurve from "./MasteryCurve";
-import ProgressCard from "./ProgressCard";
-import TopicCard from "./TopicCard";
-import { curveForRecommendation, pickRecommendation, summarize } from "./dashboardLogic";
-import { getMockDashboard } from "./mockData";
 
-// Grid cells stretch their single child so cards in a row share the same height.
-const cell = "flex [&>*]:flex-1";
+import { useEffect, useState } from "react";
+
+import DashboardHeader from "../../components/dashboard/DashboardHeader";
+import WelcomeBanner from "../../components/dashboard/WelcomeBanner";
+import RecommendationCard from "../../components/dashboard/RecommendationCard";
+import StatsGrid from "../../components/dashboard/StatsGrid";
+import MasteryChart from "../../components/dashboard/MasteryChart";
+import TopicGrid from "../../components/dashboard/TopicGrid";
+import EmptyState from "../../components/dashboard/EmptyState";
+
+import { fetchDashboardData } from "../../lib/dashboard/dashboardService";
+import { mapDashboardData } from "../../lib/dashboard/dashboardMapper";
+import { buildDashboardData } from "../../lib/dashboard/dashboardLogic";
+
+import type { DashboardData } from "../../lib/dashboard/types";
 
 export default function Index() {
-  const [searchParams] = useSearchParams();
-  // TODO: ganti getMockDashboard dengan data Supabase (student_progress, student_answers); ?demo= hanya untuk fase mock.
-  const data = getMockDashboard(searchParams.get("demo"));
-  const recommendation = pickRecommendation(data.topics);
-  const summary = summarize(data);
-  const curve = curveForRecommendation(data, recommendation);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const greeting = <h1 className="font-display text-2xl font-bold sm:text-3xl">Halo, {data.studentName}</h1>;
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDashboard() {
+      setLoading(true);
+      setError("");
+
+      try {
+        // 1. Ambil data dari Supabase.
+        const sourceData = await fetchDashboardData();
+
+        // 2. Ubah data database ke format dashboard.
+        const mappedData = mapDashboardData(sourceData);
+
+        // 3. Hitung statistik dan rekomendasi.
+        const dashboardData = buildDashboardData(
+          mappedData.studentName,
+          mappedData.topics,
+          mappedData.masteryHistory,
+          mappedData.quizAttemptsCount
+        );
+
+        // 4. Perbarui UI jika komponen masih aktif.
+        if (!cancelled) {
+          setData(dashboardData);
+        }
+      } catch (err) {
+        console.error("Gagal memuat dashboard:", err);
+
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Terjadi kesalahan saat memuat dashboard."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadDashboard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FFF9F0] px-4 py-10">
+        <div
+          className="mx-auto max-w-7xl animate-pulse space-y-6"
+          aria-label="Memuat dashboard"
+        >
+          <div className="h-16 rounded-2xl bg-[#EAE2F0]" />
+          <div className="h-24 rounded-2xl bg-white" />
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="h-48 rounded-2xl bg-[#EAE2F0]" />
+            <div className="h-48 rounded-2xl bg-white" />
+          </div>
+
+          <div className="h-64 rounded-2xl bg-white" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="min-h-screen bg-[#FFF9F0] px-4 py-12">
+        <div
+          className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-white p-6"
+          role="alert"
+        >
+          <h1 className="text-lg font-bold text-[#29243B]">
+            Dashboard tidak dapat dimuat
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-red-600">
+            {error || "Data dashboard belum tersedia."}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-5 rounded-xl bg-[#7560B5] px-5 py-3 text-sm font-semibold text-white hover:bg-[#62509B]"
+          >
+            Coba lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const hasTopics = data.topics.length > 0;
+  const recommendation = data.recommendation;
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)]">
-      <DashboardTopBar studentName={data.studentName} />
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        {recommendation.kind === "empty" ? (
-          <div className="max-w-2xl space-y-5">
-            {greeting}
-            <EmptyState />
-          </div>
-        ) : (
-          <div className="space-y-5">
-            {greeting}
+    <div className="min-h-screen bg-[#FFF9F0]">
+      <DashboardHeader studentName={data.studentName} />
 
-            <div className="grid gap-5 lg:grid-cols-12">
-              <div className={`${cell} lg:col-span-8`}>
-                <HeroCard recommendation={recommendation} />
-              </div>
-              <div className={`${cell} lg:col-span-4`}>
-                <ProgressCard topics={data.topics} summary={summary} />
-              </div>
-              {curve && (
-                <div className={`${cell} lg:col-span-12`}>
-                  <MasteryCurve topicName={curve.topicName} points={curve.points} />
-                </div>
-              )}
-            </div>
+      <main className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <WelcomeBanner studentName={data.studentName} />
 
-            <section aria-labelledby="topik-heading" className="pt-3">
-              <div className="mb-3 flex items-center justify-between gap-4">
-                <h2 id="topik-heading" className="font-display text-lg font-bold">
-                  Topikmu
-                </h2>
-                <Link
-                  to="/topicSelect"
-                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-[var(--color-pink-deep)] hover:underline"
-                >
-                  Jelajahi topik
-                  <ArrowRight aria-hidden="true" size={16} />
-                </Link>
+        {hasTopics ? (
+          <>
+            <section className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-12">
+              <div className="lg:col-span-7">
+                {recommendation ? (
+                  <RecommendationCard
+                    topicName={recommendation.topicName}
+                    description={recommendation.description}
+                    progress={recommendation.progress}
+                    isCompleted={recommendation.isCompleted}
+                  />
+                ) : (
+                  <EmptyState
+                    title="Semua siap untuk perjalanan berikutnya"
+                    description="Pilih topik baru untuk melanjutkan perjalanan belajarmu."
+                    buttonLabel="Pilih Topik"
+                  />
+                )}
               </div>
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {data.topics.map((topic) => (
-                  <li key={topic.id} className="flex [&>*]:flex-1">
-                    <TopicCard topic={topic} />
-                  </li>
-                ))}
-              </ul>
+
+              <div className="lg:col-span-5">
+                <StatsGrid
+                  totalTopics={data.stats.totalTopics}
+                  completedTopics={data.stats.completedTopics}
+                  masteryPercentage={data.stats.masteryPercentage}
+                  totalSessions={data.stats.totalSessions}
+                />
+              </div>
             </section>
-          </div>
+
+            <MasteryChart
+              data={data.masteryHistory}
+              currentMastery={data.stats.masteryPercentage}
+            />
+
+            <TopicGrid
+              topics={data.topics}
+              title="Topik Pembelajaran"
+              description="Lihat progres dan lanjutkan materi yang ingin kamu kuasai."
+              limit={6}
+            />
+          </>
+        ) : (
+          <EmptyState
+            title="Mulai perjalanan belajarmu"
+            description="Pilih topik pertama yang ingin kamu pelajari. SkillPath AI akan membantumu belajar secara bertahap."
+            buttonLabel="Pilih Topik Pertama"
+            href="/topicSelect"
+          />
         )}
+
+        <footer className="border-t border-[#EAE2F0] py-5 text-center">
+          <p className="text-xs text-[#93879F]">
+            SkillPath AI · Belajar sesuai kemampuanmu, berkembang setiap hari.
+          </p>
+        </footer>
       </main>
     </div>
   );
