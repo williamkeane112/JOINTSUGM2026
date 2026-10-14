@@ -370,3 +370,76 @@ Section baru **§14 "v0.dev Prompt — Dashboard Page (Production Code Generatio
 ### Status
 
 Dashboard page **belum di-generate/di-koding** — ini baru tahap desain/spec (`docs/DESIGN.md` §14). Langkah berikutnya: jalankan prompt §14.3 di v0.dev, tempel hasilnya ke `src/page/dashboard/Index.tsx`, lalu sambungkan ke data asli setelah BKT (`src/lib/algorithms/bkt.ts`) dan service layer progress diimplementasikan.
+
+## 🧭 Keputusan Produk & Dashboard (2026-10-14) — SUPERSEDES §14 di DESIGN.md
+
+### Konteks
+Sesi brainstorming (skill `brainstorming` dari `~/.agents/skills/`). Sempat dibahas ide "topik + UI halaman digenerate AI per user"; **ditolak** karena terlalu besar untuk deadline dan mengaburkan USP BKT (dua siswa dengan kurikulum berbeda tidak membuktikan adaptivitas). Kembali ke alur yang diusulkan teman user.
+
+### Alur final
+`/auth` → `/topicSelect` (katalog topik seeded) → jika topik baru: **diagnostic per topik** (soal AI, di-cache di `questions`, `source='ai'`) → AI menyusun **Journey berlevel** (JSON + Zod, fallback `recommendation.ts`) → Dashboard.
+
+### Keputusan
+- Topik = seeded, bukan AI. "Ajukan topik baru" = post-MVP.
+- Soal AI digenerate **sekali per topik** (bukan per user), dicek manual → hasil siswa bisa dibandingkan, demo tidak bergantung API.
+- AI hanya mengisi JSON; komponen React yang merender. AI tidak menulis UI.
+- Dashboard = **opsi A "pintu ke langkah berikutnya"**: hero gelap + daftar topik yang sudah dimulai + ringkasan + 1 top bar. Bentuk akhirnya sudah berevolusi menjadi bento v2 (lihat "Status Dashboard v2" dan "Ringkasan sesi" di bawah); detail awal di `01-mvp-scope.md` §6.
+- Dashboard dikerjakan **dengan mock data dulu**, wajib punya empty state.
+- Onboarding (nama/kelas) dipangkas demi deadline.
+
+### Belum diputuskan (jangan blok Dashboard)
+- Bentuk visual Journey.
+- Apakah tiap level Journey punya P(L) sendiri (**asumsi/rekomendasi saya, belum dikonfirmasi user**) → menentukan skema (tabel level / `topics.parent_id`).
+- Route belum ada: `/diagnostic`, `/journey`, `/knowledge-map`, `/ai-tutor`. Isi `/topicSelect` belum diverifikasi (file 128 byte, kemungkinan placeholder).
+
+### Dokumen yang disesuaikan hari ini
+`01-mvp-scope.md`, `02-database-schema.md` (kolom `questions.source`), `skillpath-ai-supabase.md`, `AGENTS.md`, `docs/USER_FLOWS.md` (§1-4), `docs/DESIGN.md` (§14 diberi catatan superseded).
+
+### Status Dashboard v1 (2026-10-14, mock data) — DIGANTIKAN oleh v2 di bawah; `TopicRow` dan `SummaryStrip` sudah dihapus
+- Kode di `src/page/dashboard/`: `Index.tsx`, `DashboardTopBar`, `HeroCard`, `TopicRow`, `SummaryStrip`, `EmptyState`, `useCountUp`, `statusStyle`, `dashboardLogic`, `mockData`, `types`. Logika status mastery bersama di `src/lib/mastery.ts` (ambang: <40 weak, 40..<70 progress, >=70 mastered).
+- Ganti skenario mock lewat `/dashboard?demo=budi|sari|empty|done` (`budi` dan `sari` menghasilkan rekomendasi berbeda — bahan demo dua siswa).
+- Tes: `npm run test` (Vitest, 24 tes). Review visual: jalankan `npm run dev -- --port 5174 --strictPort`, lalu `BASE_URL=http://localhost:5174 npm run screenshot` (hasil di `.screenshots/`, di-ignore git).
+- Deviasi dari plan (alasan: aturan craft-floor): tanpa kicker di atas judul hero; progress ring diganti track mastery dengan tanda di 40 dan 70; `EmptyState` memakai permukaan gelap yang sama dengan hero.
+- Belum: data Supabase (`student_progress`), route Journey (tombol hero sementara ke `/topicSelect` lewat `topicHref`), `ProtectedRoute` masih dikomentari di `App.tsx` sehingga `/dashboard` bisa dibuka tanpa login.
+
+### Status Dashboard v2 (2026-10-14, bento + kurva penguasaan, mock data)
+- Layout `lg`: hero (8 kolom) + `ProgressCard` (4), `MasteryCurve` (12), lalu grid `TopicCard` (isi latar = persen penguasaan). Container `max-w-7xl`, navbar pill (Dashboard, Topik) di `DashboardTopBar`. Komponen lama `SummaryStrip`/`TopicRow` dihapus.
+- BKT kini nyata di `src/lib/algorithms/bkt.ts` (`BKTModel`, `buildMasteryCurve`). Mock di `mockData.ts` dibangun dari string jawaban ("T"/"F"); mastery topik = titik terakhir kurva BKT, jadi angka hero dan grafik selalu sama. Kurva memakai awal P(L)=0.10 (`CURVE_INITIAL_P_LEARNED`) dan 30 jawaban terakhir.
+- Tes: `npm run test` (43 tes). Review visual: server dev di port bebas, lalu `BASE_URL=... npm run screenshot` (360/768/1280px × `?demo=budi|sari|empty|done`). Catatan: tool baca gambar meng-cache per nama file; salin ke nama baru bila screenshot diulang.
+- Deviasi dari plan: navbar mobile satu baris (brand ikon saja, Keluar ikon saja) agar urutan DOM = urutan visual, bukan dua baris.
+- Belum: halaman Topik (`/topicSelect` masih placeholder), data Supabase, route Journey, `ProtectedRoute` masih dikomentari.
+- Pembaruan 2026-10-14 (grafik): label grafik memakai kata, bukan angka teknis: sumbu 0/50/100 dan satu garis hijau "Dikuasai" (ketinggian 70). Titik awal (prior P(L)) tidak digambar: grafik berisi satu titik per jawaban, jadi 10 jawaban = 10 titik, dan "Mulai" adalah hasil setelah soal 1. Mock data kini hanya berisi set penuh (`QUESTIONS_PER_SET = 10` jawaban per topik) dan `questionsAnswered` = total jawaban tercatat. Tes: 51.
+
+## 📌 Ringkasan sesi 2026-10-14 (baca ini dulu di sesi berikutnya)
+
+### Yang sudah ada di kode
+- `src/lib/mastery.ts` — ambang status UI (<40 weak, 40..<70 progress, >=70 mastered), `clampMastery`, `getMasteryStatus`.
+- `src/lib/algorithms/bkt.ts` — `BKTModel`, `buildMasteryCurve(answers)`, `CURVE_INITIAL_P_LEARNED = 0.1`. Dites di `bkt.test.ts`.
+- `src/page/dashboard/` — dashboard v2 dengan **mock data**: `Index`, `DashboardTopBar` (navbar pill), `HeroCard`, `ProgressCard`, `MasteryCurve` (SVG), `TopicCard`, `EmptyState`, `useCountUp`, `statusStyle`, `dashboardLogic`, `mockData`, `types`.
+- Tes: `npm run test` (Vitest, 51 tes). Visual: `npm run screenshot` (butuh server dev; lihat catatan lingkungan).
+- Rencana yang dieksekusi: `docs/superpowers/plans/2026-10-14-dashboard.md` (v1) dan `2026-10-14-dashboard-v2.md`. Tidak ada commit; semua masih di working tree branch `main`.
+
+### Keputusan UI dashboard (hasil diskusi)
+- Referensi tampilan dari user: `.kiro/something/7a7730c4eaf18f138ae091a59f45747a.jpg` (dashboard "Swaraloka": navbar pill, grid bento, palet netral). Diambil: struktur dan kelonggarannya; tidak diambil: kartu affiliate, grafik jam belajar.
+- Palet tenang: latar cream, kartu putih, satu permukaan gelap (hero). Pink hanya untuk aksi/fokus/tautan. Warna status hanya di isi kartu topik, chip, segmen progres, bar hero. Violet hanya untuk seri data grafik.
+- **Siswa tidak melihat angka teknis.** Tidak ada "40"/"70" atau istilah BKT di UI. Grafik memakai sumbu 0/50/100 dan satu garis hijau berlabel kata "Dikuasai".
+- Grafik: satu titik per jawaban (10 jawaban = 10 titik), titik terisi = benar, kosong = salah; nilai awal BKT tidak digambar; label kiri "Mulai" (atau "Soal N" bila riwayat dipotong 30 jawaban), kanan "Terbaru".
+- Mock hanya berisi set penuh: `QUESTIONS_PER_SET = 10` jawaban per topik; "soal dijawab" = total jawaban tercatat. Aturan produk: semua soal dalam satu sesi (diagnostic) wajib dijawab.
+- Navbar hanya Dashboard dan Topik (Peta/AI Tutor disembunyikan sampai route-nya ada).
+- Tombol hero dan kartu topik sementara menuju `/topicSelect` lewat `topicHref` (satu-satunya tempat yang diganti saat route Journey ada).
+
+### Umpan balik user yang belum diselesaikan
+- User menyatakan (18:46) **masih kurang suka dan kurang setuju** dengan hasil visual dashboard. Bagian yang tidak disukai belum ditanyakan. Tanyakan dulu sebelum mempoles lebih jauh; jangan anggap dashboard sudah final.
+- User meminta rumus BKT **dikesampingkan dulu**. Catatan terbuka untuk nanti (lihat juga `03-bkt-algorithm.md`): kurva zigzag karena parameter default belum dikalibrasi (satu jawaban salah bisa menurunkan 72% menjadi 34%); definisi "dikuasai" UI (70%) berbeda dari `isMastered(0.95)`; nilai awal kurva 10% adalah asumsi demo.
+
+### Belum dikerjakan
+- Halaman Topik `/topicSelect` (masih placeholder; dua tautan di dashboard bergantung padanya), diagnostic, Journey, Knowledge Map, AI Tutor.
+- Data Supabase untuk dashboard (`student_progress`, `student_answers`), migrasi database.
+- `ProtectedRoute` masih dikomentari di `App.tsx`, jadi `/dashboard` bisa dibuka tanpa login. Aktifkan sebelum demo.
+- Kolom `questions.source` (manual/ai) sudah tercatat di dokumen skema tetapi ditunda oleh user; belum ada migrasi.
+
+### Catatan lingkungan (supaya tidak mengulang masalah)
+- Server dev lama di port 5173 punya cache dependensi basi (halaman putih, 504 "Outdated Optimize Dep"). Jalankan server sendiri: `npm run dev -- --port 5174 --strictPort`, lalu `BASE_URL=http://localhost:5174 npm run screenshot`; matikan hanya server yang kita mulai.
+- Tool baca gambar meng-cache per nama file: salin screenshot ke nama baru sebelum dibaca ulang.
+- Windows PowerShell 5.1: `Get-Content`/`Set-Content` tanpa `-Encoding` merusak karakter non-ASCII (mis. `§`). Edit file teks dengan tool tulis atau `node`, bukan `Set-Content`.
+- Browser untuk screenshot: Microsoft Edge yang sudah terpasang lewat `playwright-core` (tanpa unduhan browser).

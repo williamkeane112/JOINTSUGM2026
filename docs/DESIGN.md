@@ -1411,6 +1411,8 @@ FEEL: Native mobile app quality, thumb-friendly, card-heavy layout, generous tou
 
 ## 14. v0.dev Prompt — Dashboard Page (Production Code Generation)
 
+> ⚠️ **SUPERSEDED 2026-10-14 (layout)**: Keputusan terbaru ada di `.kiro/steering/01-mvp-scope.md` §6 — hero gelap "Lanjut dari sini" + daftar `TopicRow` topik yang sudah dimulai + 1 baris ringkasan + top bar tunggal. **Bukan** sidebar + 4 stat card + achievements row seperti prompt §14.3 di bawah. Token warna/tipografi di §14.2 tetap berlaku. Jangan tempel §14.3 apa adanya ke v0.
+
 > **Beda dengan §11 (Google Stitch)**: Stitch menghasilkan mockup visual statis, cocok untuk eksplorasi look & feel. **v0.dev menghasilkan kode React + Tailwind nyata** yang akan dipakai/di-adaptasi langsung di `src/page/dashboard/Index.tsx`. Prompt untuk v0 harus berupa **spesifikasi fungsional yang presisi** (token warna literal, struktur komponen, tipe data, copy exact), bukan deskripsi gambar.
 
 ### 14.1 Status Implementasi Saat Ini

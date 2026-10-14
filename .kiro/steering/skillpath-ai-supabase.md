@@ -145,7 +145,7 @@ src/
 │   └── dashboard/
 │       ├── StudentDashboard.tsx
 │       └── ProgressChart.tsx
-├── pages/                      # Page-level components
+├── page/                       # Page-level components (nama folder aktual: src/page/)
 │   ├── LoginPage.tsx
 │   ├── RegisterPage.tsx
 │   ├── DashboardPage.tsx
@@ -250,6 +250,7 @@ CREATE TABLE questions (
     correct_answer VARCHAR(255) NOT NULL,
     explanation TEXT,
     difficulty VARCHAR(10) CHECK (difficulty IN ('easy', 'medium', 'hard')),
+    source VARCHAR(10) DEFAULT 'manual' CHECK (source IN ('manual', 'ai')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -336,12 +337,12 @@ USING (auth.uid() = user_id);
 
 ## Core Features (P0 - MUST HAVE)
 
-### 1. Diagnostic Test
+### 1. Diagnostic Test (per topik, dipicu saat pertama masuk topik)
 
-- 10-15 multiple choice questions
-- Maps to 3-5 topics
+- ~5-8 multiple choice questions, satu topik
+- Soal AI digenerate sekali per topik, di-cache di `questions` (`source = 'ai'`)
 - Calculates initial mastery using BKT (client-side)
-- Output: Knowledge map with mastery percentages
+- Output: P(L) awal topik → input penyusunan learning path (lihat `01-mvp-scope.md`)
 
 ### 2. Knowledge Map
 

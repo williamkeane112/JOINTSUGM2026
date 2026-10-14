@@ -184,4 +184,13 @@ const THRESHOLDS = {
 
 ---
 
+## Status Implementasi (2026-10-14)
+
+- `src/lib/algorithms/bkt.ts` sudah ada dan dites (`bkt.test.ts`): `BKTModel` (rumus di atas, penyebut 0 dan hasil non-finit ditangani) serta `buildMasteryCurve(answers, initialPLearned = CURVE_INITIAL_P_LEARNED)` yang memutar ulang jawaban (benar/salah, lama ke baru) menjadi `CurvePoint[]` (`answer`, `masteryPct`, `correct`). Titik `answer: 0` adalah nilai awal; dashboard tidak menggambarnya (satu titik per jawaban).
+- Ambang status **UI** ada di `src/lib/mastery.ts` (40 / 70, `>= 70` = mastered). `BKTModel.isMastered()` default 0.95 — dua definisi "dikuasai" ini belum disatukan.
+- UI tidak menampilkan istilah BKT maupun angka ambang; siswa hanya melihat 0-100, kata status, dan garis berlabel "Dikuasai".
+- **Terbuka (user minta rumus dikesampingkan dulu):** parameter default (tebak 0.25, slip 0.1, belajar 0.1) belum dikalibrasi sehingga kurva bisa zigzag; nilai awal 10% hanya asumsi demo (nilai nyata nanti dari `student_progress.p_learned`).
+
+---
+
 *Ref: Full BKT theory di `docs/PROJECT_PLAN.md` section "BKT Algorithm"*

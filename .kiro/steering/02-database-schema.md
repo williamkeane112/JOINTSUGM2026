@@ -62,11 +62,14 @@ CREATE TABLE questions (
     correct_answer VARCHAR(255) NOT NULL,
     explanation TEXT,
     difficulty VARCHAR(10) CHECK (difficulty IN ('easy', 'medium', 'hard')),
+    source VARCHAR(10) DEFAULT 'manual' CHECK (source IN ('manual', 'ai')),  -- 'ai' = digenerate SEKALI per topik, dicek manual, di-cache di sini
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_questions_topic_difficulty ON questions(topic_id, difficulty);
 ```
+
+> **Catatan 2026-10-14**: `topics` = katalog seeded (bukan dibuat AI). Level di dalam topik (Journey) **belum punya tabel** — asumsi sementara tiap level = skill dengan P(L) sendiri → butuh tabel level atau `topics.parent_id`. Putuskan sebelum membangun Journey; tidak memblok Dashboard (pakai mock). `topic_requests` ("Ajukan topik baru") = post-MVP.
 
 ### 5. student_progress (BKT State)
 ```sql

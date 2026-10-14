@@ -10,11 +10,14 @@
 JOINTSUGM2026/
 ├── 📄 README.md                           (Vite template — project setup)
 ├── 📄 AGENTS.md                           (Kiro agent instructions)
+├── 📁 scripts/
+│   └── screenshot.mjs                     (Screenshot + cek overflow untuk review visual: npm run screenshot)
 │
 ├── 📁 docs/                                (Reference Documents — Human-Readable)
 │   ├── 📘 PROJECT_PLAN.md                 (Full project spec — 2050 lines, read once)
 │   ├── 🎨 DESIGN.md                       (UI/UX design system + Google Stitch prompts)
-│   └── 🗺️ USER_FLOWS.md                   (Navigation flows, state transitions)
+│   ├── 🗺️ USER_FLOWS.md                   (Navigation flows, state transitions)
+│   └── 📁 superpowers/plans/              (Plan implementasi: dashboard v1 dan v2, 2026-10-14)
 │
 └── 📁 .kiro/steering/                      (AI Context — Auto-loaded oleh Kiro)
     ├── 00-NAVIGATION.md                   (This file — dokumentasi guide)
@@ -110,4 +113,4 @@ Jika file menyebut "Ref: ...", cek:
 
 ---
 
-*Last updated: 2026-10-12*
+*Last updated: 2026-10-14 (ditambah: scripts/screenshot.mjs, docs/superpowers/plans; baca bagian "Ringkasan sesi 2026-10-14" di session-progress.md dulu)*

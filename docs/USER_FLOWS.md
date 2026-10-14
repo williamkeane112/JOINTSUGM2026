@@ -3,6 +3,8 @@
 > **⚠️ NOTE**: Nama project masih belum final. Ganti `[PROJECT_NAME]` saat nama sudah dipilih.
 
 > State transitions, navigation logic, dan conditional flows per tipe user.
+>
+> **Diperbarui 2026-10-14**: topik = katalog seeded (`/topicSelect`); diagnostic **per topik** (bukan global sekali); path disusun AI dari hasil diagnostic, tampil sebagai Journey berlevel; Dashboard = top bar + hero "lanjut dari sini" (bukan sidebar). Onboarding (§2) dipangkas/ditunda demi deadline.
 
 ---
 
@@ -22,19 +24,20 @@
          │
          ├─ [Register Page]
          │       │
-         │       ├─ Submit OK ──→ [Onboarding Step 1]
+         │       ├─ Submit OK ──→ [Topic Select /topicSelect]
          │       └─ Has Account ──→ [Login Page]
          │
          └─ [Login Page]
                  │
-                 ├─ Login OK + new user ──→ [Onboarding Step 1]
-                 ├─ Login OK + existing user + no diagnostic ──→ [Onboarding → Diagnostic]
-                 └─ Login OK + existing user + has diagnostic ──→ [Dashboard]
+                 ├─ Login OK + belum punya topik apa pun ──→ [Topic Select /topicSelect]
+                 └─ Login OK + sudah punya ≥1 topik ──→ [Dashboard]
 ```
 
 ---
 
-## 2. Onboarding Flow (New User Only)
+## 2. Onboarding Flow (POST-MVP / opsional — dilewati demi deadline)
+
+> Flow aktif MVP: Auth → `/topicSelect` → (diagnostic topik itu jika baru) → Journey/Dashboard. Onboarding nama/kelas di bawah hanya dikerjakan jika waktu tersisa.
 
 ```
 [Onboarding Step 1 — Sambutan]
@@ -63,9 +66,9 @@
 ## 3. Diagnostic Test Flow
 
 ```
-[Diagnostic Test Start]
-    - 15 soal pilihan ganda
-    - Soal per topik: 3 soal × 5 topik
+[Diagnostic Test Start] — dipicu saat user memilih topik yang BELUM pernah disentuh
+    - ~5-8 soal pilihan ganda, SATU topik
+    - Soal dari bank `questions` (source='ai', digenerate sekali per topik, dicek manual)
     │
     ▼
 [Per Soal Loop]
@@ -73,22 +76,21 @@
     → Feedback singkat (500ms: ✓ atau ✗)
     → Auto-lanjut ke soal berikutnya
     │
-    ├─ Soal 1-14: lanjut loop
+    ├─ Soal 1..N-1: lanjut loop
     │
-    └─ Soal 15 (terakhir):
+    └─ Soal N (terakhir):
              │
              ▼
     [Test Complete Screen]
         - Animasi Spark celebrating
-        - Summary: "Benar X dari 15"
-        - XP gained: +50 XP
-        - CTA: "Lihat Peta Kemampuanmu →"
+        - Summary: "Benar X dari N"
+        - CTA: "Lihat Jalur Belajarmu →"
              │
              ▼
-    [Knowledge Map] (dengan hasil diagnostic)
+    [Learning Path / Journey] (AI menyusun urutan level dari P(L) awal)
              │
              ▼
-    [Dashboard] (setelah dismiss map / klik dashboard)
+    [Dashboard] (topik ini kini muncul di daftar topik)
 
 INTERUPSI:
     - Klik "Keluar" → Modal konfirmasi
@@ -115,11 +117,14 @@ INTERUPSI:
     ├─ Klik achievement badge
     │       └──→ [Profile & Achievements Page]
     │
-    └─ Sidebar Navigation
+    ├─ Klik "+ Tambah topik"
+    │       └──→ [Topic Select /topicSelect]
+    │
+    └─ Top bar (mobile & desktop, 1 komponen)
             ├─ Dashboard → [Dashboard] (current)
-            ├─ Peta Kemampuan → [Knowledge Map]
-            ├─ Belajar → [Learning Path / Last topic]
-            └─ AI Tutor → [AI Tutor Page]
+            ├─ Topik → [Topic Select]
+            ├─ Keluar → logout, kembali ke /auth
+            └─ Peta / AI Tutor → ditambahkan saat route-nya ada
 ```
 
 ---

@@ -33,7 +33,7 @@ All business logic lives in `/src/lib/`:
 
 ## Core Features (P0 - MUST HAVE)
 
-1. **Diagnostic Test** (10-15 questions) → Initial mastery calculation
+1. **Topic Select** (`/topicSelect`, topik seeded) → **Diagnostic Test per topik** (~5-8 soal, bank soal AI di-cache) → AI menyusun Journey berlevel → initial mastery per topik (detail: `.kiro/steering/01-mvp-scope.md`)
 2. **Knowledge Map** - Visual representation with 🔴🟡🟢 status
 3. **Adaptive Learning Path** - Recommends topics based on mastery + prerequisites
 4. **Adaptive Exercises** - Questions adjust to student level, BKT updates in real-time
@@ -138,7 +138,7 @@ P(L_new) = P(L|answer) + (1 - P(L|answer)) * P(T)
 ```
 src/
 ├── components/        # UI components (diagnostic, knowledge-map, learning, ai-tutor, dashboard)
-├── pages/            # Page-level components
+├── page/             # Page-level components (nama folder aktual: src/page/; dashboard/ sudah ada, auth/, TopicSelected/)
 ├── lib/              # ⚠️ ALL business logic here!
 │   ├── supabase.ts          # Client init
 │   ├── api/                 # Service layer
@@ -222,6 +222,9 @@ VITE_OPENAI_API_KEY=sk-your-key  # or VITE_ANTHROPIC_API_KEY
 
 ### Before Committing
 - [ ] Frontend starts: `npm run dev`
+- [ ] Unit tests pass: `npm run test`
+- [ ] Build and lint pass: `npm run build`, `npm run lint`
+- [ ] Visual review: server dev di port bebas (`npm run dev -- --port 5174 --strictPort`), lalu `BASE_URL=http://localhost:5174 npm run screenshot`
 - [ ] Supabase connection works
 - [ ] Auth flow: register/login/logout
 - [ ] BKT calculations correct with sample data
@@ -296,5 +299,5 @@ When helping with this project:
 
 ---
 
-**Last Updated**: 2026-10-12  
-**Status**: Planning & Setup Phase (Week 1)
+**Last Updated**: 2026-10-14  
+**Status**: Week 1 — Dashboard v2 terimplementasi dengan mock data (belum final menurut user); halaman Topik, diagnostic, Journey, dan data Supabase belum. Lihat `session-progress.md` "Ringkasan sesi 2026-10-14".
