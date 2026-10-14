@@ -214,3 +214,20 @@ h4,
   outline: 3px solid var(--color-pink);
   outline-offset: 3px;
 }
+
+/* Themed horizontal scrollbar — used by dashboard's horizontal-scroll rows
+   (knowledge-map preview, achievements) instead of the raw browser default. */
+.scrollbar-themed {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+.scrollbar-themed::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-themed::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-themed::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: var(--radius-pill);
+}

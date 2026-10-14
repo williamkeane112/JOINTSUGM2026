@@ -1,3 +1,106 @@
+## 🖥️ Dashboard Page — Implemented (2026-10-13)
+
+### Yang dibuat
+
+`src/page/dashboard/Index.tsx` (placeholder) diganti dengan dashboard penuh,
+responsive (375px–1280px+), terdiri dari 4 file baru/diubah:
+
+- `src/page/dashboard/mockData.ts` — `interface DashboardData` + 2 fixture:
+  `mockDashboardData` (populated, Budi Santoso) dan `emptyDashboardData`
+  (first-time user). `recommendedTopic` dibuat **nullable** (`| null`) —
+  deviasi kecil dari spec §14.3 yang tidak mendefinisikan null — supaya
+  empty-state tidak perlu object rekomendasi palsu, dan `Index.tsx` bisa
+  langsung `data.recommendedTopic ? <RecommendationCard/> : <DiagnosticBanner/>`.
+- `src/page/dashboard/dashboardUtils.ts` — `statusStyle()` dan
+  `usePrefersReducedMotion()`. Dipisah dari `parts.tsx` karena
+  `eslint-plugin-react-refresh` (rule `only-export-components`) melarang
+  file yang mengekspor komponen React dicampur dengan fungsi/hook biasa.
+  Ini bukan penambahan file komponen baru — sejalan dengan arahan
+  "jangan terlalu banyak component terpisah".
+- `src/page/dashboard/parts.tsx` — semua komponen presentational dalam
+  satu file: `CircularProgress`, `StatCard`, `TopicMiniCard`,
+  `AchievementCard`, `Sidebar`, `MobileBottomNav`, `RecommendationCard`,
+  `DiagnosticBanner`.
+- `src/page/dashboard/Index.tsx` — compose halaman penuh + logout Supabase
+  asli (`signOut()` → `navigate("/auth")`, error disurface ke UI, bukan
+  silent fail).
+- `src/index.css` — ditambah utility `.scrollbar-themed` untuk baris
+  horizontal-scroll (knowledge-map preview, achievements) agar scrollbar
+  mengikuti tema, bukan default browser.
+
+### Data: masih mock, belum nyambung ke Supabase/BKT
+
+Sengaja ditunda. Untuk menyambungkan ke data asli nanti: ganti
+`const data = mockDashboardData` di `Index.tsx` dengan hasil fetch dari
+`src/lib/api/progress.ts` (belum ada — buat setelah
+`src/lib/algorithms/bkt.ts` diimplementasikan), dibungkus
+`useEffect`/hook data-fetching sesuai `student_progress` +
+`student_answers`.
+
+### Deviasi sengaja dari prompt v0 mentah di DESIGN.md §14.3
+
+Dicatat supaya sesi berikutnya **tidak** "memperbaiki" ini balik ke
+versi generik:
+
+1. **Tidak ada `border-left` 4px berwarna** di kartu — ini tell AI-slop
+   menurut skill `impeccable/craft-floor`. Status dikomunikasikan lewat
+   badge + warna fill mastery-bar saja.
+2. **Elevasi dideklarasikan sekali per kartu** — kartu hero
+   (`RecommendationCard`, pakai class `.card` → shadow asli) vs kartu
+   sekunder (stat card, topic mini-card, achievement) pakai garis 1px
+   `#EADFE4` flat, tidak keduanya (menghindari "ghost card").
+3. **Hanya satu circular progress ring** di seluruh halaman (Overall
+   Mastery). Stat lain (XP, streak, topik dikuasai) pakai angka + elemen
+   sekunder yang berbeda-beda (thin bar / 7-dot row / trophy count),
+   supaya 4 stat card tidak terlihat identik.
+4. **Satu animasi termotivasi saja**: ring mastery + bar rekomendasi
+   animasi ke nilai akhir saat mount (ease-out), tidak ada fade-in
+   bertahap di tiap section atau hover-lift di kartu non-interaktif.
+   Animasi menghormati `prefers-reduced-motion` (dicek via
+   `usePrefersReducedMotion`, transition di-set `"none"` saat aktif).
+5. Baris horizontal-scroll (knowledge map, achievements) pakai scrollbar
+   bertema (`.scrollbar-themed`), bukan default browser.
+6. Tracking heading dashboard di -0.02em/-0.03em (bukan -0.065em seperti
+   Auth.tsx) — tetap di atas floor -0.04em yang didokumentasikan.
+
+### Verifikasi yang dilakukan
+
+- `npm run build` (`tsc -b && vite build`) — **PASS**, 0 error.
+  (Catatan: ditemukan 2 error TS pre-existing tak terkait — unused
+  `import React` di `src/page/Index.tsx` dan
+  `src/page/TopicSelected/Index.tsx` — diperbaiki juga karena memblokir
+  verifikasi build, scope-nya minimal/aman: hanya menghapus import yang
+  memang tidak dipakai di React 17+ JSX transform.)
+- `npm run lint` (eslint) — **PASS**, 0 error. Sebelumnya menangkap 2
+  masalah nyata yang diperbaiki: (a) `parts.tsx` sempat mengekspor
+  `statusStyle`/`usePrefersReducedMotion` bercampur komponen → dipindah
+  ke `dashboardUtils.ts`; (b) `setState` sinkron di dalam `useEffect`
+  (rule `react-hooks/set-state-in-effect`) pada animasi ring & bar →
+  diperbaiki jadi `useState(() => ...)` untuk nilai awal + `useEffect`
+  hanya memicu `requestAnimationFrame` tanpa cabang sinkron.
+- Craft pass manual juga menemukan 2 bug aksesibilitas/posisi nyata yang
+  diperbaiki: `aria-labelledby` pada progressbar rekomendasi yang
+  menunjuk ke `div` kosong tanpa teks (diganti `aria-label` langsung),
+  dan dot-indikator aktif di `MobileBottomNav` yang `absolute` tanpa
+  ancestor `relative` yang benar (ditambahkan `relative` ke `Link`
+  pembungkusnya).
+- Tidak ada test runner di repo ini — tidak ada unit test ditambahkan
+  untuk halaman presentational ini (sesuai scope yang disepakati).
+- `dist/` hasil build verifikasi dihapus setelah selesai (artifact
+  sementara, bukan untuk commit).
+
+### Status
+
+Dashboard **selesai untuk iterasi mock-data**. Langkah lanjutan: setelah
+BKT (`src/lib/algorithms/bkt.ts`) dan service layer `src/lib/api/progress.ts`
+ada, ganti `mockDashboardData` di `Index.tsx` dengan data asli dari
+Supabase. Route `/knowledge-map` dan `/ai-tutor` belum dibuat — sidebar/
+bottom-nav tetap menampilkan item tersebut sebagai disabled + badge
+"Segera" sampai route-nya dibuat di `src/App.tsx`.
+
+---
+
+
 # SkillPath AI - Session Progress & Context
 
 > **⚠️ NOTE**: "SkillPath AI" adalah nama placeholder. Nama final belum ditentukan.
