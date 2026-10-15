@@ -56,10 +56,7 @@ export default function DashboardTopBar({
           <span className="hidden sm:inline">SkillPath AI</span>
         </Link>
 
-        <nav
-          aria-label="Navigasi utama"
-          className="flex items-center gap-2"
-        >
+        <nav aria-label="Navigasi utama" className="flex items-center gap-2">
           <NavLink to="/dashboard" end className={navClass}>
             Dashboard
           </NavLink>
