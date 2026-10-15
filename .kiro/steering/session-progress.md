@@ -501,3 +501,30 @@ Sesi brainstorming (skill `brainstorming` dari `~/.agents/skills/`). Sempat diba
 - Terbuka: klaim "AI Tutor dengan batas harian" di paket Gratis belum benar (AI Tutor belum ada); nama brand; belum ada commit.
 
 - (2026-10-15, siang) Section landing setinggi layar: hero `min-h-svh` di semua ukuran; section lain `lg:min-h-svh` dengan isi di tengah (min-height, bukan tinggi tetap; di bawah lg tinggi alami karena isi lebih tinggi dari layar); penutup + footer berbagi layar terakhir. Panel demo di lg dibagi dua kolom (tahap kiri, meter kanan) agar muat 800px; baris bantuan di bawah meter selalu tampil supaya panel tidak melompat. Terukur di 1280x800/1440x900: tiap section = tinggi layar; 1366x768: Topik 782px (lebih 14px). Tanpa scroll-snap (sengaja).
+
+
+## Diagnostic adaptif: keputusan (2026-10-15, siang)
+- Jumlah soal fleksibel, ditentukan algoritma, bukan AI. BKT per skill (cocok dengan `student_mastery.skill_key`; skill_key harus unik global, mis. `dasar-pemrograman.perulangan`).
+- Aturan: min 2 / maks 4 soal per skill; berhenti bila P(L) >= 85% atau <= 20%; maks 20 soal per topik; prior 50%. Ambang berhenti (keyakinan) berbeda dari ambang status UI (40/70).
+- Contoh angka bkt.ts dari 50%: B=80, BB=94, SS=13, BS=42, BSS=18.
+- AI membuat bank 5-8 soal per skill (dicek manual); algoritma memilih urutan.
+- Konsekuensi landing: teks 'Satu soal per skill' di DemoSection tidak akurat lagi; demo Raka perlu memperlihatkan soal tambahan. Belum dikerjakan.
+
+
+- (2026-10-15) Mesin diagnostic: src/lib/algorithms/diagnostic.ts (startDiagnostic/nextQuestion/answerQuestion/getResults, selang-seling antar-skill, aturan 2-4 soal/skill, stop 85/20, maks 20) + learningPath.ts (dipakai bersama demo landing). Plan: docs/superpowers/plans/2026-10-15-diagnostic-engine.md. Belum ada UI/bank soal.
+
+
+## Konten & alur belajar (2026-10-15, siang)
+
+- Struktur konten: Topik -> Unit (3-5 per topik) -> Skill (3-5 per unit), tiap skill punya prasyarat (harus skill sebelumnya). `skill_key` global berformat `<topik>.<skill>` (mis. `dasar-pemrograman.variabel`).
+- Saat masuk topik, user memilih "Mulai dari awal" (tanpa tes, belajar dari skill pertama) atau "Cek kemampuanku dulu" (satu tes). Tes berjalan bertahap per unit dari Unit 1, berhenti di unit pertama tempat user lemah (unit sesudahnya dianggap belum dikuasai), maks 20 soal. User hanya melihat satu pilihan + satu tes; unit/prasyarat bekerja di belakang layar.
+- Alur belajar = mastery learning: skill terbuka setelah prasyaratnya dikuasai; per skill: materi singkat -> contoh -> latihan adaptif sampai BKT yakin; checkpoint campuran di akhir unit; gagal checkpoint di satu skill membuka ulang skill itu.
+- Target topik pertama "Dasar Pemrograman": pemula total, Python. Peta 5 unit/17 skill — Fondasi (output, variabel, tipe-data, input-konversi), Ekspresi & keputusan (operator-aritmatika, perbandingan-logika, percabangan), Perulangan (for-range, while, akumulator), Kumpulan data (list-dasar, menelusuri-list, string-urutan), Fungsi (def-return, parameter, return-vs-print, variabel-lokal). `break`/`continue` sengaja dibuang untuk pemula. Demo cukup Unit 1-3.
+- Standar kualitas konten (anti AI slop): soal menguji kemampuan (tebak output, tebak error, pilih kode) bukan definisi; tiap pilihan salah mewakili miskonsepsi nyata pemula + feedback spesifik; penjelasan menjawab "kenapa"; semua kode dijalankan untuk verifikasi (`npm run content:verify`, Python); materi pendek berbasis contoh (goal, 3 paragraf, contoh, 2 jebakan, catatan, satu "tebak dulu"); kode materi tidak boleh sama dengan kode soal; bank 8-9 soal per skill; tim adalah penilai akhir.
+- Konten disimpan sebagai JSON di `src/content/<topik>/` (`topic.json` + `skills/<skill>.json`, format di `src/content/types.ts`), baru diubah ke seed Supabase setelah skema tim pasti (butuh tabel skill per topik dan relasi soal ke topik/skill — belum ada di `supabase-db-model.md`).
+- Skill contoh `skills/variabel.json` (9 soal) sudah ditulis model utama. Menunggu kritik user sebelum panduan gaya (`docs/content-style-guide.md`) dibekukan dan skill lain ditulis.
+- Konsekuensi ke mesin (belum dikerjakan): `learningPath.ts` harus mengikuti prasyarat dulu baru penguasaan terendah; `diagnostic.ts` perlu mode bertahap per unit (berhenti di unit lemah) dan mode "Mulai dari awal" (tanpa tes).
+- Plan: `docs/superpowers/plans/2026-10-15-content-dasar-pemrograman.md` (T1 format+validator+verifier sedang dikerjakan, T2 skill variabel selesai menunggu kritik, T3-T10 menyusul).
+
+
+- (2026-10-15) Plan seed data: docs/superpowers/plans/2026-10-15-seed-data.md (JSON repo = sumber kebenaran; 1 materials per skill sebagai jembatan topik->soal; UUID v5 deterministik; upsert idempoten; tanpa DELETE; tes kontrak enum migrasi; 10 soal/skill; policy student_mastery & seed hosted = gated). Belum dieksekusi.

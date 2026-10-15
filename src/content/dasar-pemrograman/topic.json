@@ -1,0 +1,222 @@
+{
+  "slug": "dasar-pemrograman",
+  "name": "Dasar Pemrograman",
+  "language": "python",
+  "level": "pemula",
+  "description": "Menulis program Python pertamamu: menyimpan data, mengambil keputusan, mengulang, dan membuat fungsi sendiri.",
+  "units": [
+    {
+      "key": "fondasi",
+      "name": "Fondasi",
+      "skills": [
+        {
+          "key": "dasar-pemrograman.output",
+          "name": "Menampilkan output",
+          "prerequisites": [],
+          "objectives": [
+            "Menampilkan teks dan angka dengan print()",
+            "Menebak output beberapa print() berurutan, termasuk print() dengan beberapa nilai"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.variabel",
+          "name": "Variabel & assignment",
+          "prerequisites": ["dasar-pemrograman.output"],
+          "objectives": [
+            "Menyimpan nilai ke variabel dengan =",
+            "Menebak isi variabel setelah beberapa baris assignment",
+            "Mengubah variabel berdasarkan nilainya sendiri, seperti x = x + 1",
+            "Membedakan nama variabel dengan teks dalam tanda kutip"
+          ],
+          "file": "variabel.json"
+        },
+        {
+          "key": "dasar-pemrograman.tipe-data",
+          "name": "Tipe data",
+          "prerequisites": ["dasar-pemrograman.variabel"],
+          "objectives": [
+            "Mengenali int, float, str, dan bool dari sebuah nilai",
+            "Menebak hasil operasi antar tipe, seperti \"3\" + \"4\" dan 3 + 4",
+            "Mengenali error saat menggabungkan str dengan int"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.input-konversi",
+          "name": "Input & konversi tipe",
+          "prerequisites": ["dasar-pemrograman.tipe-data"],
+          "objectives": [
+            "Membaca masukan pengguna dengan input()",
+            "Menjelaskan bahwa input() selalu menghasilkan str",
+            "Mengubah tipe dengan int(), float(), dan str()"
+          ],
+          "file": null
+        }
+      ]
+    },
+    {
+      "key": "keputusan",
+      "name": "Ekspresi & keputusan",
+      "skills": [
+        {
+          "key": "dasar-pemrograman.operator-aritmatika",
+          "name": "Operator aritmatika",
+          "prerequisites": ["dasar-pemrograman.tipe-data"],
+          "objectives": [
+            "Memakai + - * / // % **",
+            "Membedakan / dengan // dan memakai % untuk sisa bagi",
+            "Menebak hasil ekspresi dengan urutan operasi"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.perbandingan-logika",
+          "name": "Perbandingan & logika",
+          "prerequisites": ["dasar-pemrograman.operator-aritmatika"],
+          "objectives": [
+            "Membandingkan nilai dengan == != < > <= >=",
+            "Membedakan = (menyimpan) dengan == (membandingkan)",
+            "Menggabungkan kondisi dengan and, or, not"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.percabangan",
+          "name": "Percabangan if/elif/else",
+          "prerequisites": ["dasar-pemrograman.perbandingan-logika"],
+          "objectives": [
+            "Menulis if, elif, dan else dengan indentasi yang benar",
+            "Menebak cabang mana yang dijalankan",
+            "Menjelaskan bahwa hanya cabang pertama yang benar yang dijalankan"
+          ],
+          "file": null
+        }
+      ]
+    },
+    {
+      "key": "perulangan",
+      "name": "Perulangan",
+      "skills": [
+        {
+          "key": "dasar-pemrograman.for-range",
+          "name": "Perulangan for & range",
+          "prerequisites": ["dasar-pemrograman.variabel", "dasar-pemrograman.operator-aritmatika"],
+          "objectives": [
+            "Mengulang kode dengan for dan range()",
+            "Menebak nilai yang dihasilkan range(n), range(a, b), dan range(a, b, langkah)",
+            "Menghitung berapa kali sebuah perulangan berjalan"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.while",
+          "name": "Perulangan while",
+          "prerequisites": ["dasar-pemrograman.perbandingan-logika", "dasar-pemrograman.for-range"],
+          "objectives": [
+            "Mengulang selama kondisi benar dengan while",
+            "Memastikan kondisi berubah agar perulangan berhenti",
+            "Memilih antara for dan while untuk sebuah masalah"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.akumulator",
+          "name": "Pola akumulator",
+          "prerequisites": ["dasar-pemrograman.for-range"],
+          "objectives": [
+            "Menjumlahkan dan menghitung di dalam perulangan",
+            "Menaruh nilai awal akumulator di luar perulangan",
+            "Menebak nilai akumulator setelah perulangan selesai"
+          ],
+          "file": null
+        }
+      ]
+    },
+    {
+      "key": "kumpulan-data",
+      "name": "Kumpulan data",
+      "skills": [
+        {
+          "key": "dasar-pemrograman.list-dasar",
+          "name": "List dasar",
+          "prerequisites": ["dasar-pemrograman.tipe-data"],
+          "objectives": [
+            "Membuat list dan mengambil isinya dengan indeks mulai dari 0",
+            "Memakai len() dan append()",
+            "Mengenali IndexError"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.menelusuri-list",
+          "name": "Menelusuri list",
+          "prerequisites": ["dasar-pemrograman.list-dasar", "dasar-pemrograman.akumulator"],
+          "objectives": [
+            "Mengolah setiap isi list dengan for",
+            "Mencari, menghitung, dan menjumlahkan isi list"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.string-urutan",
+          "name": "String sebagai urutan",
+          "prerequisites": ["dasar-pemrograman.list-dasar"],
+          "objectives": [
+            "Mengambil karakter dengan indeks dan potongan dengan slicing",
+            "Memakai len() pada string",
+            "Menelusuri string karakter demi karakter"
+          ],
+          "file": null
+        }
+      ]
+    },
+    {
+      "key": "fungsi",
+      "name": "Fungsi",
+      "skills": [
+        {
+          "key": "dasar-pemrograman.def-return",
+          "name": "Membuat fungsi",
+          "prerequisites": ["dasar-pemrograman.operator-aritmatika"],
+          "objectives": [
+            "Mendefinisikan fungsi dengan def dan memanggilnya",
+            "Mengembalikan nilai dengan return",
+            "Menjelaskan bahwa kode setelah return tidak dijalankan"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.parameter",
+          "name": "Parameter & argumen",
+          "prerequisites": ["dasar-pemrograman.def-return"],
+          "objectives": [
+            "Memberi masukan ke fungsi lewat parameter",
+            "Mencocokkan argumen dengan parameter sesuai urutan"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.return-vs-print",
+          "name": "return vs print",
+          "prerequisites": ["dasar-pemrograman.def-return"],
+          "objectives": [
+            "Membedakan mengembalikan nilai dengan menampilkannya",
+            "Menebak hasil fungsi tanpa return (None)"
+          ],
+          "file": null
+        },
+        {
+          "key": "dasar-pemrograman.variabel-lokal",
+          "name": "Variabel lokal",
+          "prerequisites": ["dasar-pemrograman.parameter"],
+          "objectives": [
+            "Menjelaskan bahwa variabel di dalam fungsi tidak terlihat dari luar",
+            "Menebak nilai variabel dengan nama sama di dalam dan di luar fungsi"
+          ],
+          "file": null
+        }
+      ]
+    }
+  ]
+}

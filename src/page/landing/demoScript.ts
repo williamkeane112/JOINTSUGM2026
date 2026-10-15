@@ -8,6 +8,7 @@
  */
 
 import { BKTModel } from "../../lib/algorithms/bkt";
+import { buildLearningPath } from "../../lib/algorithms/learningPath";
 import { getMasteryStatus, type MasteryStatus } from "../../lib/mastery";
 
 export type SkillKey = "variabel" | "kondisi" | "perulangan" | "fungsi";
@@ -130,15 +131,9 @@ export function computeSkillResults(
 /**
  * Splits results into skills already mastered (skipped, curriculum order)
  * and the rest (steps), ordered by mastery ascending with curriculum order
- * as the tiebreaker.
+ * as the tiebreaker. Delegates to the shared `learningPath.ts` rule so the
+ * demo and the real diagnostic engine never diverge.
  */
 export function buildDemoPath(results: readonly SkillResult[]): DemoPath {
-  const skipped = results.filter((result) => result.status === "mastered");
-  const steps = results
-    .filter((result) => result.status !== "mastered")
-    .map((result, index) => ({ result, index }))
-    .sort((a, b) => a.result.masteryPct - b.result.masteryPct || a.index - b.index)
-    .map(({ result }) => result);
-
-  return { skipped, steps };
+  return buildLearningPath(results);
 }

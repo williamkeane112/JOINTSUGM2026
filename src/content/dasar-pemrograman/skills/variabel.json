@@ -1,0 +1,319 @@
+{
+  "skillKey": "dasar-pemrograman.variabel",
+  "material": {
+    "goal": "Setelah ini kamu bisa menyimpan nilai ke variabel, mengubahnya, dan menebak isinya setelah beberapa baris kode.",
+    "explanation": [
+      "Variabel adalah nama untuk sebuah nilai. Baris `skor = 10` berarti: simpan 10, beri nama `skor`. Setelah itu, setiap kali kamu menulis `skor`, Python memakai nilai yang tersimpan.",
+      "Tanda `=` di Python bukan \"sama dengan\" seperti di matematika. Baca sebagai \"menjadi\": sisi kanan dihitung dulu, lalu hasilnya disimpan ke nama di sisi kiri. Karena itu `skor = skor + 5` masuk akal: ambil skor sekarang, tambah 5, simpan lagi ke `skor`.",
+      "Satu variabel hanya menyimpan satu nilai. Nilai baru menimpa nilai lama, dan Python menjalankan kode dari atas ke bawah. Jadi untuk tahu isi sebuah variabel, telusuri barisnya satu per satu."
+    ],
+    "example": {
+      "code": "skor = 10\nprint(skor)\nskor = skor + 5\nprint(skor)",
+      "output": "10\n15",
+      "note": "Baris ketiga dihitung dari kanan: 10 + 5 = 15, lalu 15 disimpan ke skor menggantikan 10."
+    },
+    "pitfalls": [
+      {
+        "title": "Variabel menyimpan hasil, bukan rumus",
+        "code": "harga = 100\ntotal = harga * 2\nharga = 150\nprint(total)",
+        "output": "200",
+        "why": "total dihitung sekali, saat barisnya dijalankan, yaitu 100 * 2. Mengubah harga sesudahnya tidak menghitung ulang total."
+      },
+      {
+        "title": "Teks dalam tanda kutip bukan variabel",
+        "code": "kota = \"Bandung\"\nprint(\"kota\")\nprint(kota)",
+        "output": "kota\nBandung",
+        "why": "\"kota\" dengan tanda kutip adalah teks apa adanya. kota tanpa tanda kutip adalah nama variabel, jadi Python mengambil isinya."
+      }
+    ],
+    "notes": [
+      "Nama variabel boleh berisi huruf, angka, dan garis bawah, tetapi tidak boleh diawali angka: `nilai_1` boleh, `1nilai` tidak.",
+      "Huruf besar dan kecil dibedakan: `Harga` dan `harga` adalah dua variabel yang berbeda."
+    ],
+    "tryIt": {
+      "prompt": "Tebak output-nya sebelum melihat jawaban. Telusuri isi a dan b baris demi baris.",
+      "code": "a = 7\na = a - 2\nb = a\na = 0\nprint(a, b)",
+      "output": "0 5",
+      "note": "Saat b = a dijalankan, isi a adalah 5, jadi b menyimpan 5. Mengubah a menjadi 0 sesudahnya tidak mengubah b."
+    }
+  },
+  "questions": [
+    {
+      "id": "dasar-pemrograman.variabel.q01",
+      "type": "predict_output",
+      "difficulty": "easy",
+      "prompt": "Apa yang dicetak?",
+      "code": "skor = 10\nskor = 15\nprint(skor)",
+      "options": [
+        { "id": "a", "text": "15" },
+        {
+          "id": "b",
+          "text": "10",
+          "misconception": "Mengira nilai pertama yang diberikan ke variabel tetap dipakai.",
+          "feedback": "Nilai baru menimpa nilai lama. Saat print dijalankan, isi skor sudah 15."
+        },
+        {
+          "id": "c",
+          "text": "10 15",
+          "misconception": "Mengira variabel menyimpan riwayat semua nilainya.",
+          "feedback": "Satu variabel hanya menyimpan satu nilai, yaitu yang terakhir diberikan."
+        },
+        {
+          "id": "d",
+          "text": "25",
+          "misconception": "Mengira memberi nilai baru menambahkan ke nilai lama.",
+          "feedback": "skor = 15 mengganti isi skor, tidak menambahkannya. Untuk menambah, tulis skor = skor + 15."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "Baris kedua mengganti isi skor dari 10 menjadi 15, jadi print menampilkan 15.",
+      "verify": { "stdout": "15" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q02",
+      "type": "predict_output",
+      "difficulty": "easy",
+      "prompt": "Apa yang dicetak?",
+      "code": "nama = \"Rina\"\nprint(\"nama\")",
+      "options": [
+        { "id": "a", "text": "nama" },
+        {
+          "id": "b",
+          "text": "Rina",
+          "misconception": "Mengira teks dalam tanda kutip dibaca sebagai nama variabel.",
+          "feedback": "Tanda kutip membuat \"nama\" menjadi teks biasa, bukan variabel. Untuk mencetak isinya, tulis print(nama) tanpa tanda kutip."
+        },
+        {
+          "id": "c",
+          "text": "\"nama\"",
+          "misconception": "Mengira tanda kutip ikut tercetak.",
+          "feedback": "Tanda kutip hanya menandai awal dan akhir teks di kode. print tidak menampilkannya."
+        },
+        {
+          "id": "d",
+          "text": "Error",
+          "misconception": "Mengira teks yang sama dengan nama variabel menimbulkan konflik.",
+          "feedback": "Tidak ada error. Teks \"nama\" dan variabel nama adalah dua hal berbeda dan boleh ada bersamaan."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "\"nama\" bertanda kutip adalah teks apa adanya, jadi yang dicetak adalah kata nama, bukan isi variabelnya.",
+      "verify": { "stdout": "nama" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q03",
+      "type": "predict_output",
+      "difficulty": "medium",
+      "prompt": "Apa yang dicetak?",
+      "code": "a = 3\nb = a + 1\na = 10\nprint(b)",
+      "options": [
+        { "id": "a", "text": "4" },
+        {
+          "id": "b",
+          "text": "11",
+          "misconception": "Mengira variabel menyimpan rumus yang dihitung ulang saat variabel lain berubah.",
+          "feedback": "b dihitung sekali, saat baris kedua dijalankan: 3 + 1 = 4. Mengubah a sesudahnya tidak menghitung ulang b."
+        },
+        {
+          "id": "c",
+          "text": "3",
+          "misconception": "Mengira b ikut menyimpan isi a tanpa penambahan.",
+          "feedback": "Sisi kanan a + 1 dihitung dulu, jadi yang disimpan ke b adalah 4, bukan 3."
+        },
+        {
+          "id": "d",
+          "text": "10",
+          "misconception": "Mengira b terhubung ke a sehingga selalu sama dengan isi a terbaru.",
+          "feedback": "b menyimpan hasil hitungan, bukan sambungan ke a. Isinya tetap 4."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "Saat b = a + 1 dijalankan, a masih 3, jadi b menyimpan 4. Baris a = 10 hanya mengubah a.",
+      "verify": { "stdout": "4" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q04",
+      "type": "predict_output",
+      "difficulty": "medium",
+      "prompt": "Apa yang dicetak?",
+      "code": "x = 5\ny = x\nx = 8\nprint(y)",
+      "options": [
+        { "id": "a", "text": "5" },
+        {
+          "id": "b",
+          "text": "8",
+          "misconception": "Mengira y = x membuat y selalu mengikuti x.",
+          "feedback": "y = x menyalin isi x saat itu, yaitu 5. Setelahnya x dan y berdiri sendiri."
+        },
+        {
+          "id": "c",
+          "text": "13",
+          "misconception": "Mengira nilai-nilai yang pernah diberikan dijumlahkan.",
+          "feedback": "Tidak ada penjumlahan di kode ini. y hanya menerima salinan isi x, yaitu 5."
+        },
+        {
+          "id": "d",
+          "text": "x",
+          "misconception": "Mengira y menyimpan nama variabel x, bukan isinya.",
+          "feedback": "Tanpa tanda kutip, x berarti isi variabel x. Jadi y menyimpan angka 5."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "y = x menyalin angka 5 ke y. Mengubah x menjadi 8 sesudahnya tidak mengubah y.",
+      "verify": { "stdout": "5" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q05",
+      "type": "predict_output",
+      "difficulty": "medium",
+      "prompt": "Apa yang dicetak?",
+      "code": "n = 4\nn = n + 2\nn = n * 3\nprint(n)",
+      "options": [
+        { "id": "a", "text": "18" },
+        {
+          "id": "b",
+          "text": "14",
+          "misconception": "Mengerjakan baris dengan urutan yang salah, dikali dulu baru ditambah.",
+          "feedback": "Baris dijalankan dari atas: 4 + 2 = 6 dulu, baru 6 * 3 = 18."
+        },
+        {
+          "id": "c",
+          "text": "6",
+          "misconception": "Berhenti di baris kedua atau mengira baris ketiga tidak mengubah n.",
+          "feedback": "Baris ketiga juga menyimpan hasil baru ke n: 6 * 3 = 18."
+        },
+        {
+          "id": "d",
+          "text": "4",
+          "misconception": "Mengira n = n + 2 tidak mungkin, seperti persamaan matematika.",
+          "feedback": "Di Python, = berarti \"menjadi\". n = n + 2 mengambil n sekarang, menambah 2, lalu menyimpannya lagi ke n."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "n berubah tiap baris: 4, lalu 4 + 2 = 6, lalu 6 * 3 = 18.",
+      "verify": { "stdout": "18" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q06",
+      "type": "predict_output",
+      "difficulty": "hard",
+      "prompt": "Kode ini dimaksudkan untuk menukar isi a dan b. Apa yang sebenarnya dicetak?",
+      "code": "a = 1\nb = 2\na = b\nb = a\nprint(a, b)",
+      "options": [
+        { "id": "a", "text": "2 2" },
+        {
+          "id": "b",
+          "text": "2 1",
+          "misconception": "Mengira dua assignment berurutan menukar isi dua variabel.",
+          "feedback": "Setelah a = b, isi a sudah 2 dan angka 1 hilang. Jadi b = a juga memberi 2. Untuk menukar, simpan dulu salah satu nilainya di variabel lain."
+        },
+        {
+          "id": "c",
+          "text": "1 2",
+          "misconception": "Mengira assignment antarvariabel tidak mengubah apa pun.",
+          "feedback": "a = b mengganti isi a menjadi 2, jadi isi a berubah."
+        },
+        {
+          "id": "d",
+          "text": "1 1",
+          "misconception": "Membaca a = b sebagai b menerima isi a.",
+          "feedback": "Nilai selalu mengalir dari kanan ke kiri. a = b berarti a menerima isi b."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "a = b membuat a berisi 2. Lalu b = a menyalin isi a yang sudah 2. Keduanya berakhir 2.",
+      "verify": { "stdout": "2 2" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q07",
+      "type": "predict_error",
+      "difficulty": "easy",
+      "prompt": "Apa yang terjadi saat kode ini dijalankan?",
+      "code": "print(total)\ntotal = 50",
+      "options": [
+        { "id": "a", "text": "Error, karena total dipakai sebelum diberi nilai" },
+        {
+          "id": "b",
+          "text": "Mencetak 50",
+          "misconception": "Mengira Python membaca seluruh kode dulu sebelum menjalankannya.",
+          "feedback": "Python menjalankan baris dari atas. Saat print(total) dijalankan, total belum ada."
+        },
+        {
+          "id": "c",
+          "text": "Mencetak 0",
+          "misconception": "Mengira variabel yang belum diberi nilai otomatis berisi 0.",
+          "feedback": "Python tidak memberi nilai awal otomatis. Variabel baru ada setelah diberi nilai dengan =."
+        },
+        {
+          "id": "d",
+          "text": "Mencetak total",
+          "misconception": "Mengira nama yang belum dikenal dicetak sebagai teks.",
+          "feedback": "Tanpa tanda kutip, total dibaca sebagai nama variabel. Karena belum ada, Python berhenti dengan NameError."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "Baris pertama memakai total sebelum baris kedua membuatnya, jadi Python berhenti dengan NameError.",
+      "verify": { "error": "NameError" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q08",
+      "type": "predict_output",
+      "difficulty": "medium",
+      "prompt": "Apa yang dicetak?",
+      "code": "Harga = 2000\nharga = 500\nprint(Harga + harga)",
+      "options": [
+        { "id": "a", "text": "2500" },
+        {
+          "id": "b",
+          "text": "1000",
+          "misconception": "Mengira huruf besar dan kecil tidak dibedakan pada nama variabel.",
+          "feedback": "Harga dan harga adalah dua variabel berbeda. Yang satu 2000, yang lain 500."
+        },
+        {
+          "id": "c",
+          "text": "4000",
+          "misconception": "Mengira harga = 500 tidak berpengaruh dan Harga dipakai dua kali.",
+          "feedback": "harga (huruf kecil) adalah variabel tersendiri berisi 500, jadi hasilnya 2000 + 500."
+        },
+        {
+          "id": "d",
+          "text": "Error",
+          "misconception": "Mengira dua nama yang hanya beda huruf besar-kecil tidak boleh dipakai bersamaan.",
+          "feedback": "Boleh, walau sebaiknya dihindari karena membingungkan. Python menganggapnya dua variabel."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "Python membedakan huruf besar dan kecil, jadi ada dua variabel: Harga = 2000 dan harga = 500. Jumlahnya 2500.",
+      "verify": { "stdout": "2500" }
+    },
+    {
+      "id": "dasar-pemrograman.variabel.q09",
+      "type": "choose_code",
+      "difficulty": "medium",
+      "prompt": "Kamu ingin menyimpan umur 17, lalu menambahnya 1 tahun sehingga umur berisi 18. Kode mana yang benar?",
+      "options": [
+        { "id": "a", "text": "umur = 17\numur = umur + 1" },
+        {
+          "id": "b",
+          "text": "umur = 17\numur + 1",
+          "misconception": "Mengira menghitung sebuah ekspresi otomatis menyimpan hasilnya.",
+          "feedback": "umur + 1 dihitung, tetapi hasilnya tidak disimpan ke mana pun. Isi umur tetap 17."
+        },
+        {
+          "id": "c",
+          "text": "17 = umur\numur = umur + 1",
+          "misconception": "Mengira arah = bisa dibalik seperti persamaan matematika.",
+          "feedback": "Sisi kiri = harus nama variabel. 17 = umur menimbulkan SyntaxError."
+        },
+        {
+          "id": "d",
+          "text": "umur = 17\numur == umur + 1",
+          "misconception": "Tertukar antara = (menyimpan) dan == (membandingkan).",
+          "feedback": "== hanya membandingkan dan menghasilkan True atau False. Tidak ada yang disimpan ke umur."
+        }
+      ],
+      "correctOptionId": "a",
+      "explanation": "umur = umur + 1 menghitung 17 + 1, lalu menyimpan 18 ke umur. Hanya pilihan ini yang benar-benar mengubah isi umur."
+    }
+  ]
+}

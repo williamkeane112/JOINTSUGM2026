@@ -40,7 +40,8 @@ Platform pembelajaran adaptif berbasis AI yang menggunakan algoritma Bayesian Kn
 
 ### 1. Diagnostic Test (PER TOPIK, bukan global sekali)
 - Dipicu saat user pertama kali memasuki sebuah topik (tidak ada baris `student_progress` untuk topik itu)
-- ~5-8 soal pilihan ganda, fokus ke satu topik. **Semua soal dalam satu sesi wajib dijawab** sebelum hasil dihitung (keluar di tengah diagnostic = progres hilang, lihat docs/USER_FLOWS.md §3)
+- Jumlah soal fleksibel, ditentukan algoritma (keputusan 2026-10-15): tiap skill punya P(L) BKT sendiri; min 2, maks 4 soal per skill; skill berhenti ditanya bila P(L) >= 85% atau <= 20%; maks 20 soal per topik. AI hanya membuat bank soal (5-8 per skill), algoritma memilih soal berikutnya. Semua soal yang diberikan sistem wajib dijawab (sesi selesai ditentukan sistem). Keluar di tengah diagnostic = progres hilang (lihat docs/USER_FLOWS.md §3)
+- Struktur Topik -> Unit -> Skill + prasyarat; saat masuk topik user memilih "Mulai dari awal" atau "Cek kemampuanku dulu"; tes bertahap per unit, berhenti di unit pertama yang lemah (keputusan 2026-10-15).
 - Soal dibuat AI **sekali per topik**, disimpan di `questions` (`source = 'ai'`), dicek manual sebelum dipakai. BUKAN digenerate per user saat runtime → semua siswa dapat bank soal yang sama, hasil bisa dibandingkan, demo tidak bergantung API hidup
 - Output: P(L) awal topik tersebut (BKT) → input penyusunan learning path
 
