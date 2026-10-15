@@ -80,7 +80,7 @@ export default function DemoSection() {
 
   return (
     <section id="cara-kerja" aria-labelledby="demo-title" className={SECTION}>
-      <div className={`${CONTAINER} grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14`}>
+      <div className={`${CONTAINER} grid gap-10 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-12`}>
         <div className="lg:pt-2">
           <h2 id="demo-title" className={SECTION_TITLE}>
             Lihat jalur Raka tersusun
@@ -163,8 +163,10 @@ export default function DemoSection() {
             {caption}
           </p>
 
+          {/* From lg: stage left, meters right, so the whole demo fits one screen. */}
+          <div className="mt-4 lg:grid lg:grid-cols-2 lg:gap-6">
           {/* Stage: one view per frame; the min height keeps the panel from jumping between frames. */}
-          <div className="mt-4 min-h-[19rem]" aria-hidden="true">
+          <div className="min-h-[19rem] lg:min-h-[23rem]" aria-hidden="true">
             {frame === 0 && <TopicPicked key="topic" />}
             {frame > 0 && frame < LAST_FRAME && <QuestionView key={frame} skill={DEMO_SKILLS[frame - 1]} index={frame} />}
             {finished && (
@@ -182,21 +184,25 @@ export default function DemoSection() {
             answers={answers}
             onAnswer={setAnswer}
           />
+          </div>
 
-          {finished && (
-            <div className={`mt-3 flex flex-wrap items-center justify-between gap-2 ${ENTER}`}>
-              <p className="text-sm text-[var(--color-muted)]">Ganti jawaban Raka, lalu lihat jalurnya berubah.</p>
-              {edited && (
-                <button
-                  type="button"
-                  onClick={() => setAnswers([...RAKA_ANSWERS])}
-                  className="inline-flex min-h-9 items-center rounded-lg text-sm font-semibold text-[var(--color-pink-deep)] underline-offset-4 hover:underline pointer-coarse:min-h-11"
-                >
-                  Kembalikan jawaban Raka
-                </button>
-              )}
-            </div>
-          )}
+          {/* Always rendered so the panel keeps its height when the final frame adds controls. */}
+          <div className="mt-3 flex min-h-9 flex-wrap items-center justify-between gap-2 pointer-coarse:min-h-11">
+            <p className="text-sm text-[var(--color-muted)]">
+              {finished
+                ? "Ganti jawaban Raka, lalu lihat jalurnya berubah."
+                : "Di akhir demo, kamu bisa mengganti jawaban Raka."}
+            </p>
+            {finished && edited && (
+              <button
+                type="button"
+                onClick={() => setAnswers([...RAKA_ANSWERS])}
+                className="inline-flex min-h-9 items-center rounded-lg text-sm font-semibold text-[var(--color-pink-deep)] underline-offset-4 hover:underline pointer-coarse:min-h-11"
+              >
+                Kembalikan jawaban Raka
+              </button>
+            )}
+          </div>
 
           {/* Scrubber: every frame is reachable by click or keyboard. */}
           <div className="mt-5 flex items-center justify-center gap-1" role="group" aria-label="Pilih tahap demo">
@@ -300,7 +306,7 @@ function SkillMeters({
   onAnswer: (index: number, value: boolean) => void;
 }) {
   return (
-    <div className="mt-5 border-t border-[var(--color-line)] pt-4">
+    <div className="mt-5 border-t border-[var(--color-line)] pt-4 lg:mt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6">
       <p className="text-xs font-semibold text-[var(--color-muted)]">Penguasaan per skill</p>
       <ul className="mt-3 space-y-3">
         {results.map((result, index) => {
@@ -310,10 +316,10 @@ function SkillMeters({
               key={result.key}
               className={`grid grid-cols-[6.5rem_minmax(0,1fr)_2.75rem] items-center gap-x-3 gap-y-2 ${
                 editable ? "sm:grid-cols-[6.5rem_minmax(0,1fr)_2.75rem_auto]" : ""
-              }`}
+              } lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-y-1.5`}
             >
-              <span className="truncate text-sm font-medium">{result.name}</span>
-              <span className="h-2 overflow-hidden rounded-full bg-[var(--color-line)]/70">
+              <span className="truncate text-sm font-medium lg:col-start-1 lg:row-start-1">{result.name}</span>
+              <span className="h-2 overflow-hidden rounded-full bg-[var(--color-line)]/70 lg:col-span-2 lg:row-start-2">
                 <span
                   className="block h-full rounded-full transition-[width,background-color] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
                   style={{
@@ -322,7 +328,7 @@ function SkillMeters({
                   }}
                 />
               </span>
-              <span className="text-right text-sm font-semibold tabular-nums">
+              <span className="text-right text-sm font-semibold tabular-nums lg:col-start-2 lg:row-start-1">
                 {answered ? `${result.masteryPct}%` : <span className="text-[var(--color-muted)]">–</span>}
               </span>
 
@@ -330,7 +336,7 @@ function SkillMeters({
                 <div
                   role="radiogroup"
                   aria-label={`Jawaban Raka untuk ${result.name}`}
-                  className="col-span-3 flex gap-1 sm:col-span-1"
+                  className="col-span-3 flex gap-1 sm:col-span-1 lg:col-span-2 lg:row-start-3"
                 >
                   <AnswerChoice label="Benar" checked={answers[index]} onSelect={() => onAnswer(index, true)} icon="check" />
                   <AnswerChoice label="Salah" checked={!answers[index]} onSelect={() => onAnswer(index, false)} icon="x" />

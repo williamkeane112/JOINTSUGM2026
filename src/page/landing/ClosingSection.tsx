@@ -4,7 +4,11 @@ import { CONTAINER } from "./landingStyles";
 
 export default function ClosingSection() {
   return (
-    <section aria-labelledby="closing-title" className="py-16 sm:py-24">
+    // Closing + footer share the last screen: 5.25rem is the footer's height.
+    <section
+      aria-labelledby="closing-title"
+      className="py-16 sm:py-24 lg:flex lg:min-h-[calc(100svh-5.25rem)] lg:flex-col lg:justify-center"
+    >
       <div className={`${CONTAINER} flex flex-col items-center text-center`}>
         {/* Small echo of the hero orbit, so the page closes in the same world it opened in. */}
         <div

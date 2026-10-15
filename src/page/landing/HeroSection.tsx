@@ -7,7 +7,7 @@ export default function HeroSection() {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden text-[var(--color-cream)]"
+      className="relative isolate flex min-h-svh flex-col justify-center overflow-hidden text-[var(--color-cream)]"
       style={{ background: NIGHT_GRADIENT }}
     >
       {/* Decoration continues the Auth world: one soft blob, constellation dots. */}
