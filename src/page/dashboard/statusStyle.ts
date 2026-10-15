@@ -30,4 +30,4 @@ export const STATUS_TINT: Record<MasteryStatus, string> = {
 
 /** Shared by HeroCard and EmptyState: both occupy the dashboard's single dark surface. */
 export const HERO_SURFACE =
-  "rounded-[var(--radius-card)] bg-[var(--color-night)] p-6 text-[var(--color-cream)] sm:p-8";
+  "rounded-[var(--radius-card)] bg-[var(--color-night)] p-5 text-[var(--color-cream)] sm:p-6";

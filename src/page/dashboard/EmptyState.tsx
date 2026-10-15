@@ -5,16 +5,13 @@ import { HERO_SURFACE } from "./statusStyle";
 export default function EmptyState() {
   return (
     <section className={HERO_SURFACE}>
-      <h2 className="font-display max-w-[16ch] text-3xl font-bold tracking-[-0.02em] leading-tight text-balance sm:text-4xl">
+      <h2 className="font-display max-w-[16ch] text-2xl leading-tight font-bold tracking-[-0.02em]! text-balance">
         Belum ada topik yang kamu mulai
       </h2>
-      <p className="mt-3 max-w-[44ch] text-[var(--color-cream)]/75">
+      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[var(--color-cream)]/75">
         Pilih satu topik, jawab beberapa soal singkat, dan kami susun jalur belajarmu.
       </p>
-      <Link
-        to="/topicSelect"
-        className="btn-primary mt-6 inline-flex min-h-12 items-center justify-center"
-      >
+      <Link to="/topicSelect" className="btn-primary btn-sm mt-5 inline-flex items-center justify-center">
         Pilih topik
       </Link>
     </section>

@@ -2,12 +2,17 @@ import { buildMasteryCurve, type CurvePoint } from "../../lib/algorithms/bkt";
 import { MASTERY_THRESHOLDS, clampMastery, getMasteryStatus } from "../../lib/mastery";
 import type { DashboardData, DashTopic, Recommendation } from "./types";
 
+/** Topics the student has access to (not locked behind a prerequisite), in their original order. */
+export function startedTopics(topics: DashTopic[]): DashTopic[] {
+  return topics.filter((topic) => !topic.locked);
+}
+
 /**
  * Picks the next topic: the lowest-mastery unlocked topic that is not yet mastered.
  * Ties go to whichever comes first in the list.
  */
 export function pickRecommendation(topics: DashTopic[]): Recommendation {
-  const unlocked = topics.filter((topic) => !topic.locked);
+  const unlocked = startedTopics(topics);
   if (unlocked.length === 0) return { kind: "empty" };
 
   const candidates = unlocked.filter(
@@ -22,7 +27,7 @@ export function pickRecommendation(topics: DashTopic[]): Recommendation {
 }
 
 export function summarize(data: DashboardData) {
-  const started = data.topics.filter((topic) => !topic.locked);
+  const started = startedTopics(data.topics);
   const total = started.reduce((sum, topic) => sum + clampMastery(topic.masteryPct), 0);
 
   return {

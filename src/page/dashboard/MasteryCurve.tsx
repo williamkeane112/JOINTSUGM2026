@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CurvePoint } from "../../lib/algorithms/bkt";
 import { MASTERY_THRESHOLDS, clampMastery } from "../../lib/mastery";
 
-const PAD = { top: 30, right: 74, bottom: 30, left: 34 };
+const PAD = { top: 26, right: 70, bottom: 26, left: 30 };
 /** The target line runs past the last point so its label never collides with the final value label. */
 const TARGET_OVERHANG = 16;
 const AXIS_TICKS = [0, 50, 100];
@@ -41,7 +41,7 @@ export default function MasteryCurve({ topicName, points }: MasteryCurveProps) {
   const hasCurve = points.length >= 2;
   const { ref, width } = useElementWidth(hasCurve);
 
-  const height = width < 520 ? 200 : 240;
+  const height = width < 520 ? 170 : 200;
   const plotWidth = width - PAD.left - PAD.right;
   const plotHeight = height - PAD.top - PAD.bottom;
   const x = (index: number) => PAD.left + (index / (points.length - 1)) * plotWidth;
@@ -56,17 +56,17 @@ export default function MasteryCurve({ topicName, points }: MasteryCurveProps) {
     : "";
 
   return (
-    <section className="card p-5 sm:p-6">
-      <h2 className="font-display text-lg font-bold">Penguasaan per soal</h2>
-      <p className="mt-0.5 text-sm text-[var(--color-muted)]">{topicName}</p>
+    <section className="card p-4 sm:p-5">
+      <h2 className="font-display text-base font-bold tracking-[-0.01em]!">Penguasaan per soal</h2>
+      <p className="mt-0.5 text-xs text-[var(--color-muted)]">{topicName}</p>
 
       {!hasCurve ? (
-        <p className="mt-6 text-[var(--color-muted)]">
+        <p className="mt-5 text-sm text-[var(--color-muted)]">
           Jawab beberapa soal dan grafik penguasaanmu muncul di sini.
         </p>
       ) : (
         <>
-          <div ref={ref} className="mt-3">
+          <div ref={ref} className="mt-2">
             <svg width={width} height={height} role="img" aria-label={summary} className="block max-w-full overflow-visible">
               {AXIS_TICKS.map((tick) => (
                 <g key={tick}>
@@ -79,7 +79,7 @@ export default function MasteryCurve({ topicName, points }: MasteryCurveProps) {
                     strokeDasharray={tick === 0 ? undefined : "2 6"}
                     style={{ stroke: LINE }}
                   />
-                  <text x={PAD.left - 10} y={y(tick) + 4} fontSize={11} textAnchor="end" style={{ fill: MUTED }}>
+                  <text x={PAD.left - 10} y={y(tick) + 4} fontSize={12} textAnchor="end" style={{ fill: MUTED }}>
                     {tick}
                   </text>
                 </g>
@@ -130,8 +130,8 @@ export default function MasteryCurve({ topicName, points }: MasteryCurveProps) {
               <text
                 x={x(points.length - 1)}
                 y={y(last.masteryPct) - 14}
+                fontSize={12}
                 textAnchor="middle"
-                fontSize={13}
                 fontWeight={700}
                 strokeWidth={4}
                 paintOrder="stroke"

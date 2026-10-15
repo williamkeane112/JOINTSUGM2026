@@ -6,6 +6,7 @@ import {
   curveForRecommendation,
   formatRelativeDay,
   pickRecommendation,
+  startedTopics,
   summarize,
   topicHref,
 } from "./dashboardLogic";
@@ -25,6 +26,32 @@ const data = (topics: DashTopic[], answerHistory: Record<string, boolean[]> = {}
   questionsAnswered: 12,
   streakDays: 3,
   answerHistory,
+});
+
+describe("startedTopics", () => {
+  it("returns an empty list for no topics", () => {
+    expect(startedTopics([])).toEqual([]);
+  });
+
+  it("keeps unlocked topics in their original order", () => {
+    const result = startedTopics([
+      topic({ id: "a" }),
+      topic({ id: "b", locked: true }),
+      topic({ id: "c" }),
+    ]);
+    expect(result.map((t) => t.id)).toEqual(["a", "c"]);
+  });
+
+  it("returns an empty list when every topic is locked", () => {
+    expect(startedTopics([topic({ id: "a", locked: true }), topic({ id: "b", locked: true })])).toEqual([]);
+  });
+
+  it("does not mutate its input and returns a new array", () => {
+    const input = [topic({ id: "a" }), topic({ id: "b", locked: true })];
+    const result = startedTopics(input);
+    expect(input.map((t) => t.id)).toEqual(["a", "b"]);
+    expect(result).not.toBe(input);
+  });
 });
 
 describe("pickRecommendation", () => {

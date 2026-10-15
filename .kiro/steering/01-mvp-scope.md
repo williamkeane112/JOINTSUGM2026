@@ -24,8 +24,8 @@ Platform pembelajaran adaptif berbasis AI yang menggunakan algoritma Bayesian Kn
 ## MVP Focus
 
 **Timeline**: 4 minggu
-**Subject**: Matematika SMP (1 subject only)
-**Topics**: 3-5 topik (Operasi Dasar, Pecahan, Bilangan Bulat, Persamaan Linear, Statistika)
+**Subject**: Multi-kategori (Pemrograman, pelajaran SMP/SMA, dll.) — seed "sedikit tapi dalam" (keputusan 2026-10-15)
+**Topics**: Jumlah final belum diputuskan (kemungkinan 20+); contoh lama/hardcoded: Operasi Dasar, Pecahan, Bilangan Bulat, Persamaan Linear, Statistika
 **Architecture**: Full Supabase (no separate backend)
 
 ---
@@ -72,8 +72,8 @@ Platform pembelajaran adaptif berbasis AI yang menggunakan algoritma Bayesian Kn
 - Satu hero gelap (`--color-night`) "Lanjut ke {topik}" = rekomendasi berikutnya + mastery besar (count-up sekali) + 1 tombol
 - Kartu progres (kalimat "X dari Y topik dikuasai", bar bersegmen per topik, rata-rata, soal dijawab, streak) — BUKAN 4 stat card
 - Grafik penguasaan per soal untuk topik rekomendasi (dihitung BKT dari riwayat jawaban, satu titik per jawaban)
-- Grid kartu topik yang sudah dimulai (`TopicCard`: latar terisi sesuai persen penguasaan + chip status + tombol) dan tautan "Jelajahi topik" → `/topicSelect`
-- Navbar pill tunggal (Dashboard, Topik, avatar, Keluar) untuk mobile & desktop, BUKAN sidebar; container `max-w-7xl`
+- Grid kartu topik yang sudah dimulai (`TopicCard`: latar terisi sesuai persen penguasaan + chip status + tombol) ditutup kartu "Jelajahi topik" (garis putus-putus, slot terakhir) → `/topicSelect`; topik terkunci tidak tampil di dashboard, tempatnya di halaman Topik
+- Navbar pill tunggal untuk mobile & desktop, BUKAN sidebar: brand kiri, navigasi (Dashboard, Topik) di tengah, avatar + Keluar kanan; container `max-w-6xl`
 - Journey berlevel = halaman terpisah, bukan bagian Dashboard
 - Wajib punya empty state (user belum punya topik) & dikerjakan dengan mock data dulu
 - Ini menggantikan layout sidebar + 4 stat cards di `docs/DESIGN.md` §14
@@ -82,7 +82,7 @@ Platform pembelajaran adaptif berbasis AI yang menggunakan algoritma Bayesian Kn
 
 ## What NOT to Build (Skip for MVP)
 
-❌ Multiple subjects (Matematika only!)
+❌ Topik/kategori yang belum lengkap isinya (seed "sedikit tapi dalam"; multi-kategori boleh, tapi tidak ditampilkan/ditandai "segera hadir" sampai lengkap — keputusan 2026-10-15)
 ❌ Teacher dashboard (student view only)
 ❌ Complex gamification (XP/badges cukup basic)
 ❌ Video call features

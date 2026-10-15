@@ -1,6 +1,8 @@
 # Database Schema (PostgreSQL / Supabase)
 
 > **⚠️ IMPORTANT**: Gunakan PostgreSQL syntax, bukan MySQL. Supabase Auth manages `users` table.
+>
+> **⚠️ USANG (2026-10-15)**: dokumen ini adalah rancangan awal. DB yang dipakai tim adalah `.kiro/steering/supabase-db-model.md` (+ `supabase/migrations/20261013035717_fullSql.sql`): `topics.id` bigint, tidak ada `student_progress`/`student_answers`/`learning_materials`; mastery per `skill_key` di `student_mastery`. Bagian BKT/RLS di bawah hanya referensi konsep.
 
 ---
 

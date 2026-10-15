@@ -2,7 +2,7 @@
 
 > **⚠️ NOTE**: "SkillPath AI" adalah nama placeholder. Nama final belum ditentukan.
 
-**Last Updated**: 2026-10-12  
+**Last Updated**: 2026-10-15 (bagian terbaru ada di paling bawah file ini)  
 **Session Started**: 2026-10-11
 
 ---
@@ -403,7 +403,7 @@ Sesi brainstorming (skill `brainstorming` dari `~/.agents/skills/`). Sempat diba
 - Belum: data Supabase (`student_progress`), route Journey (tombol hero sementara ke `/topicSelect` lewat `topicHref`), `ProtectedRoute` masih dikomentari di `App.tsx` sehingga `/dashboard` bisa dibuka tanpa login.
 
 ### Status Dashboard v2 (2026-10-14, bento + kurva penguasaan, mock data)
-- Layout `lg`: hero (8 kolom) + `ProgressCard` (4), `MasteryCurve` (12), lalu grid `TopicCard` (isi latar = persen penguasaan). Container `max-w-7xl`, navbar pill (Dashboard, Topik) di `DashboardTopBar`. Komponen lama `SummaryStrip`/`TopicRow` dihapus.
+- Layout `lg`: hero (8 kolom) + `ProgressCard` (4), `MasteryCurve` (12), lalu grid `TopicCard` (isi latar = persen penguasaan). Container `max-w-6xl` (diperkecil 2026-10-14 malam), navbar pill (Dashboard, Topik, di tengah) di `DashboardTopBar`. Komponen lama `SummaryStrip`/`TopicRow` dihapus.
 - BKT kini nyata di `src/lib/algorithms/bkt.ts` (`BKTModel`, `buildMasteryCurve`). Mock di `mockData.ts` dibangun dari string jawaban ("T"/"F"); mastery topik = titik terakhir kurva BKT, jadi angka hero dan grafik selalu sama. Kurva memakai awal P(L)=0.10 (`CURVE_INITIAL_P_LEARNED`) dan 30 jawaban terakhir.
 - Tes: `npm run test` (43 tes). Review visual: server dev di port bebas, lalu `BASE_URL=... npm run screenshot` (360/768/1280px × `?demo=budi|sari|empty|done`). Catatan: tool baca gambar meng-cache per nama file; salin ke nama baru bila screenshot diulang.
 - Deviasi dari plan: navbar mobile satu baris (brand ikon saja, Keluar ikon saja) agar urutan DOM = urutan visual, bukan dua baris.
@@ -443,3 +443,59 @@ Sesi brainstorming (skill `brainstorming` dari `~/.agents/skills/`). Sempat diba
 - Tool baca gambar meng-cache per nama file: salin screenshot ke nama baru sebelum dibaca ulang.
 - Windows PowerShell 5.1: `Get-Content`/`Set-Content` tanpa `-Encoding` merusak karakter non-ASCII (mis. `§`). Edit file teks dengan tool tulis atau `node`, bukan `Set-Content`.
 - Browser untuk screenshot: Microsoft Edge yang sudah terpasang lewat `playwright-core` (tanpa unduhan browser).
+
+
+## Skala dashboard diperkecil (2026-10-14, malam)
+
+- Rencana: `docs/superpowers/plans/2026-10-14-dashboard-scale-down.md` (dieksekusi native, tanpa commit). Hanya `src/page/dashboard/*`, penambahan class di `src/index.css`, dan `scripts/screenshot.mjs`; Auth dan default `.btn-primary`/`.badge-*` tidak disentuh.
+- Hasil ukur (`?demo=budi`): tinggi halaman desktop 1143 -> 927px, tablet 1573 -> 1276, mobile 2004 -> 1613. Teks di bawah 12px: 4 -> 0. Target sentuh < 44px (emulasi `TOUCH=1`): 0. Target rencana <= 900px di desktop meleset 27px; tidak diperkecil lagi tanpa konfirmasi user.
+- Keputusan: enam tingkat font (12/14/16/20/24/48), container `max-w-6xl`, `.btn-sm` dan `.badge-sm` sebagai modifier, kontrol 36px di desktop dan 44px di layar sentuh lewat `pointer-coarse:`. Panah dekoratif di kartu topik tetap 32px (seluruh kartu adalah tautannya).
+- Temuan: aturan global `h1..h4 { letter-spacing: -0.03em }` di `index.css` tidak berlapis, jadi mengalahkan utilitas `tracking-*` (terbukti: h2 hero ber-kelas `tracking-[-0.02em]` tetap terhitung -0.03em). Di dashboard dipakai sufiks important `tracking-[...]!`. Aturan global sengaja tidak diubah karena akan mengubah tampilan Auth (`tracking-[-0.07em]` di h1-nya selama ini tidak berlaku).
+- `npm run screenshot` kini mencetak metrik per viewport (tinggi, teks < 12px, letter-spacing) dan keluar dengan kode 1 untuk teks kecil atau target sentuh kecil. Metrik diambil sebelum screenshot penuh (tangkapan penuh mengubah ukuran viewport dan membuat transisi `min-height` terukur setengah jalan).
+- Umpan balik "kurang suka" dari user belum tentu terselesaikan oleh perubahan ukuran ini saja; tanyakan bagian lain yang tidak disukai.
+- Auth page ikut diperkecil (2026-10-14, malam): h1 cerita `clamp(42,5.2vw,72)` -> `clamp(32,3.7vw,48)` (3 baris -> 2), h2 form `clamp(30,3vw,42)` -> `clamp(24,2.3vw,30)` (1 baris di desktop), orbit 126 -> 96px, form `max-w` 410 -> 380, input `py-3` -> `py-2.5`, teks 11px -> 12px (kicker, "Lupa kata sandi?", catatan bawah). Kelas `tracking-[-0.07em]`/`[-0.065em]` di Auth dihapus karena mati (kalah dari aturan global h1-h4, efektif -0.03em); tampilan tidak berubah dari sisi itu. Warna tab nonaktif dan catatan bawah diganti `--color-muted` (sebelumnya #aaa0a9/#a69ca6, kontras ~2.5:1). Target sentuh (tab, toggle sandi, "Lupa kata sandi?", "Daftar sekarang") >= 44px di layar sentuh. Metrik `/auth`: teks < 12px 4-5 -> 0, target sentuh kecil 5 -> 0. Belum dicek visual: mode Daftar dan pesan sukses/galat.
+## Navbar tengah + kartu Jelajahi topik (2026-10-15, dini hari)
+
+- Rencana: `docs/superpowers/plans/2026-10-14-navbar-explore-card.md` (dieksekusi native, tanpa commit).
+- Navbar kini grid tiga kolom `minmax(0,1fr) auto minmax(0,1fr)`: brand kiri, pill Dashboard/Topik tepat di tengah (`npm run screenshot` mencetak `navOffset`; baseline 44.6/133/317px di 360/768/1280, sesudah 0.0px di semua viewport dan skenario). Batas: dengan 3 item navigasi pemusatan masih muat di HP 360px (perkiraan); item ke-4 sebaiknya pindah ke bottom nav.
+- Tautan "Jelajahi topik" di judul "Topikmu" dihapus. Grid hanya menampilkan topik yang sudah dimulai (`startedTopics`, dites, 55 tes) dan ditutup `ExploreCard` (garis putus-putus, tanpa bayangan, ikon plus). Grid `sm:2 lg:4` kolom; 4 topik dimulai + kartu Jelajahi (skenario `sari`) membuat kartu Jelajahi sendirian di baris kedua; belum diputuskan apakah itu perlu ditangani.
+- **Konsekuensi:** kartu topik terkunci tidak lagi tampil di dashboard (data `locked` tetap di tipe dan mock untuk halaman Topik). Bukti "prasyarat mengunci/membuka topik" (kriteria demo #5) belum terlihat di aplikasi mana pun sampai `/topicSelect` dibangun. Cabang terkunci di `TopicCard` dihapus; entri `locked` di `statusStyle.ts` dibiarkan untuk halaman Topik.
+- Skrip screenshot: `navOffset` mengukur pill (kiri link pertama sampai kanan link terakhir), bukan kotak `<nav>` yang melebar.
+## Diskusi produk, DB, dan tooling (2026-10-14 malam; BELUM ada keputusan akhir konsep)
+
+### Database aktual vs keputusan kita
+- DB tim: `.kiro/steering/supabase-db-model.md` + migrasi `supabase/migrations/20261013035717_fullSql.sql` (11 tabel: categories, topics int8, learning_goals, learning_paths, learning_path_steps, materials, quiz_questions, quiz_attempts, student_mastery, step_progress, ai_usage_events). Catatan model juga menyebut `users`, `topic_requests`, `diagnostic_assessments`, `diagnostic_answer_keys` yang TIDAK ada di migrasi yang dibaca (belum diverifikasi ke DB hidup).
+- Rancangannya mengarah ke path/langkah/diagnostic **per siswa** (dibuat backend/Edge Function): `student_mastery`, `learning_paths`, `learning_path_steps` hanya punya policy SELECT; `quiz_questions.correct_answer` terbuka ke klien (komentar di migrasi).
+- Tiga ketidakcocokan dengan keputusan 14 Okt: (1) soal diagnostic per siswa vs "per topik sekali, cache"; (2) BKT di klien butuh policy INSERT/UPDATE di `student_mastery`; (3) tidak ada tempat template skill/langkah per topik (butuh mis. `topic_skills(topic_id, skill_key, nama, urutan)` bila skill ingin stabil). Belum dijawab user.
+
+### Konsep (user masih bingung; ini usulan saya, bukan keputusan)
+- "Skill" = kemampuan kecil dalam satu topik (mis. Pecahan: arti pecahan, pecahan senilai, penjumlahan, perkalian, soal cerita). BKT dihitung per `skill_key`; AI tidak boleh mengarang nama skill per siswa (hasil tidak sebanding) — daftar 4-6 skill per topik ditulis manual, tersembunyi dari UI.
+- Setelah diagnostic siswa mendapat: peta kuat/lemah per skill (+tingkat keyakinan; 1-2 soal per skill = kasar), penjelasan singkat AI, pola kesalahan (miskonsepsi), roadmap berurutan (skill kuat dilewati dan alasannya ditampilkan, lemah lebih dulu, "belum yakin" dicek singkat), satu tombol "Mulai". Roadmap hidup: disusun ulang setelah latihan (`generation_version`). Pemilihan/urutan = aturan dari BKT; AI hanya soal dan kalimat alasan.
+- User kemudian menyatakan: tunda "langkah"/jalur titik-titik; langsung diagnostic dengan soal "dynamic" lalu roadmap pengajaran. **Pertanyaan terbuka:** "dynamic" = tiap siswa soal berbeda (generate per siswa, lambat/bisa gagal saat demo/tidak sebanding) atau soal berikutnya menyesuaikan jawaban (adaptif dari bank soal; rekomendasi saya)?
+
+### Tooling
+- Serena MCP: `.kiro/settings/mcp.json` diperbaiki ke `serena start-mcp-server` (executable lama `serena-mcp-server` sudah tidak ada). Perlu restart sesi Kiro agar tool termuat. Serena membuat folder `.serena/` yang belum ada di `.gitignore`.
+- Skill `grill-me` hanya wrapper ke skill `grilling` yang tidak terpasang di `~/.agents/skills`; isinya diambil dari `mattpocock/skills` (putaran pertanyaan bernomor, tiap pertanyaan dengan jawaban rekomendasi). Launcher `impeccable` kini berfungsi (`impeccable.cmd context`); `PRODUCT.md` belum ada.
+## Menunggu keputusan user (2026-10-15, dini hari) — mulai dari sini besok
+
+- User menyukai gambar referensi `.kiro/something/b4d3065a-62f3-4cc0-a1d4-1f1942beeadf.jpg` (kartu "Lanjutkan perjalanan belajarmu": nama topik, deskripsi satu kalimat, progres berlabel, satu tombol; plus hero sapaan besar dan 4 kartu statistik) dan ingin mengganti komponen "Lanjut ke Pecahan" (HeroCard) dengannya.
+- Pendapat saya: ambil struktur kartu "Lanjutkan" saja; jangan ambil kicker ("UNTUKMU"), ubin sparkle besar, 4 kartu statistik ber-chip "Statistik" (bertentangan dengan keputusan "bukan 4 stat card" dan membatalkan sebagian perkecilan), dan tombol "Lihat Rekomendasi" (ambigu). "Progres materi 85%" bukan penguasaan: pilih satu ukuran per kartu (rekomendasi: penguasaan, berlabel jelas); "Sesi Belajar" tidak ada di data; "Dasar Pemrograman" dianggap placeholder (MVP = Matematika SMP).
+- **Pertanyaan terbuka ke user:** bagian mana yang mengganti HeroCard? (1) hanya kartu "Lanjutkan" (rekomendasi saya), (2) kartu itu + hero sapaan besar, (3) semuanya termasuk 4 kartu statistik. Pilihan saya yang belum disetujui: kartu baru berpermukaan terang (isi bertint), tombol utama gelap sebagai jangkar; `ProgressCard` tetap di kanan. Setelah dijawab: tulis plan di `docs/superpowers/plans/`.
+- Masih terbuka juga: arti soal "dynamic" pada diagnostic, dan kartu Jelajahi yang sendirian di baris kedua pada skenario `sari`.
+
+## Landing page + perluasan topik (2026-10-15, pagi)
+- Brainstorming landing page dimulai (skill brainstorming, frontend-design, impeccable mode Persuade). Belum ada kode; desain akan ditulis di docs/superpowers/specs/ setelah disetujui.
+- Route '/' masih placeholder (src/page/Index.tsx). Tidak ada library animasi; aset gambar di repo hanya sisa template Vite. Aset utama yang direncanakan: komponen produk asli (kurva penguasaan, kartu topik) + demo mini interaktif (3-4 soal, BKT sungguhan di browser) + vektor geometris meneruskan orbit Auth. Tidak memakai stok ilustrasi/foto.
+- Target landing: mahasiswa/orang yang belajar mandiri; rasa yang dituju: efisien, menarik, tanpa ribet, jalur sesuai kemampuannya. Pesan inti: yang sudah dikuasai dilewati.
+- Keputusan perluasan topik: topik tidak lagi terbatas Matematika SMP. Katalog multi-kategori (Pemrograman dasar sampai lanjut, pelajaran SMP, SMA, dll.), tetap seeded (bukan AI per user). Strategi "sedikit tapi dalam": tiap topik yang dibuka harus lengkap (4-6 skill, soal diagnostic+latihan per skill dicek manual, materi singkat); topik yang belum lengkap tidak ditampilkan/ditandai "segera hadir". Jumlah topik final belum diputuskan (kemungkinan 20+). Target pengguna utama bergeser ke mahasiswa/orang dewasa muda yang belajar mandiri (bukan hanya siswa SMP). Topik demo mini di landing page: Dasar Pemrograman. Data saat ini masih hardcoded/mock, belum tersambung ke Supabase.
+- Terbuka: nama brand ('SkillPath AI' masih placeholder); skema skill per topik (tidak ada tabel topic_skills; quiz_questions hanya punya skill_key + material_id/step_id, tanpa topic_id).
+- Jangan menyalin dari Auth ke landing: kicker di atas judul dan satu kata beraksen di headline.
+
+- (2026-10-15) Spec landing: docs/superpowers/specs/2026-10-15-landing-page-design.md; plan: docs/superpowers/plans/2026-10-15-landing-page.md. Keputusan user: demo tontonan (bukan interaktif), harga Pro "segera hadir" tanpa angka, section: nav, hero, demo, topik, harga, FAQ, penutup+footer. Menunggu persetujuan plan.
+
+
+## Landing page terimplementasi (2026-10-15, siang)
+- Kode di `src/page/landing/` (Nav, Hero+PathPreview, DemoSection, Topics, Pricing, FAQ, Closing, Footer; logika `demoScript.ts` dites, `useDemoPlayback.ts`, `catalog.ts`), `src/lib/brand.ts` (`BRAND_NAME`), `src/page/Index.tsx` merender `LandingPage`, `index.html` (lang id, title, meta description). Tanpa dependensi baru.
+- Interaktif di luar spec awal (atas permintaan user "lebih interaktif"): demo bisa di-scrub (stepper kiri + titik), jeda/putar ulang; di frame akhir pengunjung bisa mengganti jawaban Raka (Benar/Salah) dan jalur diurutkan ulang dengan animasi (BKT sungguhan); filter kategori di Topik; FAQ `<details>`. Transisi masuk memakai varian Tailwind `starting:` (tanpa library).
+- Verifikasi: build, lint, 62 tes lulus; `npm run screenshot -- /` 360/768/1280: overflow 0, teks <12px 0, target sentuh kecil (TOUCH=1) 0. `navOffset` mobile 180px bukan masalah (nav jangkar disembunyikan < md; metrik itu untuk dashboard).
+- Terbuka: klaim "AI Tutor dengan batas harian" di paket Gratis belum benar (AI Tutor belum ada); nama brand; belum ada commit.

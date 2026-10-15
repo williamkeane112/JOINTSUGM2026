@@ -4,7 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 
 const pill =
-  "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors sm:px-5";
+  "inline-flex h-9 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors pointer-coarse:h-11 sm:px-4";
 const pillIdle =
   "bg-white text-[var(--color-ink)] ring-1 ring-[var(--color-line)] hover:bg-[#fff0f5]";
 const pillActive = "bg-[var(--color-night)] text-[var(--color-cream)]";
@@ -42,15 +42,15 @@ export default function DashboardTopBar({
 
   return (
     <header className="border-b border-[var(--color-line)] bg-[var(--color-cream)] sm:sticky sm:top-0 sm:z-10">
-      <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 px-4 py-2 sm:gap-3 sm:px-6 lg:px-8">
         <Link
           to="/dashboard"
           aria-label="SkillPath AI, ke dashboard"
-          className="font-display flex min-h-11 items-center gap-2 text-lg font-bold sm:mr-4"
+          className="font-display flex min-h-9 items-center justify-center gap-2 text-base font-bold tracking-[-0.01em]! pointer-coarse:min-h-11 pointer-coarse:min-w-11 justify-self-start"
         >
           <Sparkles
             aria-hidden="true"
-            size={22}
+            size={20}
             className="text-[var(--color-pink)]"
           />
           <span className="hidden sm:inline">SkillPath AI</span>
@@ -58,7 +58,7 @@ export default function DashboardTopBar({
 
         <nav
           aria-label="Navigasi utama"
-          className="flex flex-1 items-center gap-2"
+          className="flex items-center gap-2"
         >
           <NavLink to="/dashboard" end className={navClass}>
             Dashboard
@@ -68,11 +68,11 @@ export default function DashboardTopBar({
           </NavLink>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center justify-self-end gap-2 sm:gap-3">
           {initial && (
             <span
               aria-hidden="true"
-              className="font-display hidden size-10 items-center justify-center rounded-full bg-[var(--color-night)] text-sm font-bold text-[var(--color-cream)] sm:flex"
+              className="font-display hidden size-8 items-center justify-center rounded-full bg-[var(--color-night)] text-xs font-bold text-[var(--color-cream)] sm:flex"
             >
               {initial}
             </span>
@@ -82,7 +82,7 @@ export default function DashboardTopBar({
             onClick={handleLogout}
             disabled={loading}
             aria-label={loading ? "Keluar..." : "Keluar"}
-            className={`${pill} ${pillIdle} gap-2 disabled:cursor-not-allowed disabled:opacity-60 max-sm:min-w-11 max-sm:px-0`}
+            className={`${pill} ${pillIdle} gap-2 disabled:cursor-not-allowed disabled:opacity-60 max-sm:min-w-9 max-sm:px-0 pointer-coarse:max-sm:min-w-11`}
           >
             <LogOut aria-hidden="true" size={16} />
             <span className="hidden sm:inline">
@@ -94,7 +94,7 @@ export default function DashboardTopBar({
       {error && (
         <p
           role="alert"
-          className="mx-auto max-w-7xl px-4 pb-3 text-sm text-[var(--color-weak-ink)] sm:px-6 lg:px-8"
+          className="mx-auto max-w-6xl px-4 pb-3 text-sm text-[var(--color-weak-ink)] sm:px-6 lg:px-8"
         >
           {error}
         </p>

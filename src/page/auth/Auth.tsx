@@ -128,43 +128,43 @@ export default function Auth() {
         />
 
         {/* Top Brand */}
-        <div className="relative z-10 flex items-center gap-3 text-lg font-extrabold tracking-tight">
-          <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff9ab8] to-[#ff3f7e] shadow-[0_8px_20px_rgba(255,79,135,0.44)]">
-            <Sparkles className="w-5 h-5 fill-[#fff8df] text-[#fff8df]" />
+        <div className="relative z-10 flex items-center gap-3 text-base font-extrabold tracking-tight">
+          <span className="grid place-items-center w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#ff9ab8] to-[#ff3f7e] shadow-[0_8px_20px_rgba(255,79,135,0.44)]">
+            <Sparkles className="w-4 h-4 fill-[#fff8df] text-[#fff8df]" />
           </span>
           <span>SkillPath AI</span>
         </div>
 
         {/* Story Content */}
-        <div className="relative z-10 max-w-[530px] my-auto py-[70px]">
+        <div className="relative z-10 max-w-[480px] my-auto py-12">
           {/* Spark Orbit */}
-          <div className="relative grid place-items-center w-[126px] h-[126px] mb-10 rounded-full border border-[#ff90b855] bg-[#ffffff0c]">
-            <div className="absolute inset-[14px] rounded-full border border-dashed border-[#ffb1c675]" />
+          <div className="relative grid place-items-center w-[96px] h-[96px] mb-8 rounded-full border border-[#ff90b855] bg-[#ffffff0c]">
+            <div className="absolute inset-[11px] rounded-full border border-dashed border-[#ffb1c675]" />
             <div
-              className="grid place-items-center w-[67px] h-[67px] rounded-[22px] bg-gradient-to-br from-[#ff97b8] to-[#ef3677] shadow-[0_14px_30px_rgba(255,64,117,0.5)]"
+              className="grid place-items-center w-[52px] h-[52px] rounded-[17px] bg-gradient-to-br from-[#ff97b8] to-[#ef3677] shadow-[0_14px_30px_rgba(255,64,117,0.5)]"
               style={{ transform: "rotate(12deg)" }}
             >
               <Sparkles
-                className="w-[34px] h-[34px] fill-[#fff9db] text-[#fff9db]"
+                className="w-[26px] h-[26px] fill-[#fff9db] text-[#fff9db]"
                 style={{ transform: "rotate(-12deg)" }}
               />
             </div>
-            <span className="absolute right-1 top-7 w-2 h-2 rounded-full bg-[#a88af9]" />
-            <span className="absolute bottom-2 left-[22px] w-2 h-2 rounded-full bg-[#ffdc7c]" />
+            <span className="absolute right-1 top-5 w-2 h-2 rounded-full bg-[#a88af9]" />
+            <span className="absolute bottom-1.5 left-4 w-2 h-2 rounded-full bg-[#ffdc7c]" />
           </div>
 
-          <p className="mb-4 text-[#ff9ab8] text-[11px] font-extrabold tracking-[0.13em] uppercase">
+          <p className="mb-3 text-[#ff9ab8] text-xs font-extrabold tracking-[0.12em] uppercase">
             Rute belajar yang terasa milikmu
           </p>
-          <h1 className="max-w-[560px] m-0 text-[#fff8fb] text-[clamp(42px,5.2vw,72px)] font-extrabold tracking-[-0.07em] leading-[0.94]">
+          <h1 className="max-w-[480px] m-0 text-[#fff8fb] text-[clamp(32px,3.7vw,48px)] font-extrabold leading-[1.02]">
             Belajar lebih cerdas,{" "}
             <em className="text-[#ff719e] not-italic">bukan</em> lebih keras.
           </h1>
-          <p className="max-w-[440px] mt-7 text-[#e6cfe1] text-base leading-relaxed">
+          <p className="max-w-[400px] mt-5 text-[#e6cfe1] text-sm leading-relaxed">
             Temukan konsep yang perlu kamu kuasai, rayakan progres kecil, dan
             tumbuh dengan ritme yang paling cocok untukmu.
           </p>
-          <div className="flex items-center gap-4 mt-11 text-[#e6cfe1] text-sm italic">
+          <div className="flex items-center gap-4 mt-8 text-[#e6cfe1] text-[13px] italic">
             <span className="w-[30px] h-px bg-[#ff7da7]" />
             <p className="m-0">
               Setiap langkah kecil tetap membawamu lebih dekat.
@@ -201,26 +201,26 @@ export default function Auth() {
         />
 
         {/* Mobile Brand */}
-        <div className="lg:hidden flex items-center gap-3 self-start px-6 pt-6 mb-5 text-white text-lg font-extrabold tracking-tight">
-          <span className="grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-[#ff9ab8] to-[#ff3f7e] shadow-[0_8px_20px_rgba(255,79,135,0.44)]">
-            <Sparkles className="w-5 h-5 fill-[#fff8df] text-[#fff8df]" />
+        <div className="lg:hidden flex items-center gap-3 self-start px-6 pt-5 mb-4 text-white text-base font-extrabold tracking-tight">
+          <span className="grid place-items-center w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#ff9ab8] to-[#ff3f7e] shadow-[0_8px_20px_rgba(255,79,135,0.44)]">
+            <Sparkles className="w-4 h-4 fill-[#fff8df] text-[#fff8df]" />
           </span>
           <span>SkillPath AI</span>
         </div>
 
         {/* Auth Card - full-width cream surface on mobile (no card), plain on desktop */}
-        <div className="relative w-full flex-1 lg:flex-none max-w-none lg:max-w-[410px] bg-[#fff7f2] lg:bg-transparent border-0 rounded-t-[34px] lg:rounded-none px-6 pt-8 pb-8 lg:p-0 shadow-[0_-8px_30px_rgba(12,3,29,0.12)] lg:shadow-none">
+        <div className="relative w-full flex-1 lg:flex-none max-w-none lg:max-w-[380px] bg-[#fff7f2] lg:bg-transparent border-0 rounded-t-[34px] lg:rounded-none px-6 pt-8 pb-8 lg:p-0 shadow-[0_-8px_30px_rgba(12,3,29,0.12)] lg:shadow-none">
           {/* Heading */}
-          <div className="mb-8">
-            <p className="mb-4 text-[#e62f72] text-[11px] font-extrabold tracking-[0.11em] uppercase">
+          <div className="mb-6">
+            <p className="mb-3 text-[#e62f72] text-xs font-extrabold tracking-[0.11em] uppercase">
               Selamat datang kembali
             </p>
-            <h2 className="m-0 text-[var(--color-ink)] text-[clamp(30px,3vw,42px)] font-extrabold tracking-[-0.065em] leading-none">
+            <h2 className="m-0 text-[var(--color-ink)] text-[clamp(24px,2.3vw,30px)] font-extrabold leading-tight">
               {mode === "login"
                 ? "Lanjutkan perjalananmu."
                 : "Mulai perjalananmu."}
             </h2>
-            <p className="max-w-[350px] mt-4 text-[var(--color-muted)] text-[13px] leading-relaxed">
+            <p className="max-w-[350px] mt-3 text-[var(--color-muted)] text-[13px] leading-relaxed">
               {mode === "login"
                 ? "Masuk untuk melihat progres belajar hari ini."
                 : "Buat akun gratis dan temukan cara belajar yang lebih personal."}
@@ -229,7 +229,7 @@ export default function Auth() {
 
           {/* Tabs */}
           <div
-            className="flex gap-7 mb-6 border-b border-[var(--color-line)]"
+            className="flex gap-6 mb-5 border-b border-[var(--color-line)]"
             role="tablist"
             aria-label="Pilih jenis akses"
           >
@@ -237,8 +237,8 @@ export default function Auth() {
               type="button"
               role="tab"
               aria-selected={mode === "login"}
-              className={`relative pb-3 border-0 bg-transparent text-[13px] font-extrabold transition-colors ${
-                mode === "login" ? "text-[#e62f72]" : "text-[#aaa0a9]"
+              className={`relative inline-flex min-h-9 items-end justify-center pb-2.5 pointer-coarse:min-w-11 border-0 bg-transparent text-[13px] font-extrabold transition-colors pointer-coarse:min-h-11 ${
+                mode === "login" ? "text-[#e62f72]" : "text-[var(--color-muted)]"
               }`}
               onClick={() => {
                 setMode("login");
@@ -254,8 +254,8 @@ export default function Auth() {
               type="button"
               role="tab"
               aria-selected={mode === "register"}
-              className={`relative pb-3 border-0 bg-transparent text-[13px] font-extrabold transition-colors ${
-                mode === "register" ? "text-[#e62f72]" : "text-[#aaa0a9]"
+              className={`relative inline-flex min-h-9 items-end justify-center pb-2.5 pointer-coarse:min-w-11 border-0 bg-transparent text-[13px] font-extrabold transition-colors pointer-coarse:min-h-11 ${
+                mode === "register" ? "text-[#e62f72]" : "text-[var(--color-muted)]"
               }`}
               onClick={() => {
                 setMode("register");
@@ -276,7 +276,7 @@ export default function Auth() {
                 <span className="text-[#4e4452] text-xs font-bold">
                   Nama lengkap
                 </span>
-                <div className="relative flex items-center mt-2">
+                <div className="relative flex items-center mt-1.5">
                   <UserRound className="absolute left-4 w-4 h-4 text-[#b0a3ac] pointer-events-none" />
                   <input
                     name="name"
@@ -285,7 +285,7 @@ export default function Auth() {
                     placeholder="Contoh: Dimas Pratama"
                     required
                     disabled={isLoading}
-                    className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-3 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
+                    className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-2.5 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
                   />
                 </div>
               </label>
@@ -293,7 +293,7 @@ export default function Auth() {
 
             <label className="block">
               <span className="text-[#4e4452] text-xs font-bold">Email</span>
-              <div className="relative flex items-center mt-2">
+              <div className="relative flex items-center mt-1.5">
                 <Mail className="absolute left-4 w-4 h-4 text-[#b0a3ac] pointer-events-none" />
                 <input
                   name="email"
@@ -302,7 +302,7 @@ export default function Auth() {
                   placeholder="namamu@email.com"
                   required
                   disabled={isLoading}
-                  className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-3 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
+                  className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-2.5 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
                 />
               </div>
             </label>
@@ -311,7 +311,7 @@ export default function Auth() {
               <span className="text-[#4e4452] text-xs font-bold">
                 Kata sandi
               </span>
-              <div className="relative flex items-center mt-2">
+              <div className="relative flex items-center mt-1.5">
                 <LockKeyhole className="absolute left-4 w-4 h-4 text-[#b0a3ac] pointer-events-none" />
                 <input
                   name="password"
@@ -323,11 +323,11 @@ export default function Auth() {
                   minLength={6}
                   required
                   disabled={isLoading}
-                  className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-3 pr-12 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
+                  className="w-full border border-[#e5d9df] rounded-[13px] px-11 py-2.5 pr-12 outline-none text-[var(--color-ink)] bg-[#fffdfc] text-[13px] transition-all focus:border-[#ff79a0] focus:shadow-[0_0_0_4px_rgba(255,189,208,0.2)] disabled:opacity-60"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 grid place-items-center border-0 p-1.5 text-[#a89ca5] bg-transparent cursor-pointer"
+                  className="absolute right-1.5 grid size-8 place-items-center border-0 text-[#a89ca5] bg-transparent cursor-pointer pointer-coarse:size-11"
                   aria-label={
                     showPassword
                       ? "Sembunyikan kata sandi"
@@ -347,7 +347,7 @@ export default function Auth() {
 
             {mode === "login" && (
               <div className="flex items-center justify-between -mt-1">
-                <label className="flex items-center gap-2 text-[#4e4452] text-xs font-bold cursor-pointer">
+                <label className="flex min-h-8 items-center gap-2 text-[#4e4452] text-xs font-bold cursor-pointer pointer-coarse:min-h-11">
                   <input
                     type="checkbox"
                     className="w-3.5 h-3.5 m-0 accent-[var(--color-pink)]"
@@ -356,7 +356,7 @@ export default function Auth() {
                 </label>
                 <a
                   href="/auth/reset-password"
-                  className="text-[#e62f72] text-[11px] font-extrabold no-underline hover:underline"
+                  className="inline-flex min-h-8 items-center text-[#e62f72] text-xs font-extrabold no-underline hover:underline pointer-coarse:min-h-11"
                 >
                   Lupa kata sandi?
                 </a>
@@ -384,7 +384,7 @@ export default function Auth() {
             )}
 
             <button
-              className="flex items-center justify-center gap-3 mt-1 border-0 rounded-[13px] px-5 py-3.5 min-h-[44px] text-white bg-[#17131a] shadow-[0_10px_20px_rgba(33,21,38,0.15)] text-[13px] font-extrabold tracking-[-0.01em] transition-all hover:bg-[#e62f72] hover:shadow-[0_12px_24px_rgba(230,47,114,0.25)] hover:-translate-y-0.5 disabled:opacity-65 disabled:cursor-wait disabled:translate-y-0"
+              className="flex items-center justify-center gap-3 mt-1 border-0 rounded-[13px] px-5 py-3 min-h-[44px] text-white bg-[#17131a] shadow-[0_10px_20px_rgba(33,21,38,0.15)] text-[13px] font-extrabold tracking-[-0.01em] transition-all hover:bg-[#e62f72] hover:shadow-[0_12px_24px_rgba(230,47,114,0.25)] hover:-translate-y-0.5 disabled:opacity-65 disabled:cursor-wait disabled:translate-y-0"
               type="submit"
               disabled={isLoading}
             >
@@ -411,13 +411,13 @@ export default function Auth() {
           )}
 
           {/* Note */}
-          <div className="flex items-center gap-3 mt-6 text-[#a69ca6] text-[11px] text-center">
+          <div className="flex items-center gap-3 mt-5 text-[var(--color-muted)] text-xs text-center">
             <span className="h-px flex-1 bg-[var(--color-line)]" />
             <p className="flex-none m-0">
               {mode === "login" ? "Belum punya akun? " : "Sudah punya akun? "}
               <button
                 type="button"
-                className="border-0 p-0 text-[#e62f72] bg-transparent font-extrabold cursor-pointer hover:underline"
+                className="border-0 p-0 text-[#e62f72] bg-transparent font-extrabold cursor-pointer hover:underline pointer-coarse:min-h-11"
                 onClick={() => {
                   setMode(mode === "login" ? "register" : "login");
                   setMessage("");
