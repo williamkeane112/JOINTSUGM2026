@@ -58,12 +58,16 @@ export default function TopicCard({
   description = "Pelajari materi ini secara bertahap sesuai kemampuanmu.",
   progress = 0,
   status = "not_started",
-  href = "/topicSelect",
+  href,
 }: TopicCardProps) {
   const safeProgress = Math.min(100, Math.max(0, progress));
   const config = statusConfig[status];
   const StatusIcon = config.icon;
   const isLocked = status === "locked";
+
+  // href harus berupa URL detail learning goal jika tersedia.
+  // Fallback memakai ID yang diterima komponen.
+  const destination = `/learning-goals/${id}`; 
 
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-[#EAE2F0] bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-[#C9B9EB] hover:shadow-md">
@@ -108,7 +112,9 @@ export default function TopicCard({
         >
           <div
             className={`h-full rounded-full transition-all duration-500 ${
-              status === "completed" ? "bg-[#65B88B]" : "bg-[#9B87D5]"
+              status === "completed"
+                ? "bg-[#65B88B]"
+                : "bg-[#9B87D5]"
             }`}
             style={{ width: `${safeProgress}%` }}
           />
@@ -126,7 +132,7 @@ export default function TopicCard({
         </button>
       ) : (
         <Link
-          to={href}
+          to={destination}
           state={{ topicId: id }}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#DCD2E8] px-4 py-3 text-sm font-semibold text-[#7560B5] transition hover:border-[#7560B5] hover:bg-[#F8F5FF] focus:outline-none focus:ring-2 focus:ring-[#9B87D5] focus:ring-offset-2"
         >
@@ -135,6 +141,7 @@ export default function TopicCard({
             : status === "in_progress"
               ? "Lanjutkan"
               : "Mulai Belajar"}
+
           <ArrowRight size={16} />
         </Link>
       )}

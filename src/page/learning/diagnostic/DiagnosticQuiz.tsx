@@ -7,6 +7,7 @@ import DiagnosticQuestion from "../../../components/learning/DiagnosticQuestion"
 import QuizProgress from "../../../components/learning/QuizProgress";
 import DiagnosticLoading from "./DiagnosticLoading";
 import DiagnosticResult from "./DiagnosticResult";
+import DashboardSidebar from "../../../components/layout/DashboardSidebar";
 
 type QuizOption = {
   id: string;
@@ -75,7 +76,6 @@ export default function DiagnosticQuiz() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ResultData | null>(null);
 
-  // Mencegah pemanggilan generate berulang pada efek React StrictMode.
   const requestedGoalRef = useRef<string | null>(null);
   const submitLockRef = useRef(false);
 
@@ -101,13 +101,8 @@ export default function DiagnosticQuiz() {
           },
         );
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
 
       if (!data?.assessment) {
         throw new Error("Data assessment tidak ditemukan.");
@@ -116,6 +111,8 @@ export default function DiagnosticQuiz() {
       setAssessment(data.assessment);
       setAnswers(data.assessment.answers ?? {});
       setCurrentIndex(0);
+      setResult(null);
+      submitLockRef.current = false;
     } catch (err) {
       setLoadingError(
         err instanceof Error
@@ -128,24 +125,17 @@ export default function DiagnosticQuiz() {
   }, [learningGoalId]);
 
   useEffect(() => {
-    if (!learningGoalId) {
-      void loadAssessment();
-      return;
-    }
+    if (requestedGoalRef.current === learningGoalId) return;
 
-    if (requestedGoalRef.current === learningGoalId) {
-      return;
-    }
-
-    requestedGoalRef.current = learningGoalId;
+    requestedGoalRef.current = learningGoalId ?? null;
     void loadAssessment();
   }, [learningGoalId, loadAssessment]);
 
   const questions = assessment?.questions ?? [];
   const currentQuestion = questions[currentIndex];
 
-  const answeredCount = questions.filter(
-    (question) => Boolean(answers[question.id]),
+  const answeredCount = questions.filter((question) =>
+    Boolean(answers[question.id]),
   ).length;
 
   const handleSelect = (answer: string) => {
@@ -159,8 +149,20 @@ export default function DiagnosticQuiz() {
     setSubmitError(null);
   };
 
+  const handlePrevious = () => {
+    setCurrentIndex((index) => Math.max(0, index - 1));
+    setSubmitError(null);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((index) =>
+      Math.min(questions.length - 1, index + 1),
+    );
+    setSubmitError(null);
+  };
+
   const handleSubmit = async () => {
-    if (!assessment || submitLockRef.current) return;
+    if (!assessment || submitLockRef.current || submitting) return;
 
     const unansweredIndex = questions.findIndex(
       (question) => !answers[question.id],
@@ -191,13 +193,8 @@ export default function DiagnosticQuiz() {
           },
         );
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
 
       if (!data?.result) {
         throw new Error("Hasil diagnostic tidak ditemukan.");
@@ -210,7 +207,6 @@ export default function DiagnosticQuiz() {
           ? err.message
           : "Gagal mengirim jawaban.",
       );
-
       submitLockRef.current = false;
     } finally {
       setSubmitting(false);
@@ -219,7 +215,9 @@ export default function DiagnosticQuiz() {
 
   if (loading) {
     return (
-      <DiagnosticLoading message="Gemini AI sedang menyusun soal sesuai tujuan belajarmu..." />
+      <DiagnosticLoading
+        message="AI sedang menyusun soal sesuai tujuan belajarmu..."
+      />
     );
   }
 
@@ -255,41 +253,64 @@ export default function DiagnosticQuiz() {
   }
 
   const isLastQuestion = currentIndex === questions.length - 1;
+  const isCurrentAnswered = Boolean(answers[currentQuestion.id]);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
+    <div className="min-h-screen bg-[#FFF9F0] text-[#30213F] lg:pl-[260px]">
+      <DashboardSidebar studentName="Siswa" />
+
+    <main className="min-h-screen bg-[#FFF9F0] px-4 py-6 sm:px-6 sm:py-10">
       <div className="mx-auto max-w-3xl">
         <button
           type="button"
-          onClick={() => navigate(`/learning-goals/${learningGoalId}`)}
-          className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-emerald-700"
+          onClick={() =>
+            navigate(`/learning-goals/${learningGoalId}`)
+          }
+          className="mb-7 inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-[#81778D] transition hover:bg-white hover:text-[#7560B5]"
         >
           <span aria-hidden="true">←</span>
           Kembali ke tujuan belajar
         </button>
 
         <header className="mb-7">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            AI Learning Assessment
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#EAE2F0] bg-white px-3.5 py-2 text-xs font-bold text-[#7560B5] shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-[#F43F91]" />
+            SKILLPATH AI · TES KEMAMPUAN
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#30213F] sm:text-4xl">
             Kenali kemampuan awalmu
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
-            Jawab pertanyaan berikut sesuai pemahamanmu saat ini.
-            Hasilnya akan membantu menentukan bagian yang perlu kamu pelajari.
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-[#81778D] sm:text-base">
+            Jawab pertanyaan sesuai pemahamanmu saat ini. Hasilnya
+            akan membantu SkillPath AI memahami kemampuanmu dan
+            menentukan materi yang perlu dipelajari.
           </p>
         </header>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+        <section className="rounded-[2rem] border border-[#EAE2F0] bg-white p-5 shadow-[0_18px_55px_rgba(48,33,63,0.06)] sm:p-8">
           <QuizProgress
             current={currentIndex + 1}
             total={questions.length}
             answered={answeredCount}
           />
+
+          <div className="mb-7 rounded-2xl bg-[#FFF9F0] p-4 sm:p-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0EAFB] text-xl text-[#7560B5]">
+                ✦
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#30213F]">
+                  Fokus pada pemahamanmu
+                </p>
+                <p className="mt-1 text-xs leading-5 text-[#81778D]">
+                  Pilih satu jawaban yang paling sesuai.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <DiagnosticQuestion
             question={currentQuestion}
@@ -301,65 +322,52 @@ export default function DiagnosticQuiz() {
           {submitError && (
             <div
               role="alert"
-              className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-700"
+              className="mt-5 rounded-xl border border-[#F8C9D9] bg-[#FFF0F5] p-4 text-sm leading-6 text-[#A52B5B]"
             >
               {submitError}
             </div>
           )}
 
-          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col-reverse gap-3 border-t border-[#F0EAF3] pt-6 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               disabled={currentIndex === 0 || submitting}
-              onClick={() => {
-                setCurrentIndex((index) => Math.max(0, index - 1));
-                setSubmitError(null);
-              }}
-              className="rounded-xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={handlePrevious}
+              className="rounded-xl border border-[#EAE2F0] bg-white px-5 py-3 font-semibold text-[#62566F] transition hover:bg-[#FAF7FD] disabled:cursor-not-allowed disabled:opacity-40"
             >
               ← Sebelumnya
             </button>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              {!isLastQuestion ? (
-                <button
-                  type="button"
-                  disabled={
-                    !answers[currentQuestion.id] || submitting
-                  }
-                  onClick={() => {
-                    setCurrentIndex((index) =>
-                      Math.min(questions.length - 1, index + 1),
-                    );
-                    setSubmitError(null);
-                  }}
-                  className="rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Soal Berikutnya →
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={
-                    !answers[currentQuestion.id] || submitting
-                  }
-                  onClick={() => void handleSubmit()}
-                  className="rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {submitting
-                    ? "Memeriksa jawaban..."
-                    : "Selesaikan Diagnostic ✓"}
-                </button>
-              )}
-            </div>
+            {!isLastQuestion ? (
+              <button
+                type="button"
+                disabled={!isCurrentAnswered || submitting}
+                onClick={handleNext}
+                className="rounded-xl bg-[#7560B5] px-6 py-3 font-bold text-white shadow-sm transition hover:bg-[#62509D] focus:outline-none focus:ring-4 focus:ring-[#7560B5]/20 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Soal Berikutnya →
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={!isCurrentAnswered || submitting}
+                onClick={() => void handleSubmit()}
+                className="rounded-xl bg-gradient-to-r from-[#7560B5] to-[#F43F91] px-6 py-3 font-bold text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-4 focus:ring-[#7560B5]/20 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {submitting
+                  ? "Memeriksa jawaban..."
+                  : "Selesaikan Tes ✓"}
+              </button>
+            )}
           </div>
         </section>
 
-        <p className="mt-5 text-center text-xs leading-5 text-slate-500">
+        <p className="mx-auto mt-5 max-w-xl text-center text-xs leading-6 text-[#958BA0]">
           Jawabanmu digunakan untuk menganalisis kemampuan awal dan
           membantu proses belajar berikutnya.
         </p>
       </div>
     </main>
+    </div>
   );
 }

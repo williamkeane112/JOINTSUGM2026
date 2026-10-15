@@ -68,7 +68,7 @@ export default function DashboardHeader({
             Dashboard
           </NavLink>
 
-          <NavLink to="/topicSelect" className={navClass}>
+          <NavLink to="/topic" className={navClass}>
             Topik
           </NavLink>
         </nav>

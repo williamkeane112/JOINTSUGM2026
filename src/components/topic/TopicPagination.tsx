@@ -1,4 +1,6 @@
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 type Props = {
   currentPage: number;
   totalPages: number;
@@ -22,47 +24,53 @@ export default function TopicPagination({
     (_, index) => start + index
   );
 
-  const buttonClass =
-    "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40";
+  const inactiveClass =
+    "inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#EAE2F0] bg-white px-3.5 py-2.5 text-sm font-medium text-[#7560B5] transition hover:border-[#CFC3E9] hover:bg-[#F8F4FF] disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <nav
       aria-label="Pagination katalog topik"
-      className="mt-5 flex flex-wrap items-center justify-center gap-1.5"
+      className="mt-7 flex flex-wrap items-center justify-center gap-2"
     >
       <button
         type="button"
         onClick={() => onChange(currentPage - 1)}
         disabled={currentPage === 1 || loading}
-        className={buttonClass}
+        className={inactiveClass}
       >
-        Sebelumnya
+        <ChevronLeft size={16} />
+        <span className="hidden sm:inline">Sebelumnya</span>
       </button>
 
-      {pages.map((page) => (
-        <button
-          key={page}
-          type="button"
-          onClick={() => onChange(page)}
-          disabled={loading || page === currentPage}
-          aria-current={page === currentPage ? "page" : undefined}
-          className={`min-w-9 rounded-lg border px-3 py-2 text-sm font-medium transition ${
-            page === currentPage
-              ? "border-violet-600 bg-violet-600 text-white"
-              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-100"
-          } disabled:cursor-default`}
-        >
-          {page}
-        </button>
-      ))}
+      {pages.map((page) => {
+        const isActive = page === currentPage;
+
+        return (
+          <button
+            key={page}
+            type="button"
+            onClick={() => onChange(page)}
+            disabled={loading || isActive}
+            aria-current={isActive ? "page" : undefined}
+            className={`min-w-10 rounded-xl border px-3.5 py-2.5 text-sm font-semibold transition ${
+              isActive
+                ? "border-[#7560B5] bg-[#7560B5] text-white shadow-sm"
+                : "border-[#EAE2F0] bg-white text-[#7560B5] hover:border-[#CFC3E9] hover:bg-[#F8F4FF]"
+            } disabled:cursor-default`}
+          >
+            {page}
+          </button>
+        );
+      })}
 
       <button
         type="button"
         onClick={() => onChange(currentPage + 1)}
         disabled={currentPage >= totalPages || loading}
-        className={buttonClass}
+        className={inactiveClass}
       >
-        Berikutnya
+        <span className="hidden sm:inline">Berikutnya</span>
+        <ChevronRight size={16} />
       </button>
     </nav>
   );

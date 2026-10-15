@@ -1,4 +1,3 @@
-
 import type {
   DashboardData,
   DashboardTopic,
@@ -30,6 +29,7 @@ export function buildDashboardData(
   const recommendation =
     topics.find((topic) => topic.status === "in_progress") ??
     topics.find((topic) => topic.status === "not_started") ??
+    topics.find((topic) => topic.status === "completed") ??
     null;
 
   return {
@@ -42,17 +42,16 @@ export function buildDashboardData(
       masteryPercentage,
       totalSessions,
     },
-  
-  recommendation: recommendation
-    ? {
-        topicName: recommendation.title,
-        description:
-          recommendation.description ??
-          "Lanjutkan perjalanan belajar sesuai tujuan yang kamu pilih.",
-        progress: recommendation.progress,
-        isCompleted: recommendation.status === "completed",
-      }
-    : null,
-
+    recommendation: recommendation
+      ? {
+          topicId: recommendation.id,
+          topicName: recommendation.title,
+          description:
+            recommendation.description ??
+            "Lanjutkan perjalanan belajar sesuai tujuan yang kamu pilih.",
+          progress: recommendation.progress,
+          isCompleted: recommendation.status === "completed",
+        }
+      : null,
   };
 }

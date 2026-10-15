@@ -1,293 +1,409 @@
-
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { supabase } from "../../lib/supabaseClient";
+import {
+  ArrowLeft,
+  BookOpen,
+  Clock3,
+  Target,
+  AlertCircle,
+  RefreshCw,
+  Play,
+} from "lucide-react";
 
-type LearningGoal = {
-  id: string;
-  user_id: string;
-  topic_id: number | null;
-  requested_topic: string | null;
-  description: string | null;
-  target_outcome: string | null;
-  target_level: string;
-  status: string;
-  created_at: string;
-  updated_at?: string;
-};
+import DashboardSidebar from "../../components/layout/DashboardSidebar";
+import DiagnosticResult from "../../components/learning-goals/DiagnosticResult";
+import LearningPathCard from "../../components/learning-goals/LearningPathCard";
+import QuizHistory from "../../components/learning-goals/QuizHistory";
 
-const levelLabels: Record<string, string> = {
-  beginner: "Pemula",
-  intermediate: "Menengah",
-  advanced: "Lanjutan",
-};
-
-const statusLabels: Record<string, string> = {
-  pending: "Persiapan belajar",
-  active: "Sedang belajar",
-  in_progress: "Sedang belajar",
-  completed: "Selesai",
-  cancelled: "Dibatalkan",
-};
+import { useLearningGoalDetail } from "../../hooks/useLearningGoalDetail";
+import {
+  getQuizHistory,
+  type QuizHistoryAttempt,
+} from "../../lib/learning-goals/quizHistoryService";
 
 export default function LearningGoalDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [goal, setGoal] = useState<LearningGoal | null>(null);
-  const [topicName, setTopicName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    goal,
+    assessment,
+    inProgressAssessment,
+    learningPath,
+    studentName,
+    loading,
+    error,
+    pathGenerated,
+    reload,
+  } = useLearningGoalDetail(id);
 
-  const loadGoal = useCallback(async () => {
+  const [quizHistory, setQuizHistory] = useState<
+    QuizHistoryAttempt[]
+  >([]);
+
+  const [quizHistoryLoading, setQuizHistoryLoading] =
+    useState(true);
+
+  const [quizHistoryError, setQuizHistoryError] = useState("");
+
+  const loadQuizHistory = useCallback(async () => {
     if (!id) {
-      setError("ID tujuan belajar tidak ditemukan.");
-      setLoading(false);
+      setQuizHistory([]);
+      setQuizHistoryLoading(false);
+      setQuizHistoryError("");
       return;
     }
 
-    setLoading(true);
-    setError("");
+    setQuizHistoryLoading(true);
+    setQuizHistoryError("");
 
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+      const history = await getQuizHistory(id);
+      setQuizHistory(history);
+    } catch (err: unknown) {
+      console.error("Gagal memuat riwayat kuis:", err);
 
-      if (authError || !user) {
-        navigate("/login");
-        return;
-      }
-
-      // Hanya mengambil tujuan belajar milik pengguna yang login.
-      const { data, error: goalError } = await supabase
-        .from("learning_goals")
-        .select(
-          "id, user_id, topic_id, requested_topic, description, target_outcome, target_level, status, created_at, updated_at"
-        )
-        .eq("id", id)
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (goalError) throw goalError;
-
-      if (!data) {
-        setGoal(null);
-        setError(
-          "Tujuan belajar tidak ditemukan atau kamu tidak memiliki akses."
-        );
-        return;
-      }
-
-      const learningGoal = data as LearningGoal;
-      setGoal(learningGoal);
-
-      // Topik dari katalog memakai nama pada tabel topics.
-      // Topik yang diajukan sendiri memakai requested_topic.
-      if (learningGoal.topic_id !== null) {
-        const { data: topic, error: topicError } = await supabase
-          .from("topics")
-          .select("name")
-          .eq("id", learningGoal.topic_id)
-          .maybeSingle();
-
-        if (topicError) throw topicError;
-        setTopicName(topic?.name ?? learningGoal.requested_topic);
-      } else {
-        setTopicName(learningGoal.requested_topic);
-      }
-    } catch (err) {
-      setError(
+      setQuizHistoryError(
         err instanceof Error
           ? err.message
-          : "Gagal memuat tujuan belajar."
+          : "Riwayat evaluasi gagal dimuat.",
       );
     } finally {
-      setLoading(false);
+      setQuizHistoryLoading(false);
     }
-  }, [id, navigate]);
+  }, [id]);
 
   useEffect(() => {
-    void loadGoal();
-  }, [loadGoal]);
+    let cancelled = false;
+
+    async function loadHistory() {
+      if (!id) {
+        setQuizHistory([]);
+        setQuizHistoryLoading(false);
+        setQuizHistoryError("");
+        return;
+      }
+
+      setQuizHistoryLoading(true);
+      setQuizHistoryError("");
+
+      try {
+        const history = await getQuizHistory(id);
+
+        if (!cancelled) {
+          setQuizHistory(history);
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          console.error("Gagal memuat riwayat kuis:", err);
+
+          setQuizHistoryError(
+            err instanceof Error
+              ? err.message
+              : "Riwayat evaluasi gagal dimuat.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setQuizHistoryLoading(false);
+        }
+      }
+    }
+
+    void loadHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const goalTitle =
+    goal?.requested_topic ??
+    goal?.topic?.name ??
+    goal?.title ??
+    "Tujuan belajar";
+
+  const goalDescription =
+    goal?.target_outcome ??
+    goal?.description ??
+    "Bangun kemampuanmu melalui proses belajar yang terarah.";
+
+  const targetLevelLabels: Record<string, string> = {
+    beginner: "Pemula",
+    intermediate: "Menengah",
+    advanced: "Lanjutan",
+  };
+
+  const targetLevel =
+    targetLevelLabels[goal?.target_level ?? ""] ??
+    goal?.target_level ??
+    "Belum ditentukan";
+
+  function handleBack() {
+    navigate("/topic");
+  }
+
+  function handleStartDiagnostic() {
+    if (!id || pathGenerated) return;
+
+    navigate(`/learning-goals/${id}/diagnostic`);
+  }
+
+  function handleContinueDiagnostic() {
+    if (!id || !inProgressAssessment) return;
+
+    navigate(`/learning-goals/${id}/diagnostic`, {
+      state: {
+        assessmentId: inProgressAssessment.id,
+        resume: true,
+      },
+    });
+  }
+
+  function handleGeneratePath() {
+    if (!id || pathGenerated || !assessment) return;
+
+    navigate(`/learning-goals/${id}/path`);
+  }
+
+  function handleContinueLearning() {
+    if (!id || !pathGenerated) return;
+
+    navigate(`/learning-goals/${id}/path`);
+  }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-12">
-        <div className="mx-auto max-w-4xl animate-pulse space-y-5">
-          <div className="h-5 w-32 rounded bg-slate-200" />
-          <div className="h-48 rounded-2xl bg-white" />
-          <div className="h-40 rounded-2xl bg-white" />
-        </div>
-      </main>
+      <div className="min-h-screen bg-[#FFF9F0] lg:pl-[260px]">
+        <DashboardSidebar studentName={studentName} />
+
+        <main className="mx-auto max-w-5xl space-y-5 px-4 py-8 sm:px-6 lg:px-8">
+          <div className="h-4 w-32 animate-pulse rounded bg-[#EAE2F0]" />
+          <div className="h-24 animate-pulse rounded-2xl bg-white" />
+          <div className="h-36 animate-pulse rounded-2xl bg-white" />
+          <div className="h-52 animate-pulse rounded-2xl bg-white" />
+        </main>
+      </div>
     );
   }
 
   if (error || !goal) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-12">
-        <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center">
-          <div className="text-3xl">📚</div>
-          <h1 className="mt-3 text-xl font-bold text-slate-900">
-            Tujuan belajar tidak tersedia
-          </h1>
-          <p className="mt-2 break-words text-sm leading-6 text-slate-600">
-            {error || "Data tujuan belajar tidak ditemukan."}
-          </p>
+      <div className="min-h-screen bg-[#FFF9F0] lg:pl-[260px]">
+        <DashboardSidebar studentName={studentName} />
 
-          <div className="mt-6 flex justify-center gap-3">
+        <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7560B5]"
+          >
+            <ArrowLeft size={17} />
+            Kembali ke topik
+          </button>
+
+          <section className="rounded-2xl border border-red-200 bg-white p-6">
+            <AlertCircle size={25} className="text-red-500" />
+
+            <h1 className="mt-3 text-lg font-bold text-[#30213F]">
+              Tujuan belajar tidak dapat dimuat
+            </h1>
+
+            <p className="mt-2 text-sm leading-6 text-[#766C80]">
+              {error || "Data tujuan belajar tidak ditemukan."}
+            </p>
+
             <button
-              onClick={() => void loadGoal()}
-              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              type="button"
+              onClick={() => void reload()}
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#7560B5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#62509B]"
             >
+              <RefreshCw size={16} />
               Coba lagi
             </button>
-            <button
-              onClick={() => navigate("/explore-topics")}
-              className="rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700"
-            >
-              Kembali ke katalog
-            </button>
-          </div>
-        </div>
-      </main>
+          </section>
+        </main>
+      </div>
     );
   }
 
-  const displayTopic = topicName || goal.requested_topic || "Topik belajar";
-  const displayStatus = statusLabels[goal.status] ?? goal.status;
-  const displayLevel = levelLabels[goal.target_level] ?? goal.target_level;
-
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen bg-[#FFF9F0] text-[#29243B] lg:pl-[260px]">
+      <DashboardSidebar studentName={studentName} />
+
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <button
-          onClick={() => navigate("/explore-topics")}
-          className="mb-6 text-sm font-medium text-slate-600 hover:text-violet-700"
+          type="button"
+          onClick={handleBack}
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#7560B5] transition hover:text-[#59458F]"
         >
-          ← Kembali ke katalog
+          <ArrowLeft size={17} />
+          Kembali ke topik
         </button>
 
-        {/* Header tujuan belajar */}
-        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-violet-700 to-indigo-600 p-6 text-white sm:p-9">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
-              Tujuan Belajar
+        <header className="mb-7">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[#F1EBFF] px-3 py-1 text-xs font-semibold text-[#7560B5]">
+              Tujuan belajar
             </span>
-            <span className="rounded-full bg-white/15 px-3 py-1 text-xs">
-              {displayStatus}
-            </span>
+
+            {pathGenerated && (
+              <span className="rounded-full bg-[#E8F7EF] px-3 py-1 text-xs font-semibold text-[#278456]">
+                Learning path tersedia
+              </span>
+            )}
+
+            {inProgressAssessment && (
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                Kuis belum selesai
+              </span>
+            )}
           </div>
 
-          <h1 className="mt-5 break-words text-3xl font-bold sm:text-4xl">
-            {displayTopic}
+          <h1 className="text-2xl font-bold tracking-tight text-[#30213F] sm:text-3xl">
+            {goalTitle}
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-violet-100 sm:text-base">
-            {goal.target_outcome ||
-              goal.description ||
-              "Mulai perjalanan belajarmu dan kembangkan kemampuan secara bertahap."}
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#766C80]">
+            {goalDescription}
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <span className="rounded-xl bg-white/10 px-4 py-2">
-              Tingkat: {displayLevel}
-            </span>
-            <span className="rounded-xl bg-white/10 px-4 py-2">
-              Dibuat:{" "}
-              {new Intl.DateTimeFormat("id-ID", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(new Date(goal.created_at))}
-            </span>
-          </div>
-        </section>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-[#EAE2F0] bg-white px-3 py-2 text-xs font-medium text-[#766C80]">
+              <Target size={15} className="text-[#7560B5]" />
+              Target: {targetLevel}
+            </div>
 
-        {/* Alur pembelajaran */}
-        <section className="mt-8">
-          <div className="mb-5">
-            <h2 className="text-xl font-bold text-slate-900">
-              Perjalanan Belajarmu
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
-              Kenali kemampuan awalmu, lalu susun langkah belajar yang sesuai.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-2xl">
-                🧠
+            {goal.created_at && (
+              <div className="inline-flex items-center gap-2 rounded-xl border border-[#EAE2F0] bg-white px-3 py-2 text-xs font-medium text-[#766C80]">
+                <Clock3 size={15} className="text-[#7560B5]" />
+                Dibuat{" "}
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                }).format(new Date(goal.created_at))}
               </div>
-
-              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-blue-700">
-                Langkah 1
-              </p>
-              <h3 className="mt-2 text-lg font-bold text-slate-900">
-                Diagnostic Quiz
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Jawab pertanyaan untuk mengukur pemahaman awal. Hasilnya
-                akan menjadi dasar penentuan materi yang sesuai.
-              </p>
-
-              <button
-                onClick={() =>
-                  navigate(`/learning-goals/${goal.id}/diagnostic`)
-                }
-                className="mt-5 w-full rounded-xl border border-blue-200 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50"
-              >
-                Mulai Tes Diagnostik →
-              </button>
-            </article>
-
-            <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-2xl">
-                ✨
-              </div>
-
-              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-violet-700">
-                Langkah 2
-              </p>
-              <h3 className="mt-2 text-lg font-bold text-slate-900">
-                AI Learning Path
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Dapatkan roadmap belajar personal berdasarkan tujuan,
-                tingkat kemampuan, dan hasil tes diagnostik.
-              </p>
-
-              <button
-                onClick={() =>
-                  navigate(`/learning-goals/${goal.id}/path`)
-                }
-                className="mt-5 w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white hover:bg-violet-700"
-              >
-                Lihat Learning Path →
-              </button>
-
-              <p className="mt-3 text-xs leading-5 text-slate-500">
-                Jika roadmap belum dibuat, halaman berikutnya perlu
-                menangani proses pembuatannya.
-              </p>
-            </article>
+            )}
           </div>
-        </section>
+        </header>
 
-        {/* Detail tujuan */}
-        {goal.description && goal.target_outcome && (
-          <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="font-bold text-slate-900">
-              Detail Tujuan Belajar
-            </h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-600">
-              {goal.description}
-            </p>
+        <div className="space-y-5">
+          {inProgressAssessment ? (
+            <section className="rounded-2xl border border-amber-200 bg-white p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                  <Play size={21} />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="font-bold text-[#30213F]">
+                    Lanjutkan Tes Diagnostik
+                  </h2>
+
+                  <p className="mt-1 text-sm leading-6 text-[#766C80]">
+                    Kamu masih memiliki tes yang belum selesai.
+                    Lanjutkan untuk meneruskan progres yang tersimpan.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleContinueDiagnostic}
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#7560B5] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#62509B]"
+                  >
+                    <Play size={16} />
+                    Lanjutkan Kuis
+                  </button>
+                </div>
+              </div>
+            </section>
+          ) : !assessment ? (
+            <section className="rounded-2xl border border-[#EAE2F0] bg-white p-5">
+              <div className="flex items-start gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F1EBFF] text-[#7560B5]">
+                  <BookOpen size={20} />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="font-bold text-[#30213F]">
+                    Tes Diagnostik
+                  </h2>
+
+                  <p className="mt-1 text-sm leading-6 text-[#93879F]">
+                    Kenali kemampuan awalmu untuk membantu menyusun
+                    jalur belajar yang lebih sesuai.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled={pathGenerated}
+                    onClick={handleStartDiagnostic}
+                    className="mt-4 rounded-xl bg-[#7560B5] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#62509B] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Mulai Tes Diagnostik
+                  </button>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <DiagnosticResult
+              assessment={assessment}
+              pathGenerated={pathGenerated}
+              onRetake={
+                pathGenerated ? undefined : handleStartDiagnostic
+              }
+            />
+          )}
+
+          {/* Riwayat evaluasi kuis */}
+          <section>
+            <QuizHistory
+              attempts={quizHistory}
+              loading={quizHistoryLoading}
+            />
+
+            {quizHistoryError && (
+              <div
+                role="alert"
+                className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+              >
+                <span>{quizHistoryError}</span>
+
+                <button
+                  type="button"
+                  onClick={() => void loadQuizHistory()}
+                  disabled={quizHistoryLoading}
+                  className="inline-flex items-center gap-2 font-semibold underline disabled:opacity-50"
+                >
+                  <RefreshCw
+                    size={15}
+                    className={
+                      quizHistoryLoading ? "animate-spin" : ""
+                    }
+                  />
+                  Coba lagi
+                </button>
+              </div>
+            )}
           </section>
-        )}
-      </div>
-    </main>
+
+          <LearningPathCard
+            learningPath={learningPath}
+            pathGenerated={pathGenerated}
+            hasAssessment={Boolean(assessment)}
+            onGenerate={handleGeneratePath}
+            onContinue={
+              pathGenerated ? handleContinueLearning : undefined
+            }
+          />
+        </div>
+
+        <footer className="mt-10 border-t border-[#EAE2F0] py-6 text-center">
+          <p className="text-xs leading-5 text-[#93879F]">
+            SkillPath AI · Belajar sesuai kemampuanmu, berkembang setiap hari.
+          </p>
+        </footer>
+      </main>
+    </div>
   );
 }

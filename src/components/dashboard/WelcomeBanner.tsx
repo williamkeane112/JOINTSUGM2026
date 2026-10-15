@@ -36,7 +36,7 @@ export default function WelcomeBanner({
           </p>
 
           <Link
-            to="/topicSelect"
+            to="/topic"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#F4A6C1] px-5 py-3 text-sm font-semibold text-[#29243B] transition hover:bg-[#F8BDD0] focus:outline-none focus:ring-2 focus:ring-[#F4A6C1] focus:ring-offset-2 focus:ring-offset-[#29243B]"
           >
             Mulai Belajar

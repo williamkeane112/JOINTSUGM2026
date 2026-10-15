@@ -10,38 +10,42 @@ export default function QuizProgress({
   total,
   answered,
 }: Props) {
-  const percentage =
-    total > 0 ? Math.round((answered / total) * 100) : 0;
+  const percentage = total > 0 ? Math.round((answered / total) * 100) : 0;
 
   return (
-    <div className="mb-7">
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="mb-8">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-800">
-            Diagnostic Assessment
+          <p className="text-sm font-bold text-[#30213F]">
+            Perjalanan diagnostik
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-sm text-[#81778D]">
             Pertanyaan {current} dari {total}
           </p>
         </div>
 
-        <span className="text-sm font-semibold text-emerald-700">
+        <div className="rounded-full bg-[#F0EAFB] px-3 py-1.5 text-xs font-bold text-[#7560B5]">
           {answered}/{total} dijawab
-        </span>
+        </div>
       </div>
 
       <div
-        className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100"
+        className="h-2.5 w-full overflow-hidden rounded-full bg-[#EEE8F3]"
         role="progressbar"
-        aria-label="Progress jawaban"
+        aria-label="Progres jawaban"
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={answered}
       >
         <div
-          className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+          className="h-full rounded-full bg-gradient-to-r from-[#7560B5] to-[#F43F91] transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
+      </div>
+
+      <div className="mt-2 flex justify-between text-xs text-[#958BA0]">
+        <span>Progres pengerjaan</span>
+        <span>{percentage}%</span>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +6,7 @@ interface RecommendationCardProps {
   description?: string;
   progress?: number;
   isCompleted?: boolean;
+  learningGoalId?: string | number;
 }
 
 export default function RecommendationCard({
@@ -14,8 +14,17 @@ export default function RecommendationCard({
   description = "Penguasaanmu paling rendah di sini, dan syaratnya sudah terpenuhi.",
   progress = 34,
   isCompleted = false,
+  learningGoalId,
 }: RecommendationCardProps) {
   const mastery = Math.max(0, Math.min(100, progress));
+
+  // Jika topik sudah selesai, arahkan ke pemilihan topik.
+  // Jika belum, buka detail learning goal.
+  const targetPath = isCompleted
+    ? "/topic"
+    : learningGoalId
+      ? `/learning-goals/${learningGoalId}`
+      : "/topic";
 
   return (
     <section className="flex min-h-[188px] flex-col justify-between gap-5 rounded-xl bg-[#190820] p-5 text-white sm:flex-row sm:items-center sm:p-6">
@@ -29,7 +38,7 @@ export default function RecommendationCard({
         </p>
 
         <Link
-          to="/topicSelect"
+          to={targetPath}
           className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#F44389] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-pink-500/20 transition hover:bg-[#E83278]"
         >
           {isCompleted ? "Pilih topik" : "Lanjutkan belajar"}

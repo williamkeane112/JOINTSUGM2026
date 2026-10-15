@@ -12,7 +12,7 @@ export default function EmptyState({
   title = "Perjalanan belajarmu dimulai di sini",
   description = "Kamu belum memiliki aktivitas belajar. Pilih topik pertamamu dan biarkan SkillPath AI membantumu belajar secara bertahap.",
   buttonLabel = "Pilih Topik Pertama",
-  href = "/topicSelect",
+  href = "/topic",
 }: EmptyStateProps) {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-[#EAE2F0] bg-white px-6 py-12 text-center shadow-sm sm:px-10">

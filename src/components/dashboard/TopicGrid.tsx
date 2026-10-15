@@ -1,8 +1,11 @@
+
 import { ArrowRight, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import TopicCard, { type TopicStatus } from "./TopicCard";
 
 export interface DashboardTopic {
+  // Harus berupa learning_goals.id jika kartu diarahkan
+  // langsung ke halaman detail learning goal.
   id: string;
   title: string;
   description?: string;
@@ -46,7 +49,7 @@ export default function TopicGrid({
         </div>
 
         <Link
-          to="/topicSelect"
+          to="/topic"
           className="inline-flex items-center gap-2 self-start text-sm font-semibold text-[#7560B5] transition hover:text-[#55428F] sm:self-auto"
         >
           Lihat semua topik
@@ -62,8 +65,8 @@ export default function TopicGrid({
               id={topic.id}
               title={topic.title}
               description={topic.description}
-              progress={topic.progress}
-              status={topic.status}
+              progress={topic.progress ?? 0}
+              status={topic.status ?? "not_started"}
               href={topic.href}
             />
           ))}
@@ -84,7 +87,7 @@ export default function TopicGrid({
           </p>
 
           <Link
-            to="/topicSelect"
+            to="/topic"
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#7560B5] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B]"
           >
             Pilih Topik

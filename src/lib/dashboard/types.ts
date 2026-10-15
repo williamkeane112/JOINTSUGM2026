@@ -5,6 +5,7 @@ export type TopicStatus =
   | "locked";
 
 export interface DashboardTopic {
+  // ID learning goal, bukan ID tabel topics.
   id: string;
   title: string;
   description?: string;
