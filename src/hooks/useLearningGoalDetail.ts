@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { supabase } from "../lib/supabaseClient";
 import { getLearningGoalDetail } from "../lib/learning-goals/learningGoalService";
 
@@ -20,6 +21,11 @@ export function useLearningGoalDetail(goalId?: string) {
 
   const reload = useCallback(async () => {
     if (!goalId) {
+      setGoal(null);
+      setAssessment(null);
+      setInProgressAssessment(null);
+      setCompletedAssessment(null);
+      setLearningPath(null);
       setError("ID tujuan belajar tidak ditemukan.");
       setLoading(false);
       return;
@@ -29,6 +35,7 @@ export function useLearningGoalDetail(goalId?: string) {
     setError("");
 
     try {
+      // 1. Validasi sesi dan pengguna.
       const {
         data: { user },
         error: authError,
@@ -39,8 +46,10 @@ export function useLearningGoalDetail(goalId?: string) {
         return;
       }
 
-      const [detail, profile] = await Promise.all([
+      // 2. Ambil detail tujuan belajar dan profil secara bersamaan.
+      const [detail, profileResult] = await Promise.all([
         getLearningGoalDetail(goalId, user.id),
+
         supabase
           .from("users")
           .select("full_name")
@@ -48,15 +57,41 @@ export function useLearningGoalDetail(goalId?: string) {
           .maybeSingle(),
       ]);
 
+      // 3. Perbarui state tujuan belajar.
       setGoal(detail.goal);
+
+      // Asesmen selesai untuk hasil diagnostik.
       setAssessment(detail.assessment);
-      setInProgressAssessment(detail.inProgressAssessment);
-      setCompletedAssessment(detail.completedAssessment);
-      setLearningPath(detail.learningPath);
-      setStudentName(
-        profile.data?.full_name?.trim() || "Pelajar",
+      setCompletedAssessment(
+        detail.completedAssessment ?? detail.assessment,
       );
-    } catch (err) {
+
+      // Asesmen yang masih berlangsung.
+      setInProgressAssessment(
+        detail.inProgressAssessment,
+      );
+
+      // Learning path terbaru, termasuk langkah-langkahnya
+      // jika learningGoalService mengambil relasi tersebut.
+      setLearningPath(detail.learningPath);
+
+      // 4. Perbarui nama pengguna.
+      if (profileResult.error) {
+        console.warn(
+          "Gagal memuat profil pengguna:",
+          profileResult.error.message,
+        );
+      }
+
+      setStudentName(
+        profileResult.data?.full_name?.trim() || "Pelajar",
+      );
+    } catch (err: unknown) {
+      console.error(
+        "Gagal memuat detail tujuan belajar:",
+        err,
+      );
+
       setError(
         err instanceof Error
           ? err.message
@@ -67,6 +102,7 @@ export function useLearningGoalDetail(goalId?: string) {
     }
   }, [goalId, navigate]);
 
+  // Muat data ketika goalId berubah.
   useEffect(() => {
     void reload();
   }, [reload]);
@@ -80,7 +116,11 @@ export function useLearningGoalDetail(goalId?: string) {
     studentName,
     loading,
     error,
+
+    // Path dianggap tersedia jika record berhasil ditemukan.
     pathGenerated: Boolean(learningPath),
+
+    // Dapat dipanggil setelah Edge Function selesai.
     reload,
   };
 }

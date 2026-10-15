@@ -2,9 +2,10 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
-  Clock3,
-  Layers3,
+  Clock,
+  LoaderCircle,
   Sparkles,
+  Target,
 } from "lucide-react";
 
 interface LearningPathCardProps {
@@ -14,28 +15,43 @@ interface LearningPathCardProps {
   generating?: boolean;
   onGenerate: () => void;
   onContinue?: () => void;
+  onTakeAssessment?: () => void;
 }
 
-function readPathContent(path: Record<string, any>) {
-  const content =
-    path.modules ??
-    path.steps ??
-    path.learning_path ??
-    path.path ??
-    path.content;
-
-  if (Array.isArray(content)) return content;
-
-  if (content && typeof content === "object") {
-    const nested =
-      content.modules ??
-      content.steps ??
-      content.learning_path;
-
-    if (Array.isArray(nested)) return nested;
+function readPathContent(learningPath: Record<string, any> | null) {
+  if (!learningPath) {
+    return {
+      title: "Learning Path Personal",
+      description:
+        "Selesaikan tes diagnostik agar AI dapat membuat jalur belajar yang sesuai dengan kemampuanmu.",
+      modules: [],
+    };
   }
 
-  return [];
+  const possibleModules =
+    learningPath.modules ??
+    learningPath.steps ??
+    learningPath.learning_path?.modules ??
+    learningPath.learning_path?.steps ??
+    learningPath.path?.modules ??
+    learningPath.path?.steps ??
+    learningPath.content?.modules ??
+    learningPath.content?.steps ??
+    learningPath.learning_path_steps ??
+    [];
+
+  return {
+    title:
+      learningPath.title ??
+      learningPath.name ??
+      learningPath.learning_path?.title ??
+      "Learning Path Personal",
+    description:
+      learningPath.description ??
+      learningPath.learning_path?.description ??
+      "Jalur belajar yang disesuaikan dengan tujuan dan kemampuanmu.",
+    modules: Array.isArray(possibleModules) ? possibleModules : [],
+  };
 }
 
 export default function LearningPathCard({
@@ -45,197 +61,245 @@ export default function LearningPathCard({
   generating = false,
   onGenerate,
   onContinue,
+  onTakeAssessment,
 }: LearningPathCardProps) {
-  const modules = learningPath ? readPathContent(learningPath) : [];
+  const path = readPathContent(learningPath);
 
-  const title =
-    learningPath?.title ??
-    learningPath?.name ??
-    "Learning Path Personal";
+  const handlePrimaryAction = () => {
+    if (generating) return;
 
-  const description =
-    learningPath?.description ??
-    learningPath?.summary ??
-    "Materi belajar disusun untuk membantu kamu mencapai tujuan belajar secara bertahap.";
+    if (!hasAssessment) {
+      onTakeAssessment?.();
+      return;
+    }
 
+    onGenerate();
+  };
+
+  // Learning path sudah dibuat: tampilkan ringkasan dan tombol lanjut belajar.
   if (pathGenerated && learningPath) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-[#EAE2F0] bg-white">
-        <div className="flex items-start justify-between gap-3 border-b border-[#F0E9F2] p-5">
+      <section className="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm">
+        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-5 text-white sm:p-6">
           <div className="flex items-start gap-3">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#EDE7FF] text-[#7560B5]">
-              <BookOpen size={21} />
+            <div className="rounded-xl bg-white/15 p-3">
+              <BookOpen size={24} />
             </div>
 
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-bold text-[#30213F]">
-                  Learning Path Kamu
-                </h2>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#E8F7EF] px-2 py-1 text-[11px] font-semibold text-[#278456]">
-                  <CheckCircle2 size={12} />
-                  Dibuat
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <CheckCircle2 size={16} />
+                <span className="text-xs font-semibold uppercase tracking-wider text-violet-100">
+                  Learning Path Tersedia
                 </span>
               </div>
 
-              <p className="mt-1 text-sm text-[#93879F]">
-                Jalur belajar personalmu sudah siap.
+              <h2 className="text-xl font-bold sm:text-2xl">
+                {path.title}
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-violet-100">
+                {path.description}
               </p>
             </div>
           </div>
-
-          <Sparkles
-            size={19}
-            className="shrink-0 text-[#F43F91]"
-          />
         </div>
 
-        <div className="p-5">
-          <h3 className="text-lg font-bold text-[#30213F]">
-            {title}
-          </h3>
-
-          <p className="mt-2 text-sm leading-6 text-[#766C80]">
-            {description}
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-3">
-            <div className="flex items-center gap-2 rounded-xl bg-[#F8F5FF] px-3 py-2 text-sm text-[#594477]">
-              <Layers3 size={16} />
-              {modules.length > 0
-                ? `${modules.length} modul`
-                : "Jalur belajar tersedia"}
-            </div>
-
-            {learningPath?.estimated_duration && (
-              <div className="flex items-center gap-2 rounded-xl bg-[#FFF5F9] px-3 py-2 text-sm text-[#A64F78]">
-                <Clock3 size={16} />
-                {String(learningPath.estimated_duration)}
+        <div className="p-5 sm:p-6">
+          <div className="mb-5 grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-violet-50 p-4">
+              <div className="flex items-center gap-2 text-violet-600">
+                <BookOpen size={17} />
+                <span className="text-sm font-medium">Total Materi</span>
               </div>
-            )}
-          </div>
 
-          {modules.length > 0 && (
-            <div className="mt-5">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#93879F]">
-                Tahapan pembelajaran
+              <p className="mt-2 text-2xl font-bold text-gray-900">
+                {path.modules.length}
               </p>
 
-              <div className="space-y-2">
-                {modules.slice(0, 3).map((module, index) => {
-                  const name =
-                    typeof module === "string"
-                      ? module
-                      : module?.title ??
-                        module?.name ??
-                        module?.topic ??
-                        `Modul ${index + 1}`;
+              <p className="mt-1 text-xs text-gray-500">
+                Tahapan pembelajaran
+              </p>
+            </div>
 
-                  return (
-                    <div
-                      key={`${String(name)}-${index}`}
-                      className="flex items-center gap-3 rounded-xl border border-[#F0E9F2] px-3 py-3"
-                    >
-                      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#F1EBFF] text-xs font-bold text-[#7560B5]">
-                        {index + 1}
-                      </span>
-                      <span className="text-sm font-medium text-[#493763]">
-                        {String(name)}
-                      </span>
-                    </div>
-                  );
-                })}
-
-                {modules.length > 3 && (
-                  <p className="pt-1 text-xs text-[#93879F]">
-                    +{modules.length - 3} tahapan lainnya
-                  </p>
-                )}
+            <div className="rounded-xl bg-indigo-50 p-4">
+              <div className="flex items-center gap-2 text-indigo-600">
+                <Clock size={17} />
+                <span className="text-sm font-medium">Estimasi</span>
               </div>
+
+              <p className="mt-2 text-2xl font-bold text-gray-900">
+                {learningPath.estimated_hours != null
+                  ? `${learningPath.estimated_hours} jam`
+                  : "Fleksibel"}
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                Waktu belajar
+              </p>
+            </div>
+          </div>
+
+          {path.modules.length > 0 && (
+            <div className="mb-5">
+              <h3 className="mb-3 text-sm font-semibold text-gray-800">
+                Tahapan pembelajaran
+              </h3>
+
+              <div className="space-y-3">
+                {path.modules.slice(0, 4).map((module: any, index: number) => (
+                  <div
+                    key={
+                      module.id ??
+                      module.order_sequence ??
+                      module.title ??
+                      index
+                    }
+                    className="flex items-start gap-3 rounded-xl border border-gray-100 p-3"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700">
+                      {module.order_sequence ?? index + 1}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {module.title ??
+                          module.name ??
+                          `Tahap ${index + 1}`}
+                      </p>
+
+                      {(module.description ?? module.content) && (
+                        <p className="mt-1 line-clamp-2 text-xs leading-5 text-gray-500">
+                          {module.description ?? module.content}
+                        </p>
+                      )}
+
+                      {module.estimated_minutes != null && (
+                        <p className="mt-2 flex items-center gap-1 text-xs text-gray-400">
+                          <Clock size={12} />
+                          {module.estimated_minutes} menit
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {path.modules.length > 4 && (
+                <p className="mt-3 text-center text-xs text-gray-500">
+                  +{path.modules.length - 4} tahapan lainnya
+                </p>
+              )}
             </div>
           )}
 
-          {onContinue && (
-            <button
-              type="button"
-              onClick={onContinue}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#7560B5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B]"
-            >
-              Lanjutkan belajar
-              <ArrowRight size={17} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onContinue}
+            disabled={!onContinue}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#7560B5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Lanjutkan belajar
+            <ArrowRight size={17} />
+          </button>
         </div>
       </section>
     );
   }
 
+  // Learning path belum dibuat: arahkan ke tes diagnostik atau generate AI.
   return (
-    <section className="rounded-2xl border border-[#EAE2F0] bg-white p-5 sm:p-6">
-      <div className="flex items-start gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#F1EBFF] text-[#7560B5]">
-          <Sparkles size={21} />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <h2 className="font-bold text-[#30213F]">
-            Buat Learning Path
-          </h2>
-
-          <p className="mt-1 text-sm leading-6 text-[#93879F]">
-            {hasAssessment
-              ? "Hasil tes diagnostikmu siap digunakan untuk menyusun jalur belajar yang lebih sesuai dengan kemampuanmu."
-              : "Mulai dengan tes diagnostik agar jalur belajar dapat disesuaikan dengan kemampuan awalmu."}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-5 rounded-xl bg-[#FAF7FF] p-4">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-[#7560B5]">
-            {hasAssessment ? (
-              <CheckCircle2 size={18} />
-            ) : (
-              <BookOpen size={18} />
-            )}
+    <section className="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm">
+      <div className="p-5 sm:p-6">
+        <div className="flex items-start gap-4">
+          <div className="rounded-xl bg-violet-100 p-3 text-violet-700">
+            <Sparkles size={24} />
           </div>
 
-          <div>
-            <p className="text-sm font-semibold text-[#493763]">
-              {hasAssessment
-                ? "Tes diagnostik selesai"
-                : "Tes diagnostik diperlukan"}
-            </p>
-            <p className="mt-1 text-xs leading-5 text-[#93879F]">
-              {hasAssessment
-                ? "Kamu dapat membuat jalur belajar berdasarkan hasil tes ini."
-                : "Selesaikan tes terlebih dahulu untuk mengetahui kemampuan awalmu."}
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-bold text-gray-900">
+              Buat Learning Path dengan AI
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-600">
+              Dapatkan jalur belajar personal berdasarkan tujuan dan hasil tes
+              diagnostikmu. AI akan membantu menyusun materi secara bertahap.
             </p>
           </div>
         </div>
-      </div>
 
-      <button
-        type="button"
-        onClick={onGenerate}
-        disabled={!hasAssessment || generating}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#7560B5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B] disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {generating ? (
-          <>
-            <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            Menyiapkan learning path...
-          </>
-        ) : (
-          <>
-            <Sparkles size={17} />
-            {hasAssessment
-              ? "Generate Learning Path"
-              : "Ikuti Tes Diagnostik"}
-            {!hasAssessment && <ArrowRight size={16} />}
-          </>
-        )}
-      </button>
+        <div className="mt-5 space-y-3">
+          <div className="flex items-start gap-3 rounded-xl bg-gray-50 p-3">
+            <Target
+              size={18}
+              className="mt-0.5 shrink-0 text-violet-600"
+            />
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                Sesuai tujuan belajarmu
+              </p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                Materi disusun berdasarkan kemampuan awal dan target yang ingin
+                kamu capai.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-xl bg-gray-50 p-3">
+            <BookOpen
+              size={18}
+              className="mt-0.5 shrink-0 text-violet-600"
+            />
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                Tahapan belajar terstruktur
+              </p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                Pelajari materi secara berurutan, dari dasar hingga tahap
+                lanjutan yang sesuai.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handlePrimaryAction}
+          disabled={
+            generating ||
+            (!hasAssessment && !onTakeAssessment) ||
+            (hasAssessment && !onGenerate)
+          }
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#7560B5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {generating ? (
+            <>
+              <LoaderCircle size={17} className="animate-spin" />
+              Sedang membuat learning path...
+            </>
+          ) : hasAssessment ? (
+            <>
+              <Sparkles size={17} />
+              Generate Learning Path
+              <ArrowRight size={17} />
+            </>
+          ) : (
+            <>
+              <Target size={17} />
+              Ikuti Tes Diagnostik
+              <ArrowRight size={17} />
+            </>
+          )}
+        </button>
+
+        <p className="mt-3 text-center text-xs text-gray-400">
+          {generating
+            ? "AI sedang menyusun tahapan belajar untukmu."
+            : hasAssessment
+              ? "Hasil tes diagnostikmu akan digunakan untuk menyusun jalur belajar."
+              : "Selesaikan tes diagnostik terlebih dahulu agar jalur belajarmu lebih personal."}
+        </p>
+      </div>
     </section>
   );
 }

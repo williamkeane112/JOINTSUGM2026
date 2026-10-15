@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -8,6 +9,7 @@ import {
   AlertCircle,
   RefreshCw,
   Play,
+  Sparkles,
 } from "lucide-react";
 
 import DashboardSidebar from "../../components/layout/DashboardSidebar";
@@ -20,6 +22,7 @@ import {
   getQuizHistory,
   type QuizHistoryAttempt,
 } from "../../lib/learning-goals/quizHistoryService";
+import { generateLearningPath } from "../../lib/learningpath/learningPathService";
 
 export default function LearningGoalDetail() {
   const { id } = useParams<{ id: string }>();
@@ -37,14 +40,12 @@ export default function LearningGoalDetail() {
     reload,
   } = useLearningGoalDetail(id);
 
-  const [quizHistory, setQuizHistory] = useState<
-    QuizHistoryAttempt[]
-  >([]);
-
-  const [quizHistoryLoading, setQuizHistoryLoading] =
-    useState(true);
-
+  const [quizHistory, setQuizHistory] = useState<QuizHistoryAttempt[]>([]);
+  const [quizHistoryLoading, setQuizHistoryLoading] = useState(true);
   const [quizHistoryError, setQuizHistoryError] = useState("");
+
+  const [generatingPath, setGeneratingPath] = useState(false);
+  const [pathGenerationError, setPathGenerationError] = useState("");
 
   const loadQuizHistory = useCallback(async () => {
     if (!id) {
@@ -160,17 +161,52 @@ export default function LearningGoalDetail() {
     });
   }
 
-  function handleGeneratePath() {
-    if (!id || pathGenerated || !assessment) return;
-
-    navigate(`/learning-goals/${id}/path`);
+const handleGeneratePath = useCallback(async () => {
+  if (!id || !assessment || pathGenerated || generatingPath) {
+    return;
   }
 
-  function handleContinueLearning() {
-    if (!id || !pathGenerated) return;
+  setGeneratingPath(true);
+  setPathGenerationError("");
 
-    navigate(`/learning-goals/${id}/path`);
+  try {
+    await generateLearningPath(id);
+
+    // Muat ulang data halaman dari Supabase.
+    await reload();
+
+    // Perbarui riwayat kuis tanpa memblokir UI.
+    void loadQuizHistory();
+  } catch (err: unknown) {
+    console.error("Gagal membuat learning path:", err);
+
+    setPathGenerationError(
+      err instanceof Error
+        ? err.message
+        : "Terjadi kesalahan saat membuat learning path."
+    );
+  } finally {
+    setGeneratingPath(false);
   }
+}, [
+  id,
+  assessment,
+  pathGenerated,
+  generatingPath,
+  reload,
+  loadQuizHistory,
+]);
+
+  const handleContinueLearning = () => {
+    const pathId = learningPath?.id;
+
+    if (!pathId) {
+      console.error("ID learning path tidak ditemukan.");
+      return;
+    }
+
+    navigate(`/learning-path/${pathId}`);
+  };
 
   if (loading) {
     return (
@@ -377,9 +413,7 @@ export default function LearningGoalDetail() {
                 >
                   <RefreshCw
                     size={15}
-                    className={
-                      quizHistoryLoading ? "animate-spin" : ""
-                    }
+                    className={quizHistoryLoading ? "animate-spin" : ""}
                   />
                   Coba lagi
                 </button>
@@ -387,15 +421,109 @@ export default function LearningGoalDetail() {
             )}
           </section>
 
-          <LearningPathCard
-            learningPath={learningPath}
-            pathGenerated={pathGenerated}
-            hasAssessment={Boolean(assessment)}
-            onGenerate={handleGeneratePath}
-            onContinue={
-              pathGenerated ? handleContinueLearning : undefined
-            }
-          />
+          {/* Error saat generate learning path */}
+          {pathGenerationError && (
+            <div
+              role="alert"
+              className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+            >
+              <AlertCircle size={20} className="mt-0.5 shrink-0" />
+
+              <div className="flex-1">
+                <p className="font-semibold">
+                  Gagal membuat learning path
+                </p>
+                <p className="mt-1">{pathGenerationError}</p>
+
+                <button
+                  type="button"
+                  onClick={() => void handleGeneratePath()}
+                  disabled={generatingPath}
+                  className="mt-2 font-semibold underline disabled:opacity-50"
+                >
+                  Coba lagi
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Tombol generate dan informasi proses */}
+          {generatingPath && (
+            <div
+              role="status"
+              className="flex items-start gap-3 rounded-xl border border-[#DCD2F4] bg-[#F7F3FF] p-4"
+            >
+              <RefreshCw
+                size={20}
+                className="mt-0.5 shrink-0 animate-spin text-[#7560B5]"
+              />
+              <div>
+                <p className="font-semibold text-[#30213F]">
+                  Shiteru AI sedang menyusun learning path
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[#766C80]">
+                  Kami sedang menyesuaikan tahapan belajar berdasarkan
+                  tujuan dan hasil tes diagnostikmu. Jangan tutup halaman ini.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!pathGenerated && (
+            <section className="rounded-2xl border border-[#EAE2F0] bg-white p-5 sm:p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#F1EBFF] text-[#7560B5]">
+                  <Sparkles size={21} />
+                </div>
+
+                <div className="flex-1">
+                  <h2 className="font-bold text-[#30213F]">
+                    Buat Learning Path dengan AI
+                  </h2>
+
+                  <p className="mt-1 text-sm leading-6 text-[#766C80]">
+                    Setelah tes diagnostik selesai, Shiteru AI akan
+                    menyusun tahapan belajar yang sesuai dengan kemampuan
+                    dan tujuanmu.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => void handleGeneratePath()}
+                    disabled={!assessment || generatingPath || Boolean(inProgressAssessment)}
+                    className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-[#7560B5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#62509B] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {generatingPath ? (
+                      <>
+                        <RefreshCw size={17} className="animate-spin" />
+                        Membuat learning path...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={17} />
+                        Generate Learning Path
+                      </>
+                    )}
+                  </button>
+
+                  {!assessment && !inProgressAssessment && (
+                    <p className="mt-2 text-xs text-[#93879F]">
+                      Selesaikan tes diagnostik terlebih dahulu.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
+        <LearningPathCard
+          learningPath={learningPath}
+          pathGenerated={pathGenerated}
+          hasAssessment={Boolean(assessment)}
+          generating={generatingPath}
+          onGenerate={() => void handleGeneratePath()}
+          onTakeAssessment={handleStartDiagnostic}
+          onContinue={handleContinueLearning}
+        />
         </div>
 
         <footer className="mt-10 border-t border-[#EAE2F0] py-6 text-center">
