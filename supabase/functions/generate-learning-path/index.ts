@@ -47,6 +47,137 @@ type GeneratedPath = {
   steps: GeneratedStep[];
 };
 
+
+const CHECKPOINT_SIZE = 3;
+const CHECKPOINT_PASSING_SCORE = 70;
+
+type CheckpointRow = {
+  user_id: string;
+  learning_path_id: string;
+  checkpoint_number: number;
+  start_order_sequence: number;
+  end_order_sequence: number;
+  passing_score: number;
+  best_score: number | null;
+  passed_at: string | null;
+  unlocked_at: string | null;
+  updated_at: string;
+};
+
+/**
+ * Membuat atau melengkapi checkpoint untuk path baru maupun path lama.
+ * Checkpoint yang sudah ada tidak di-reset: best_score dan passed_at tetap.
+ * Harus dipanggil dari Edge Function dengan admin/service-role client.
+ */
+async function ensureLearningPathCheckpoints(
+  admin: ReturnType<typeof createClient>,
+  userId: string,
+  learningPathId: string,
+) {
+  const { data: steps, error: stepsError } = await admin
+    .from("learning_path_steps")
+    .select("order_sequence")
+    .eq("learning_path_id", learningPathId)
+    .order("order_sequence", { ascending: true });
+
+  if (stepsError) throw stepsError;
+  if (!steps?.length) {
+    throw new Error("Learning path belum memiliki tahap untuk dibuat checkpoint.");
+  }
+
+  const sequences = steps
+    .map((step) => Number(step.order_sequence))
+    .filter((sequence) => Number.isInteger(sequence) && sequence > 0)
+    .sort((a, b) => a - b);
+
+  if (!sequences.length) {
+    throw new Error("Tidak ditemukan order_sequence tahap yang valid.");
+  }
+
+  const now = new Date().toISOString();
+  const expected: CheckpointRow[] = [];
+
+  for (let startIndex = 0; startIndex < sequences.length; startIndex += CHECKPOINT_SIZE) {
+    const group = sequences.slice(startIndex, startIndex + CHECKPOINT_SIZE);
+    const checkpointNumber = Math.floor(startIndex / CHECKPOINT_SIZE) + 1;
+
+    expected.push({
+      user_id: userId,
+      learning_path_id: learningPathId,
+      checkpoint_number: checkpointNumber,
+      start_order_sequence: group[0],
+      end_order_sequence: group[group.length - 1],
+      passing_score: CHECKPOINT_PASSING_SCORE,
+      best_score: null,
+      passed_at: null,
+      unlocked_at: checkpointNumber === 1 ? now : null,
+      updated_at: now,
+    });
+  }
+
+  const { data: existing, error: existingError } = await admin
+    .from("learning_path_checkpoints")
+    .select("id, checkpoint_number, start_order_sequence, end_order_sequence, passing_score, best_score, passed_at, unlocked_at")
+    .eq("user_id", userId)
+    .eq("learning_path_id", learningPathId);
+
+  if (existingError) throw existingError;
+
+  const existingByNumber = new Map<number, Record<string, unknown>>(
+    (existing ?? []).map((row) => [Number(row.checkpoint_number), row]),
+  );
+
+  const missing: CheckpointRow[] = [];
+
+  for (const expectedRow of expected) {
+    const oldRow = existingByNumber.get(expectedRow.checkpoint_number);
+
+    if (!oldRow) {
+      missing.push(expectedRow);
+      continue;
+    }
+
+    // Selaraskan batas tahap yang lama, tetapi pertahankan progres kelulusan.
+    const needsUpdate =
+      Number(oldRow.start_order_sequence) !== expectedRow.start_order_sequence ||
+      Number(oldRow.end_order_sequence) !== expectedRow.end_order_sequence ||
+      Number(oldRow.passing_score) !== expectedRow.passing_score ||
+      (expectedRow.checkpoint_number === 1 && !oldRow.unlocked_at);
+
+    if (needsUpdate) {
+      const updatePayload: Record<string, unknown> = {
+        start_order_sequence: expectedRow.start_order_sequence,
+        end_order_sequence: expectedRow.end_order_sequence,
+        passing_score: expectedRow.passing_score,
+        updated_at: now,
+      };
+      if (expectedRow.checkpoint_number === 1 && !oldRow.unlocked_at) {
+        updatePayload.unlocked_at = now;
+      }
+
+      const { error: updateError } = await admin
+        .from("learning_path_checkpoints")
+        .update(updatePayload)
+        .eq("id", oldRow.id)
+        .eq("user_id", userId)
+        .eq("learning_path_id", learningPathId);
+
+      if (updateError) throw updateError;
+    }
+  }
+
+  if (missing.length) {
+    const { error: insertError } = await admin
+      .from("learning_path_checkpoints")
+      .insert(missing);
+
+    if (insertError) throw insertError;
+  }
+
+  // Kembalikan jumlah checkpoint yang seharusnya ada.
+  return expected.length;
+}
+
 function isUuid(value: unknown): value is string {
   return (
     typeof value === "string" &&
@@ -250,12 +381,34 @@ Deno.serve(async (req) => {
     if (existingPathError) throw existingPathError;
 
     if (existingPath) {
+      // Perbaiki checkpoint yang hilang pada learning path lama juga.
+      const checkpointsCount = await ensureLearningPathCheckpoints(
+        admin,
+        user.id,
+        existingPath.id,
+      );
+
+      const { error: readyExistingError } = await admin
+        .from("learning_goals")
+        .update({
+          status: "ready",
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", goalId)
+        .eq("user_id", user.id);
+
+      if (readyExistingError) throw readyExistingError;
+
       return jsonResponse({
         success: true,
         already_exists: true,
         learning_path_id: existingPath.id,
         title: existingPath.title,
         status: existingPath.status,
+        checkpoints_count: checkpointsCount,
+        checkpoint_size: CHECKPOINT_SIZE,
+        checkpoints_repaired: true,
       });
     }
 
@@ -533,7 +686,14 @@ Format:
       if (prerequisiteError) throw prerequisiteError;
     }
 
-    // 10. Tandai goal siap.
+    // 10. Buat checkpoint otomatis setelah seluruh tahap dan prasyarat tersimpan.
+    const checkpointsCount = await ensureLearningPathCheckpoints(
+      admin,
+      user.id,
+      savedPath.id,
+    );
+
+    // 11. Tandai goal siap setelah path, tahap, prasyarat, dan checkpoint tersimpan.
     const { error: readyError } = await admin
       .from("learning_goals")
       .update({
@@ -553,6 +713,9 @@ Format:
       title: savedPath.title,
       status: savedPath.status,
       steps_count: savedSteps.length,
+      checkpoints_count: checkpointsCount,
+      checkpoint_size: CHECKPOINT_SIZE,
+      passing_score: CHECKPOINT_PASSING_SCORE,
     });
   } catch (error) {
     console.error("generate-learning-path error:", error);

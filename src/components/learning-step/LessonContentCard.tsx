@@ -39,18 +39,19 @@ export default function LessonContentCard({
     );
   }
 
-  // Lindungi komponen dari struktur materi AI yang tidak lengkap.
   const paragraphs = Array.isArray(section?.paragraphs)
     ? section.paragraphs.filter(
         (paragraph): paragraph is string =>
-          typeof paragraph === "string" && paragraph.trim().length > 0,
+          typeof paragraph === "string" &&
+          paragraph.trim().length > 0,
       )
     : [];
 
   const bullets = Array.isArray(section?.bullets)
     ? section.bullets.filter(
         (bullet): bullet is string =>
-          typeof bullet === "string" && bullet.trim().length > 0,
+          typeof bullet === "string" &&
+          bullet.trim().length > 0,
       )
     : [];
 
@@ -58,6 +59,9 @@ export default function LessonContentCard({
     typeof section?.title === "string" && section.title.trim()
       ? section.title
       : `Bagian ${activeSection + 1}`;
+
+  const isLastSection =
+    totalSections > 0 && activeSection >= totalSections - 1;
 
   const SectionIcon =
     activeSection === 0
@@ -198,22 +202,17 @@ export default function LessonContentCard({
           Bagian sebelumnya
         </button>
 
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={completed}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#7653c5] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#6542b4] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {activeSection < totalSections - 1
-            ? "Bagian berikutnya"
-            : "Tandai tahap selesai"}
-
-          {activeSection < totalSections - 1 ? (
+        {!isLastSection && (
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={completed}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#7653c5] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#6542b4] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Bagian berikutnya
             <ArrowRight className="h-4 w-4" />
-          ) : (
-            <CheckCircle2 className="h-4 w-4" />
-          )}
-        </button>
+          </button>
+        )}
       </div>
     </article>
   );

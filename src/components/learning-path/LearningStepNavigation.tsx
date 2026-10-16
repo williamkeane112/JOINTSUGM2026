@@ -1,5 +1,11 @@
 
-import { ArrowRight, Check, LoaderCircle, Play } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  LoaderCircle,
+  Play,
+} from "lucide-react";
 import type { LearningPathStep } from "../../types/learning-path";
 
 interface Props {
@@ -27,10 +33,21 @@ export default function LearningStepNavigation({
 
   if (step.status === "completed") {
     return (
-      <span className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
-        <Check className="h-4 w-4" />
-        Sudah selesai
-      </span>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700">
+          <Check className="h-4 w-4" />
+          Sudah selesai
+        </span>
+
+        <button
+          type="button"
+          onClick={onOpen}
+          className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-sm font-semibold text-violet-700 transition hover:bg-violet-50"
+        >
+          <BookOpen className="h-4 w-4" />
+          Baca ulang materi
+        </button>
+      </div>
     );
   }
 
@@ -41,7 +58,7 @@ export default function LearningStepNavigation({
           type="button"
           disabled={loading}
           onClick={onStart}
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <LoaderCircle className="h-4 w-4 animate-spin" />
@@ -55,7 +72,7 @@ export default function LearningStepNavigation({
           <button
             type="button"
             onClick={onOpen}
-            className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 px-4 py-2.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 px-4 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
           >
             Lanjutkan materi
             <ArrowRight className="h-4 w-4" />
@@ -65,7 +82,7 @@ export default function LearningStepNavigation({
             type="button"
             disabled={loading}
             onClick={onComplete}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <LoaderCircle className="h-4 w-4 animate-spin" />

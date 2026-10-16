@@ -161,8 +161,16 @@ export default function LearningGoalDetail() {
     });
   }
 
+
 const handleGeneratePath = useCallback(async () => {
-  if (!id || !assessment || pathGenerated || generatingPath) {
+  // Jangan generate jika data belum memenuhi syarat.
+  if (
+    !id ||
+    !assessment ||
+    pathGenerated ||
+    inProgressAssessment ||
+    generatingPath
+  ) {
     return;
   }
 
@@ -172,10 +180,10 @@ const handleGeneratePath = useCallback(async () => {
   try {
     await generateLearningPath(id);
 
-    // Muat ulang data halaman dari Supabase.
+    // Ambil ulang status terbaru dari Supabase.
     await reload();
 
-    // Perbarui riwayat kuis tanpa memblokir UI.
+    // Muat ulang riwayat tanpa memblokir halaman.
     void loadQuizHistory();
   } catch (err: unknown) {
     console.error("Gagal membuat learning path:", err);
@@ -183,7 +191,7 @@ const handleGeneratePath = useCallback(async () => {
     setPathGenerationError(
       err instanceof Error
         ? err.message
-        : "Terjadi kesalahan saat membuat learning path."
+        : "Terjadi kesalahan saat membuat learning path.",
     );
   } finally {
     setGeneratingPath(false);
@@ -192,6 +200,7 @@ const handleGeneratePath = useCallback(async () => {
   id,
   assessment,
   pathGenerated,
+  inProgressAssessment,
   generatingPath,
   reload,
   loadQuizHistory,

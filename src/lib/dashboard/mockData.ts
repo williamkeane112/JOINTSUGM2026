@@ -66,8 +66,11 @@ export const mockDashboardData: DashboardData = {
   stats: {
     totalTopics: 5,
     completedTopics: 1,
+    inProgressTopics: 2,
+    notStartedTopics: 2,
     masteryPercentage: 68,
     totalSessions: 12,
+    streakDays: 0,
   },
 
   topics: demoTopics,
@@ -101,8 +104,11 @@ export function getMockDashboard(
       stats: {
         totalTopics: 0,
         completedTopics: 0,
+        inProgressTopics: 0,
+        notStartedTopics: 0,
         masteryPercentage: 0,
         totalSessions: 0,
+        streakDays: 0,
       },
       topics: [],
       masteryHistory: [],

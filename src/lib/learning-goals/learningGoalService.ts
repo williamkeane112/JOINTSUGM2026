@@ -10,7 +10,7 @@ export async function getLearningGoalDetail(
     completedAssessmentResult,
     pathResult,
   ] = await Promise.all([
-    // 1. Ambil detail tujuan belajar
+    // 1. Detail tujuan belajar
     supabase
       .from("learning_goals")
       .select("*")
@@ -18,7 +18,7 @@ export async function getLearningGoalDetail(
       .eq("user_id", userId)
       .maybeSingle(),
 
-    // 2. Ambil kuis yang masih berjalan
+    // 2. Asesmen yang masih berjalan
     supabase
       .from("diagnostic_assessments")
       .select("*")
@@ -28,7 +28,7 @@ export async function getLearningGoalDetail(
       .order("created_at", { ascending: false })
       .limit(1),
 
-    // 3. Ambil evaluasi terakhir yang sudah selesai
+    // 3. Asesmen terakhir yang selesai
     supabase
       .from("diagnostic_assessments")
       .select("*")
@@ -39,7 +39,7 @@ export async function getLearningGoalDetail(
       .order("created_at", { ascending: false })
       .limit(1),
 
-    // 4. Ambil learning path
+    // 4. Learning path terbaru
     supabase
       .from("learning_paths")
       .select("*")
@@ -69,19 +69,21 @@ export async function getLearningGoalDetail(
   const completedAssessment =
     completedAssessmentResult.data?.[0] ?? null;
 
+  const learningPath = pathResult.data?.[0] ?? null;
+
   return {
     goal: goalResult.data,
 
-    // Pertahankan properti assessment untuk kompatibilitas
-    // dengan komponen yang sudah menggunakan properti ini.
+    // Pertahankan untuk kompatibilitas komponen lama
     assessment: completedAssessment,
-
-    // Asesmen yang belum selesai untuk tombol Lanjutkan Kuis.
-    inProgressAssessment,
-
-    // Asesmen selesai untuk menampilkan hasil evaluasi.
     completedAssessment,
+    inProgressAssessment,
+    learningPath,
 
-    learningPath: pathResult.data?.[0] ?? null,
+    // Status eksplisit untuk penguncian asesmen
+    hasLearningPath: Boolean(learningPath),
+
+    // Status eksplisit untuk tombol mulai/lanjutkan kuis
+    hasInProgressAssessment: Boolean(inProgressAssessment),
   };
 }

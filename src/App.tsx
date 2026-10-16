@@ -12,6 +12,7 @@ import LearningGoalDetail from "./page/learning/LearningGoalDetail";
 import DiagnosticQuiz from "./page/learning/diagnostic/DiagnosticQuiz";
 import LearningPathPage from "./page/learning/LearningPathPage";
 import LearningStepPage from "./page/learning/LearningStepPage";
+import CheckpointQuizPage from "./page/learning/CheckpointQuizPage";
 
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/learning-goals/:id/diagnostic" element={<DiagnosticQuiz />} />
           <Route path="/learning-path/:id" element={<LearningPathPage />} />
           <Route path="/learning-path/:id/steps/:stepId" element={<LearningStepPage />} />
+          <Route path="/learning-path/:id/checkpoint/:checkpointNumber" element={<CheckpointQuizPage />} />
         </Route>
         {/* if link not found navigate to /dashboard */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

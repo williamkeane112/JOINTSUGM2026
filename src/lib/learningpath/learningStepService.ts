@@ -1,15 +1,29 @@
 
 import { supabase } from "../supabaseClient";
+
 import type {
   LearningPathStep,
   LearningStepStatus,
 } from "../../types/learning-path";
 
+type LearningPathCheckpoint = {
+  id: string;
+  user_id: string;
+  learning_path_id: string;
+  checkpoint_number: number;
+  start_order_sequence: number;
+  end_order_sequence: number;
+  passing_score: number;
+  best_score: number | null;
+  passed_at: string | null;
+  unlocked_at: string | null;
+};
+
 /**
  * Mengambil seluruh tahap belajar berdasarkan learning path.
  */
 export async function getLearningSteps(
-  learningPathId: string
+  learningPathId: string,
 ): Promise<LearningPathStep[]> {
   if (!learningPathId) {
     throw new Error("ID learning path tidak ditemukan.");
@@ -32,8 +46,12 @@ export async function getLearningSteps(
  * Mengambil satu tahap belajar berdasarkan ID.
  */
 export async function getLearningStep(
-  stepId: string
+  stepId: string,
 ): Promise<LearningPathStep> {
+  if (!stepId) {
+    throw new Error("ID tahap belajar tidak ditemukan.");
+  }
+
   const { data, error } = await supabase
     .from("learning_path_steps")
     .select("*")
@@ -52,12 +70,92 @@ export async function getLearningStep(
 }
 
 /**
+ * Mengambil checkpoint yang sudah dibuat oleh generator learning path.
+ *
+ * Penting:
+ * - Frontend hanya membaca checkpoint.
+ * - Frontend tidak membuat checkpoint karena INSERT dibatasi RLS.
+ * - Checkpoint yang belum tersedia harus dibuat oleh proses generator
+ *   di backend/Edge Function.
+ */
+async function getLearningPathCheckpoint(
+  userId: string,
+  learningPathId: string,
+  orderSequence: number,
+): Promise<LearningPathCheckpoint> {
+  if (orderSequence <= 0 || orderSequence % 3 !== 0) {
+    throw new Error("Nomor tahap bukan batas checkpoint yang valid.");
+  }
+
+  const checkpointNumber = Math.floor(orderSequence / 3);
+
+  const { data, error } = await supabase
+    .from("learning_path_checkpoints")
+    .select(
+      [
+        "id",
+        "user_id",
+        "learning_path_id",
+        "checkpoint_number",
+        "start_order_sequence",
+        "end_order_sequence",
+        "passing_score",
+        "best_score",
+        "passed_at",
+        "unlocked_at",
+      ].join(", "),
+    )
+    .eq("user_id", userId)
+    .eq("learning_path_id", learningPathId)
+    .eq("checkpoint_number", checkpointNumber)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Gagal mengambil checkpoint:", error);
+
+    throw new Error(
+      `Gagal membaca checkpoint tahap ${orderSequence}: ${error.message}. ` +
+        "Pastikan sesi login valid dan policy SELECT RLS mengizinkan " +
+        "pengguna membaca checkpoint miliknya.",
+    );
+  }
+
+  if (!data) {
+    throw new Error(
+      `Checkpoint untuk tahap ${orderSequence} belum tersedia. ` +
+        "Checkpoint harus dibuat oleh generator learning path di backend. " +
+        "Silakan buat atau perbaiki checkpoint melalui proses generator, " +
+        "kemudian muat ulang halaman.",
+    );
+  }
+
+  const checkpoint = data as LearningPathCheckpoint;
+
+  if (
+    checkpoint.user_id !== userId ||
+    checkpoint.learning_path_id !== learningPathId
+  ) {
+    throw new Error(
+      "Checkpoint tidak cocok dengan pengguna atau learning path aktif.",
+    );
+  }
+
+  if (checkpoint.end_order_sequence !== orderSequence) {
+    throw new Error(
+      `Konfigurasi checkpoint ${checkpointNumber} tidak sesuai dengan ` +
+        `tahap ${orderSequence}.`,
+    );
+  }
+
+  return checkpoint;
+}
+
+/**
  * Memulai tahap belajar.
  * Tahap locked tidak boleh dimulai.
  */
-
 export async function startLearningStep(
-  stepId: string
+  stepId: string,
 ): Promise<LearningPathStep> {
   if (!stepId) {
     throw new Error("ID tahap belajar tidak ditemukan.");
@@ -69,13 +167,16 @@ export async function startLearningStep(
     throw new Error("Selesaikan tahap sebelumnya terlebih dahulu.");
   }
 
-  if (step.status === "completed" || step.status === "in_progress") {
+  if (
+    step.status === "completed" ||
+    step.status === "in_progress"
+  ) {
     return step;
   }
 
   if (step.status !== "available") {
     throw new Error(
-      `Tahap tidak dapat dimulai. Status saat ini: ${step.status}.`
+      `Tahap tidak dapat dimulai. Status saat ini: ${step.status}.`,
     );
   }
 
@@ -88,10 +189,8 @@ export async function startLearningStep(
     .maybeSingle();
 
   if (error) {
-    console.error("Gagal update status tahap:", error);
-
     throw new Error(
-      `Gagal memulai tahap belajar: ${error.message}`
+      `Gagal memulai tahap belajar: ${error.message}`,
     );
   }
 
@@ -99,7 +198,6 @@ export async function startLearningStep(
     return data as LearningPathStep;
   }
 
-  // Update tidak mengembalikan baris: periksa status terbaru.
   const latestStep = await getLearningStep(stepId);
 
   if (
@@ -115,42 +213,181 @@ export async function startLearningStep(
 
   throw new Error(
     "Status tahap tidak berubah. Periksa kebijakan UPDATE RLS " +
-    "pada tabel learning_path_steps di Supabase."
+      "pada tabel learning_path_steps di Supabase.",
   );
 }
 
+/**
+ * Membuka tahap berikutnya jika tahap saat ini selesai
+ * dan checkpoint (jika ada) sudah lulus.
+ */
+async function unlockNextLearningStep(
+  learningPathId: string,
+  currentOrderSequence: number,
+): Promise<LearningPathStep | null> {
+  const { data: nextStep, error: nextError } = await supabase
+    .from("learning_path_steps")
+    .select("*")
+    .eq("learning_path_id", learningPathId)
+    .eq("order_sequence", currentOrderSequence + 1)
+    .maybeSingle();
+
+  if (nextError) {
+    throw new Error(
+      `Gagal mengambil tahap berikutnya: ${nextError.message}`,
+    );
+  }
+
+  if (!nextStep) {
+    return null;
+  }
+
+  if (nextStep.status !== "locked") {
+    return nextStep as LearningPathStep;
+  }
+
+  const { data: unlocked, error: unlockError } = await supabase
+    .from("learning_path_steps")
+    .update({ status: "available" })
+    .eq("id", nextStep.id)
+    .eq("status", "locked")
+    .select("*")
+    .maybeSingle();
+
+  if (unlockError) {
+    throw new Error(
+      `Gagal membuka tahap berikutnya: ${unlockError.message}`,
+    );
+  }
+
+  if (unlocked) {
+    return unlocked as LearningPathStep;
+  }
+
+  // Mungkin sudah dibuka oleh request lain.
+  const { data: latestNextStep, error: latestError } = await supabase
+    .from("learning_path_steps")
+    .select("*")
+    .eq("id", nextStep.id)
+    .maybeSingle();
+
+  if (latestError) {
+    throw new Error(
+      `Gagal memeriksa status tahap berikutnya: ${latestError.message}`,
+    );
+  }
+
+  return (latestNextStep as LearningPathStep | null) ?? null;
+}
+
+/**
+ * Memperbarui status learning path menjadi completed
+ * jika seluruh tahap sudah selesai.
+ */
+async function updateLearningPathCompletion(
+  learningPathId: string,
+): Promise<void> {
+  const { data: remainingSteps, error: remainingError } = await supabase
+    .from("learning_path_steps")
+    .select("id")
+    .eq("learning_path_id", learningPathId)
+    .neq("status", "completed");
+
+  if (remainingError) {
+    throw new Error(
+      `Gagal memeriksa progres akhir: ${remainingError.message}`,
+    );
+  }
+
+  if (remainingSteps && remainingSteps.length > 0) {
+    return;
+  }
+
+  const { error: pathError } = await supabase
+    .from("learning_paths")
+    .update({ status: "completed" })
+    .eq("id", learningPathId);
+
+  if (pathError) {
+    throw new Error(
+      `Semua tahap selesai, tetapi status learning path gagal diperbarui: ` +
+        pathError.message,
+    );
+  }
+}
 
 /**
  * Menyelesaikan tahap belajar dan membuka tahap berikutnya.
  *
- * Catatan:
- * Untuk konsistensi ketika beberapa pengguna melakukan aksi bersamaan,
- * proses ini sebaiknya dipindahkan ke PostgreSQL RPC transaction.
+ * Pada tahap 3, 6, 9, dan seterusnya, checkpoint harus sudah ada.
+ * Jika checkpoint belum lulus, tahap berikutnya tetap terkunci.
  */
 export async function completeLearningStep(
-  stepId: string
+  stepId: string,
 ): Promise<{
   completedStep: LearningPathStep;
   unlockedStep: LearningPathStep | null;
 }> {
+  if (!stepId) {
+    throw new Error("ID tahap belajar tidak ditemukan.");
+  }
+
   const step = await getLearningStep(stepId);
 
   if (step.status === "locked") {
     throw new Error("Tahap ini masih terkunci.");
   }
 
-  if (step.status === "completed") {
-    const steps = await getLearningSteps(step.learning_path_id);
-    const next = steps.find(
-      (item) =>
-        item.order_sequence === step.order_sequence + 1 &&
-        item.status !== "locked"
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error(
+      "Sesi login tidak ditemukan. Silakan login kembali.",
     );
+  }
+
+  const isCheckpointBoundary =
+    step.order_sequence > 0 &&
+    step.order_sequence % 3 === 0;
+
+  let checkpointPassed = false;
+
+  if (isCheckpointBoundary) {
+    const checkpoint = await getLearningPathCheckpoint(
+      user.id,
+      step.learning_path_id,
+      step.order_sequence,
+    );
+
+    checkpointPassed = Boolean(checkpoint.passed_at);
+  }
+
+  // Jika tahap sudah selesai, jangan mengulang update.
+  if (step.status === "completed") {
+    let unlockedStep: LearningPathStep | null = null;
+
+    if (!isCheckpointBoundary || checkpointPassed) {
+      unlockedStep = await unlockNextLearningStep(
+        step.learning_path_id,
+        step.order_sequence,
+      );
+    }
+
+    await updateLearningPathCompletion(step.learning_path_id);
 
     return {
       completedStep: step,
-      unlockedStep: next ?? null,
+      unlockedStep,
     };
+  }
+
+  if (!["available", "in_progress"].includes(step.status)) {
+    throw new Error(
+      `Tahap tidak dapat diselesaikan. Status: ${step.status}.`,
+    );
   }
 
   const { data: completedData, error: completeError } = await supabase
@@ -163,93 +400,64 @@ export async function completeLearningStep(
 
   if (completeError) {
     throw new Error(
-      `Gagal menyelesaikan tahap: ${completeError.message}`
+      `Gagal menyelesaikan tahap: ${completeError.message}`,
     );
   }
 
   if (!completedData) {
-    throw new Error(
-      "Status tahap berubah atau tahap tidak dapat diselesaikan."
-    );
+    // Periksa apakah request lain sudah menyelesaikan tahap.
+    const latestStep = await getLearningStep(stepId);
+
+    if (latestStep.status !== "completed") {
+      throw new Error(
+        "Tahap tidak berubah. Muat ulang halaman dan coba kembali.",
+      );
+    }
+
+    const canUnlock =
+      !isCheckpointBoundary || checkpointPassed;
+
+    const unlockedStep = canUnlock
+      ? await unlockNextLearningStep(
+          latestStep.learning_path_id,
+          latestStep.order_sequence,
+        )
+      : null;
+
+    await updateLearningPathCompletion(latestStep.learning_path_id);
+
+    return {
+      completedStep: latestStep,
+      unlockedStep,
+    };
   }
 
   const completedStep = completedData as LearningPathStep;
-
-  const { data: nextStep, error: nextError } = await supabase
-    .from("learning_path_steps")
-    .select("*")
-    .eq("learning_path_id", step.learning_path_id)
-    .eq("order_sequence", step.order_sequence + 1)
-    .maybeSingle();
-
-  if (nextError) {
-    throw new Error(
-      `Tahap selesai, tetapi tahap berikutnya gagal diambil: ${nextError.message}`
-    );
-  }
-
   let unlockedStep: LearningPathStep | null = null;
 
-  if (nextStep && nextStep.status === "locked") {
-    const { data: unlockedData, error: unlockError } = await supabase
-      .from("learning_path_steps")
-      .update({ status: "available" })
-      .eq("id", nextStep.id)
-      .eq("status", "locked")
-      .select("*")
-      .maybeSingle();
-
-    if (unlockError) {
-      throw new Error(
-        `Tahap selesai, tetapi gagal membuka tahap berikutnya: ${unlockError.message}`
-      );
-    }
-
-    unlockedStep = unlockedData
-      ? (unlockedData as LearningPathStep)
-      : null;
-  } else if (nextStep) {
-    unlockedStep = nextStep as LearningPathStep;
-  }
-
-  // Jika seluruh tahap selesai, tandai learning path sebagai completed.
-  const { data: remainingSteps, error: remainingError } = await supabase
-    .from("learning_path_steps")
-    .select("id")
-    .eq("learning_path_id", step.learning_path_id)
-    .neq("status", "completed");
-
-  if (remainingError) {
-    throw new Error(
-      `Tahap selesai, tetapi progres akhir gagal diperiksa: ${remainingError.message}`
+  if (!isCheckpointBoundary || checkpointPassed) {
+    unlockedStep = await unlockNextLearningStep(
+      completedStep.learning_path_id,
+      completedStep.order_sequence,
     );
   }
 
-  if (!remainingSteps || remainingSteps.length === 0) {
-    const { error: pathError } = await supabase
-      .from("learning_paths")
-      .update({ status: "completed" })
-      .eq("id", step.learning_path_id);
+  await updateLearningPathCompletion(completedStep.learning_path_id);
 
-    if (pathError) {
-      throw new Error(
-        `Semua tahap selesai, tetapi status learning path gagal diperbarui: ${pathError.message}`
-      );
-    }
-  }
-
-  return { completedStep, unlockedStep };
+  return {
+    completedStep,
+    unlockedStep,
+  };
 }
 
 /**
  * Mengubah status tahap.
- *
  * Gunakan startLearningStep() dan completeLearningStep()
  * untuk alur belajar normal.
  */
 export async function updateLearningStepStatus(
   stepId: string,
-  status: LearningStepStatus
+  status: LearningStepStatus,
 ): Promise<LearningPathStep> {
   if (status === "completed") {
     const result = await completeLearningStep(stepId);
@@ -274,7 +482,9 @@ export async function updateLearningStepStatus(
     .single();
 
   if (error) {
-    throw new Error(`Gagal memperbarui status tahap: ${error.message}`);
+    throw new Error(
+      `Gagal memperbarui status tahap: ${error.message}`,
+    );
   }
 
   return data as LearningPathStep;

@@ -59,6 +59,40 @@ export interface DashboardSourceData {
   progressRows: StepProgressRow[];
   masteryRows: MasteryRow[];
   quizAttemptsCount: number;
+  streakDays: number;
+}
+
+function calculateStreakDays(attemptedAtValues: string[]): number {
+  if (attemptedAtValues.length === 0) return 0;
+
+  const dayKey = (value: string): string => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  };
+
+  const uniqueDays = [...new Set(attemptedAtValues.map(dayKey).filter(Boolean))]
+    .sort((a, b) => b.localeCompare(a));
+  if (uniqueDays.length === 0) return 0;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const keyForDate = (date: Date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+  const newestDay = uniqueDays[0];
+  if (newestDay !== keyForDate(today) && newestDay !== keyForDate(yesterday)) return 0;
+
+  let streak = 0;
+  const cursor = new Date(`${newestDay}T12:00:00`);
+  for (const recordedDay of uniqueDays) {
+    if (recordedDay !== keyForDate(cursor)) break;
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
 }
 
 function throwIfError(
@@ -194,13 +228,21 @@ export async function fetchDashboardData(): Promise<DashboardSourceData> {
 
       supabase
         .from("quiz_attempts")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id),
+        .select("attempted_at")
+        .eq("user_id", user.id)
+        .order("attempted_at", { ascending: false }),
     ]);
 
   throwIfError(progressResult.error);
   throwIfError(masteryResult.error);
   throwIfError(quizResult.error);
+
+  const quizAttemptDates = (quizResult.data ?? [])
+    .map((row) => row.attempted_at as string)
+    .filter((value) => Boolean(value));
+
+  // Hitung streak berdasarkan hari kalender lokal dari aktivitas menjawab kuis.
+  const streakDays = calculateStreakDays(quizAttemptDates);
 
   return {
     userId: user.id,
@@ -213,6 +255,7 @@ export async function fetchDashboardData(): Promise<DashboardSourceData> {
       (progressResult.data ?? []) as StepProgressRow[],
     masteryRows:
       (masteryResult.data ?? []) as MasteryRow[],
-    quizAttemptsCount: quizResult.count ?? 0,
+    quizAttemptsCount: quizAttemptDates.length,
+    streakDays,
   };
 }
