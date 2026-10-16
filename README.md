@@ -61,6 +61,7 @@ npx supabase link --project-ref PROJECT_REF
 ```
 Untuk mencari project ref perlu membuat supabase terlebih dahulu lalu pergi ke **Project Settings -> general**
 <img width="979" height="655" alt="image" src="https://github.com/user-attachments/assets/0621c70e-ecef-4c4e-80f3-6fa8c45eac6b" />
+disana akan terlihat Project ID dan bisa di copy
 
 
 Ganti `PROJECT_REF` dengan project reference dari Supabase Dashboard.
