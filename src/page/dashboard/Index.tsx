@@ -51,9 +51,6 @@ export default function Index() {
         mappedData.streakDays,
       );
 
-      // topicId dari recommendation merupakan ID learning goal.
-      const learningGoalId = dashboardBase.recommendation?.topicId;
-
     const dashboardData: DashboardPageData = {
         ...dashboardBase,
         skillNetwork: mappedData.skillNetwork ?? [],

@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   BookOpen,
   Check,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   Clock3,

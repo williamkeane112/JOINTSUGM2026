@@ -19,7 +19,6 @@ export default function StatsGrid({
   questionsAnswered,
   streakDays = 0,
   inProgressTopics = 0,
-  notStartedTopics = 0,
 }: StatsGridProps) {
   const safeTotal = Math.max(0, Math.floor(totalTopics));
   const safeCompleted = Math.min(

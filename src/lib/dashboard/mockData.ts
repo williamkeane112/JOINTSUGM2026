@@ -60,6 +60,16 @@ const demoTopics: DashboardTopic[] = [
   },
 ];
 
+const demoMasteryHistory = [
+  { label: "Sen", mastery: 35 },
+  { label: "Sel", mastery: 42 },
+  { label: "Rab", mastery: 48 },
+  { label: "Kam", mastery: 45 },
+  { label: "Jum", mastery: 57 },
+  { label: "Sab", mastery: 63 },
+  { label: "Min", mastery: 68 },
+];
+
 export const mockDashboardData: DashboardData = {
   studentName: "Siswa",
 
@@ -75,15 +85,9 @@ export const mockDashboardData: DashboardData = {
 
   topics: demoTopics,
 
-  masteryHistory: [
-    { label: "Sen", mastery: 35 },
-    { label: "Sel", mastery: 42 },
-    { label: "Rab", mastery: 48 },
-    { label: "Kam", mastery: 45 },
-    { label: "Jum", mastery: 57 },
-    { label: "Sab", mastery: 63 },
-    { label: "Min", mastery: 68 },
-  ],
+  masteryHistory: demoMasteryHistory,
+
+  skillNetwork: demoMasteryHistory,
 
   recommendation: {
     topicId: "topic-1",
@@ -96,11 +100,12 @@ export const mockDashboardData: DashboardData = {
 };
 
 export function getMockDashboard(
-  demo?: string | null
+  demo?: string | null,
 ): DashboardData {
   if (demo === "empty") {
     return {
       studentName: "Siswa",
+
       stats: {
         totalTopics: 0,
         completedTopics: 0,
@@ -110,8 +115,10 @@ export function getMockDashboard(
         totalSessions: 0,
         streakDays: 0,
       },
+
       topics: [],
       masteryHistory: [],
+      skillNetwork: [],
       recommendation: null,
     };
   }

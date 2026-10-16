@@ -18,17 +18,12 @@ export default function ActivityOverview({
   notStartedTopics,
   totalQuestions,
   streakDays,
-  masteryPercentage = 0,
 }: ActivityOverviewProps) {
   const total = Math.max(0, totalTopics);
   const completed = Math.max(0, completedTopics);
   const inProgress = Math.max(0, inProgressTopics);
   const notStarted = Math.max(0, notStartedTopics);
 
-  const mastery = Math.min(
-    100,
-    Math.max(0, Math.round(masteryPercentage))
-  );
 
   const completionRate =
     total > 0

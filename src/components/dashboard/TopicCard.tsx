@@ -58,7 +58,6 @@ export default function TopicCard({
   description = "Pelajari materi ini secara bertahap sesuai kemampuanmu.",
   progress = 0,
   status = "not_started",
-  href,
 }: TopicCardProps) {
   const safeProgress = Math.min(100, Math.max(0, progress));
   const config = statusConfig[status];

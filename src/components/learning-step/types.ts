@@ -1,9 +1,9 @@
-export type LessonSection = {
+export interface LessonSection {
   title: string;
-  paragraphs: string[];
+  paragraphs?: string[];
   bullets?: string[];
-};
-
+  example?: string;
+}
 export type LessonStep = {
   id: string;
   title: string;

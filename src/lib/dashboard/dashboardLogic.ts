@@ -71,13 +71,14 @@ export function buildDashboardData(
     studentName,
     topics,
     masteryHistory,
+    skillNetwork: masteryHistory,
     stats: {
       totalTopics,
       completedTopics,
       inProgressTopics,
       notStartedTopics,
       masteryPercentage: calculateMasteryPercentage(masteryHistory),
-      // This value is the number of quiz attempts, not learning sessions.
+      // Jumlah percobaan kuis, bukan jumlah sesi belajar.
       totalSessions: Math.max(
         0,
         Number.isFinite(totalSessions) ? Math.floor(totalSessions) : 0,

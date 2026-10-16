@@ -1,5 +1,5 @@
 
-import { BookOpen, SearchX, Sparkles } from "lucide-react";
+import { SearchX, Sparkles } from "lucide-react";
 import TopicCard from "./TopicCard";
 import TopicGridSkeleton from "./TopicGridSkeleton";
 import type {
