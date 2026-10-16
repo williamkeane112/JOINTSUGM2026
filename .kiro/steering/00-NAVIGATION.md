@@ -113,4 +113,4 @@ Jika file menyebut "Ref: ...", cek:
 
 ---
 
-*Last updated: 2026-10-14 (ditambah: scripts/screenshot.mjs, docs/superpowers/plans; baca bagian "Ringkasan sesi 2026-10-14" di session-progress.md dulu)*
+*Last updated: 2026-10-15. Tambahan: `supabase-db-model.md` (DB aktual, menggantikan `02-database-schema.md` yang usang), `docs/superpowers/plans/` (dashboard v1, v2, scale-down, navbar-explore-card), `scripts/screenshot.mjs` (metrik: tinggi, teks <12px, target sentuh, navOffset). Baca bagian paling bawah `session-progress.md` dulu.*

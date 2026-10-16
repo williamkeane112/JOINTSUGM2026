@@ -1,7 +1,5 @@
-function Index() {
-  return (
-    <div>Ini landing page biasa aja</div>
-  )
-}
+import LandingPage from "./landing/LandingPage";
 
-export default Index
+export default function Index() {
+  return <LandingPage />;
+}

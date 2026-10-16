@@ -7,7 +7,7 @@
 **USP**: Dua siswa dengan kemampuan berbeda mendapatkan jalur pembelajaran yang berbeda - bukan sekadar chatbot, tetapi sistem yang secara aktif menyesuaikan pembelajaran.
 
 **Timeline**: 4 minggu MVP development
-**Subject**: Matematika SMP (3-5 topik untuk MVP)
+**Subject**: Multi-kategori (Pemrograman, pelajaran SMP/SMA, dll.) — seed "sedikit tapi dalam" per topik (keputusan 2026-10-15; contoh lama/hardcoded: Matematika SMP 3-5 topik)
 **Architecture**: Full Supabase (Backend as a Service)
 
 ---
@@ -728,7 +728,7 @@ supabase gen types typescript --local > src/lib/types.ts
 
 ## What NOT to Build (Skip for MVP)
 
-❌ Multiple subjects (stick to Matematika only)
+❌ Topik/kategori yang belum lengkap isinya (seed "sedikit tapi dalam"; multi-kategori boleh, tapi tidak ditampilkan/ditandai "segera hadir" sampai lengkap — keputusan 2026-10-15)
 ❌ Complex gamification (XP, leaderboard, badges)
 ❌ Teacher dashboard (focus on student view)
 ❌ Video call features
