@@ -16,7 +16,7 @@ Pastikan sudah tersedia:
 - jalankan git clone
 ```bash
 git clone link repo
-``
+```
 lalu npm install
 ```bash
 npm install
