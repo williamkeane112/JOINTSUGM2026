@@ -11,6 +11,7 @@ Pastikan sudah tersedia:
 - Proyek Supabase yang aktif
 - Folder `supabase/` di root proyek
 - Akses ke proyek Supabase dan kredensial yang diperluka
+- install Extension **Deno** di vsc
 
 ## 2. Inisialisai Awal
 - jalankan git clone
@@ -89,4 +90,21 @@ Jika perubahan yang akan diterapkan sudah benar, jalankan:
 npx supabase db push
 ```
 
+## 8. mematikan Email Verification
+Di supabase Pergi ke **Authentication → Sign In / Providers → Email** lalu matin email Confirmation
+
+## 9. menjalankan Edge Function
+di cmd ketik
+```bash
+npx supabase functions deploy
+```
+
+## 10. Ambil api Shiteru AI 
+- pertama login ke https://shiteru.id/app
+- ambil api keynya
+- lalu masukan ke cmd
+```bash
+supabase secrets set SHITERU_API_KEY=isi_api_key_shiteru_kamu --project-ref project_Ref/projectID_supabase
+```
+- lalu masukan tipe model ke cmd
 **Catatan:** Dokumentasi ini mencatat prosedur pengelolaan riwayat migration untuk SkillPath AI. Keberhasilan sinkronisasi tetap harus diverifikasi menggunakan `npx supabase migration list` dan pemeriksaan database.
