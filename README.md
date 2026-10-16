@@ -10,9 +10,19 @@ Pastikan sudah tersedia:
 - Git
 - Proyek Supabase yang aktif
 - Folder `supabase/` di root proyek
-- Akses ke proyek Supabase dan kredensial yang diperlukan
+- Akses ke proyek Supabase dan kredensial yang diperluka
 
-## 2. Instalasi Supabase CLI
+## 2. Inisialisai Awal
+- jalankan git clone
+```bash
+git clone link repo
+``
+lalu npm install
+```bash
+npm install
+```
+
+## 3. Instalasi Supabase CLI
 
 Jika Supabase CLI belum tersedia di proyek, jalankan:
 
@@ -26,7 +36,7 @@ Periksa instalasi:
 npx supabase --version
 ```
 
-## 3. Login ke Supabase
+## 4. Login ke Supabase
 
 Login menggunakan akun Supabase:
 
@@ -42,7 +52,7 @@ npx supabase init
 
 Jangan menjalankan `init` jika proyek sudah memiliki konfigurasi `supabase/config.toml`.
 
-## 4. Hubungkan Proyek Supabase
+## 5. Hubungkan Proyek Supabase
 
 Hubungkan proyek lokal ke database Supabase online:
 
@@ -52,7 +62,7 @@ npx supabase link --project-ref PROJECT_REF
 
 Ganti `PROJECT_REF` dengan project reference dari Supabase Dashboard.
 
-## 5. Periksa Migration
+## 6. Periksa Migration
 
 Tampilkan daftar migration lokal dan remote:
 
@@ -62,7 +72,7 @@ npx supabase migration list
 
 Pastikan timestamp pada nama file sesuai dengan riwayat migration yang tercatat di database remote.
 
-## 6. Menjalankan Migration ke Database Online
+## 7. Menjalankan Migration ke Database Online
 
 Sebelum menerapkan perubahan, simulasikan terlebih dahulu:
 
