@@ -1,6 +1,6 @@
 import { Check, Pause, Play, RotateCcw, X } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
-import { STATUS_COLOR } from "../dashboard/statusStyle";
+import { STATUS_COLOR } from "../../components/LandingPage/statusStyle";
 import SkillPathList from "./SkillPathList";
 import {
   DEMO_FRAME_COUNT,

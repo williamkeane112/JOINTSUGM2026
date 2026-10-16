@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { STATUS_BADGE, STATUS_LABEL } from "../dashboard/statusStyle";
+import { STATUS_BADGE, STATUS_LABEL } from "../../components/LandingPage/statusStyle";
 import type { DemoPath } from "./demoScript";
 
 const ROW_HEIGHT = 56;
