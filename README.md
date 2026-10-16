@@ -1,75 +1,79 @@
-# React + TypeScript + Vite
+# SkillPath AI — Supabase Migration Guide
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Panduan mengelola migration Supabase menggunakan Supabase CLI, termasuk memeriksa status migration, menghapus catatan migration dari database remote, dan menyinkronkan migration lokal dengan database online.
 
-Currently, two official plugins are available:
+## 1. Persyaratan
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Pastikan sudah tersedia:
 
-## React Compiler
+- Node.js dan npm
+- Git
+- Proyek Supabase yang aktif
+- Folder `supabase/` di root proyek
+- Akses ke proyek Supabase dan kredensial yang diperlukan
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 2. Instalasi Supabase CLI
 
-## Expanding the ESLint configuration
+Jika Supabase CLI belum tersedia di proyek, jalankan:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install -D supabase
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Periksa instalasi:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npx supabase --version
 ```
+
+## 3. Login ke Supabase
+
+Login menggunakan akun Supabase:
+
+```bash
+npx supabase login
+```
+
+Jika folder konfigurasi Supabase belum tersedia, inisialisasikan:
+
+```bash
+npx supabase init
+```
+
+Jangan menjalankan `init` jika proyek sudah memiliki konfigurasi `supabase/config.toml`.
+
+## 4. Hubungkan Proyek Supabase
+
+Hubungkan proyek lokal ke database Supabase online:
+
+```bash
+npx supabase link --project-ref PROJECT_REF
+```
+
+Ganti `PROJECT_REF` dengan project reference dari Supabase Dashboard.
+
+## 5. Periksa Migration
+
+Tampilkan daftar migration lokal dan remote:
+
+```bash
+npx supabase migration list
+```
+
+Pastikan timestamp pada nama file sesuai dengan riwayat migration yang tercatat di database remote.
+
+## 6. Menjalankan Migration ke Database Online
+
+Sebelum menerapkan perubahan, simulasikan terlebih dahulu:
+
+```bash
+npx supabase db push --dry-run
+```
+
+Jika perubahan yang akan diterapkan sudah benar, jalankan:
+
+```bash
+npx supabase db push
+```
+
+**Catatan:** Dokumentasi ini mencatat prosedur pengelolaan riwayat migration untuk SkillPath AI. Keberhasilan sinkronisasi tetap harus diverifikasi menggunakan `npx supabase migration list` dan pemeriksaan database.
